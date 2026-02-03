@@ -161,77 +161,56 @@ button:hover { opacity:.9 }
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsPW9z61YYyj7ADp6ec-XfUm4NFoNPtCYglst_6tv6KtgjpIbumukuJGiLOaL5mdv5/exec";
 
-function tambahDesa() {
-  const desa = document.createElement("div");
-  desa.className = "desa";
-  desa.innerHTML = `
-    <label>Desa</label>
-    <input type="text" class="nama-desa" placeholder="Nama Desa">
-
-    <div class="poktanContainer"></div>
-    <button type="button" onclick="tambahPoktan(this)">+ Tambah Poktan</button>
-  `;
-  document.getElementById("desaContainer").appendChild(desa);
-}
-
-function tambahPoktan(btn) {
-  const c = btn.parentElement.querySelector(".poktanContainer");
-  const p = document.createElement("div");
-  p.className = "poktan";
-  p.innerHTML = `
-    <input type="text" placeholder="Nama Poktan">
-    <input type="number" step="0.01" placeholder="Luas (Ha)" oninput="hitung()">
-    <select onchange="hitung()">
-      <option value="reguler">Reguler</option>
-      <option value="oplah">OPLAH</option>
-      <option value="pompa">Pompa</option>
-      <option value="das">DAS</option>
-      <option value="tusip">Tusip</option>
-    </select>
-  `;
-  c.appendChild(p);
-}
-
-function hitung() {
-  let t={reguler:0,oplah:0,pompa:0,das:0,tusip:0};
-  document.querySelectorAll(".poktan").forEach(p=>{
-    const luas=parseFloat(p.children[1].value)||0;
-    t[p.children[2].value]+=luas;
-  });
-  reguler.innerText=t.reguler.toFixed(2);
-  oplah.innerText=t.oplah.toFixed(2);
-  pompa.innerText=t.pompa.toFixed(2);
-  das.innerText=t.das.toFixed(2);
-  tusip.innerText=t.tusip.toFixed(2);
-}
-
 function simpan() {
-  const data = {
-    pelapor: pelapor.value,
-    kecamatan: kecamatan.value,
-    tanggal: tanggal.value,
-    rows:[]
-  };
+  const pelapor   = document.getElementById("pelapor").value.trim();
+  const kecamatan = document.querySelector("select").value;
+  const tanggal   = document.querySelector("input[type=date]").value;
 
-  document.querySelectorAll(".desa").forEach(d=>{
-    const desa=d.querySelector(".nama-desa").value;
-    d.querySelectorAll(".poktan").forEach(p=>{
-      data.rows.push({
+  if (!pelapor || !tanggal) {
+    alert("⚠️ Nama pelapor & tanggal wajib diisi");
+    return;
+  }
+
+  let rows = [];
+
+  document.querySelectorAll(".desa").forEach(desaBox => {
+    const desa = desaBox.querySelector("input").value;
+    desaBox.querySelectorAll(".poktan").forEach(p => {
+      rows.push({
         desa,
-        poktan:p.children[0].value,
-        luas:p.children[1].value,
-        jenis:p.children[2].value
+        poktan: p.children[0].value,
+        luas: p.children[1].value,
+        jenis: p.children[2].value
       });
     });
   });
 
-fetch(SCRIPT_URL, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify(data)
-});
+  if (rows.length === 0) {
+    alert("⚠️ Data belum diisi");
+    return;
+  }
+
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      pelapor,
+      kecamatan,
+      tanggal,
+      rows
+    })
+  })
+  .then(r => r.text())
+  .then(r => {
+    console.log("RESPON:", r);
+    alert("✅ Data berhasil tersimpan");
+  })
+  .catch(err => {
+    console.error(err);
+    alert("❌ Gagal mengirim data");
+  });
 }
 </script>
 </body>
