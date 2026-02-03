@@ -225,8 +225,9 @@ function hitung() {
   tusip.innerText = total.tusip.toFixed(2);
 }
 </script>
-<script>            
+<script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsPW9z61YYyj7ADp6ec-XfUm4NFoNPtCYglst_6tv6KtgjpIbumukuJGiLOaL5mdv5/exec";
+
 function simpan() {
   const kecamatan = document.querySelector("select").value;
   const tanggal = document.querySelector("input[type=date]").value;
@@ -253,20 +254,24 @@ function simpan() {
     return;
   }
 
+  const formData = new URLSearchParams();
+  formData.append("rows", JSON.stringify(rows));
+
   fetch(SCRIPT_URL, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify(rows)
-})
+    method: "POST",
+    body: formData
+  })
   .then(r => r.text())
   .then(r => {
-    console.log(r);
-    alert("✅ Data berhasil tersimpan ke Spreadsheet");
+    console.log("RESPON:", r);
+    if (r.startsWith("OK")) {
+      alert("✅ Data berhasil tersimpan ke Spreadsheet");
+    } else {
+      alert("❌ Server error:\n" + r);
+    }
   })
   .catch(err => {
-    alert("❌ Gagal menyimpan");
+    alert("❌ Gagal menyimpan (network)");
     console.error(err);
   });
 }
