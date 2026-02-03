@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Prototype LTT – Sekali Input Semua Jenis</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background:#f4f6f8;
+  padding:16px;
+  margin:0;
+}
+
+h2,h3 {
+  margin:0 0 10px;
+}
+
+/* HEADER LOGO */
+.header {
+  background:#ffffff;
+  padding:16px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-bottom:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,.06);
+}
+.header img {
+  width:60px;
+}
+.header .title {
+  font-size:16px;
+  font-weight:600;
+}
+.header .subtitle {
+  font-size:13px;
+  color:#6b7280;
+}
+
+/* BOX */
+.box {
+  background:#fff;
+  padding:16px;
+  margin-bottom:16px;
+  border-radius:10px;
+  box-shadow:0 4px 12px rgba(0,0,0,.06);
+}
+
+label {
+  font-size:13px;
+  font-weight:600;
+  display:block;
+  margin-top:12px;
+}
+
+input, select {
+  width:100%;
+  padding:10px 12px;
+  margin-top:6px;
+  border-radius:8px;
+  border:1px solid #cfd6dd;
+  font-size:14px;
+  box-sizing:border-box;
+}
+
+input::placeholder {
+  color:#9ca3af;
+}
+
+button {
+  margin-top:12px;
+  padding:10px 16px;
+  border-radius:8px;
+  border:none;
+  background:#0f766e;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+button:hover { opacity:.9 }
+
+/* DESA */
+.desa {
+  border:1px dashed #b6bec8;
+  padding:14px;
+  margin-top:14px;
+  border-radius:8px;
+  background:#fafafa;
+}
+
+/* POKTAN */
+.poktan {
+  display:grid;
+  grid-template-columns: 1fr 110px 170px;
+  gap:10px;
+  margin-top:10px;
+}
+
+@media (max-width:600px){
+  .poktan {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* REKAP */
+.rekap div {
+  font-size:14px;
+  margin-top:6px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
+  <div>
+    <div class="title">Form LTT Kecamatan - Kabupaten Indragiri Hilir</div>
+    <div class="subtitle">Dinas Pertanian Kabupaten Indragiri Hilir</div>
+  </div>
+</div>
+
+<!-- IDENTITAS -->
+<div class="box">
+  <label>Kecamatan</label>
+  <select>
+    <option>Batang Tuaka</option>
+    <option>Concong</option>
+    <option>Enok</option>
+    <option>Gaung</option>
+    <option>Gaung Anak Serka</option>
+    <option>Kateman</option>
+    <option>Kempas</option>
+    <option>Kemuning</option>
+    <option>Keritang</option>
+    <option>Kuala Indragiri</option>
+    <option>Mandah</option>
+    <option>Pelangiran</option>
+    <option>Pulau Burung</option>
+    <option>Reteh</option>
+    <option>Sungai Batang</option>
+    <option>Tanah Merah</option>
+    <option>Teluk Belengkong</option>
+    <option>Tembilahan</option>
+    <option>Tembilahan Hulu</option>
+    <option>Tempuling</option>
+  </select>
+
+  <label>Tanggal</label>
+  <input type="date">
+</div>
+
+<!-- DESA & POKTAN -->
+<div class="box">
+  <h3>Data Desa & Poktan</h3>
+  <div id="desaContainer"></div>
+  <button onclick="tambahDesa()">+ Tambah Desa</button>
+</div>
+
+<!-- REKAP -->
+<div class="box">
+  <h3>Rekap Otomatis LTT (Preview)</h3>
+  <div class="rekap">
+    <div>LT Padi Reguler : <b id="reguler">0</b> Ha</div>
+    <div>LT OPLAH : <b id="oplah">0</b> Ha</div>
+    <div>LT Pompa : <b id="pompa">0</b> Ha</div>
+    <div>LT DAS/Bendungan : <b id="das">0</b> Ha</div>
+    <div>LT Tusip Sawit/Kelapa : <b id="tusip">0</b> Ha</div>
+  </div>
+</div>
+
+<div class="box">
+  <button onclick="simpan()">Simpan Laporan</button>
+</div>
+
+<script>
+function tambahDesa() {
+  const desa = document.createElement("div");
+  desa.className = "desa";
+  desa.innerHTML = `
+    <label>Desa</label>
+    <input type="text" placeholder="Nama Desa / Kelurahan">
+
+    <div class="poktanContainer"></div>
+    <button type="button" onclick="tambahPoktan(this)">+ Tambah Poktan</button>
+  `;
+  document.getElementById("desaContainer").appendChild(desa);
+}
+
+function tambahPoktan(btn) {
+  const container = btn.parentElement.querySelector(".poktanContainer");
+  const p = document.createElement("div");
+  p.className = "poktan";
+  p.innerHTML = `
+    <input type="text" placeholder="Nama Poktan">
+    <input type="number" step="0.01" placeholder="Luas (Ha)" oninput="hitung()">
+    <select onchange="hitung()">
+      <option value="reguler">Reguler</option>
+      <option value="oplah">OPLAH</option>
+      <option value="pompa">Pompa</option>
+      <option value="das">DAS/Bendungan</option>
+      <option value="tusip">Tusip Sawit/Kelapa</option>
+    </select>
+  `;
+  container.appendChild(p);
+}
+
+function hitung() {
+  let total = { reguler:0, oplah:0, pompa:0, das:0, tusip:0 };
+
+  document.querySelectorAll(".poktan").forEach(p => {
+    const luas = parseFloat(p.children[1].value) || 0;
+    const jenis = p.children[2].value;
+    total[jenis] += luas;
+  });
+
+  reguler.innerText = total.reguler.toFixed(2);
+  oplah.innerText = total.oplah.toFixed(2);
+  pompa.innerText = total.pompa.toFixed(2);
+  das.innerText = total.das.toFixed(2);
+  tusip.innerText = total.tusip.toFixed(2);
+}
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEMFpQzzt5gH4C9G-yevQLmmfMMRkcBEDOzkj_A3dNB79_ed1PF8g2_rJyUtm_9uxY/exec";
+
+function simpan() {
+  const kecamatan = document.querySelector("select").value;
+  const tanggal = document.querySelector("input[type=date]").value;
+
+  let rows = [];
+
+  document.querySelectorAll(".desa").forEach(desaBox => {
+    const desa = desaBox.querySelector("input").value;
+
+    desaBox.querySelectorAll(".poktan").forEach(p => {
+      rows.push({
+        kecamatan: kecamatan,
+        tanggal: tanggal,
+        desa: desa,
+        poktan: p.children[0].value,
+        luas: p.children[1].value,
+        jenis: p.children[2].value
+      });
+    });
+  });
+
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify({ rows }),
+    headers: { "Content-Type": "application/json" }
+  })
+  .then(res => res.json())
+  .then(() => alert("✅ Data berhasil tersimpan ke Spreadsheet"))
+  .catch(err => {
+    alert("❌ Gagal menyimpan");
+    console.error(err);
+  });
+}
+</script>
+</body>
+</html>
