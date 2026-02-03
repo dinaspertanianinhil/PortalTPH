@@ -204,7 +204,7 @@ function hitung() {
 }
 </script>
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFQWcr7kcrOk0hjIoKMHfjrn4SOg0TuitKiFhyYB2cXLraqj34riZdmoxFMWTyBDrN/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzb05XYKJGjg6ksbzsJMEbhTjgeVhA4LvuJ904jJo4DCm3UDwiAL9ttPc_gD7Qej3oI/exec";
 
 function simpan() {
   const pelapor   = document.getElementById("pelapor").value.trim();
@@ -212,7 +212,7 @@ function simpan() {
   const tanggal   = document.getElementById("tanggal").value;
 
   if (!pelapor || !tanggal) {
-    alert("⚠️ Nama pelapor dan tanggal wajib diisi");
+    alert("⚠️ Nama pelapor & tanggal wajib diisi");
     return;
   }
 
@@ -223,7 +223,7 @@ function simpan() {
 
     desaBox.querySelectorAll(".poktan").forEach(p => {
       rows.push({
-        desa: desa,
+        desa,
         poktan: p.children[0].value,
         luas: p.children[1].value,
         jenis: p.children[2].value
@@ -232,34 +232,32 @@ function simpan() {
   });
 
   if (rows.length === 0) {
-    alert("⚠️ Data poktan belum diisi");
+    alert("⚠️ Data belum diisi");
     return;
   }
 
+  const data = new URLSearchParams();
+  data.append("pelapor", pelapor);
+  data.append("kecamatan", kecamatan);
+  data.append("tanggal", tanggal);
+  data.append("rows", JSON.stringify(rows));
+
   fetch(SCRIPT_URL, {
     method: "POST",
-    body: JSON.stringify({
-      pelapor,
-      kecamatan,
-      tanggal,
-      rows
-    }),
-    headers: {
-      "Content-Type": "application/json"
-    }
+    body: data
   })
-  .then(res => res.text())
-  .then(text => {
-    console.log("RESPON:", text);
-    if (text.startsWith("OK")) {
+  .then(r => r.text())
+  .then(r => {
+    console.log("RESPON:", r);
+    if (r.startsWith("OK")) {
       alert("✅ Data berhasil disimpan");
     } else {
-      alert("❌ Error server:\n" + text);
+      alert("❌ Server error:\n" + r);
     }
   })
   .catch(err => {
     console.error(err);
-    alert("❌ Gagal mengirim data (fetch)");
+    alert("❌ Gagal mengirim data");
   });
 }
 </script>
