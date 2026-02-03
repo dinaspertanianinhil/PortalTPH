@@ -157,25 +157,68 @@ button:hover { opacity:.9 }
 <div class="box">
   <button onclick="simpan()">Simpan Laporan</button>
 </div>
-</script>
+
 <script>
+function tambahDesa() {
+  const desa = document.createElement("div");
+  desa.className = "desa";
+  desa.innerHTML = `
+    <label>Desa</label>
+    <input type="text" placeholder="Nama Desa / Kelurahan">
+
+    <div class="poktanContainer"></div>
+    <button type="button" onclick="tambahPoktan(this)">+ Tambah Poktan</button>
+  `;
+  document.getElementById("desaContainer").appendChild(desa);
+}
+
+function tambahPoktan(btn) {
+  const container = btn.parentElement.querySelector(".poktanContainer");
+  const p = document.createElement("div");
+  p.className = "poktan";
+  p.innerHTML = `
+    <input type="text" placeholder="Nama Poktan">
+    <input type="number" step="0.01" placeholder="Luas (Ha)" oninput="hitung()">
+    <select onchange="hitung()">
+      <option value="reguler">Reguler</option>
+      <option value="oplah">OPLAH</option>
+      <option value="pompa">Pompa</option>
+      <option value="das">DAS/Bendungan</option>
+      <option value="tusip">Tusip Sawit/Kelapa</option>
+    </select>
+  `;
+  container.appendChild(p);
+}
+
+function hitung() {
+  let total = { reguler:0, oplah:0, pompa:0, das:0, tusip:0 };
+  document.querySelectorAll(".poktan").forEach(p => {
+    const luas = parseFloat(p.children[1].value) || 0;
+    total[p.children[2].value] += luas;
+  });
+  reguler.innerText = total.reguler.toFixed(2);
+  oplah.innerText = total.oplah.toFixed(2);
+  pompa.innerText = total.pompa.toFixed(2);
+  das.innerText = total.das.toFixed(2);
+  tusip.innerText = total.tusip.toFixed(2);
+}
+
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsPW9z61YYyj7ADp6ec-XfUm4NFoNPtCYglst_6tv6KtgjpIbumukuJGiLOaL5mdv5/exec";
 
 function simpan() {
-  const pelapor   = document.getElementById("pelapor").value.trim();
-  const kecamatan = document.querySelector("select").value;
-  const tanggal   = document.querySelector("input[type=date]").value;
+  const pelapor = pelapor.value.trim();
+  const kecamatan = document.getElementById("kecamatan").value;
+  const tanggal = document.getElementById("tanggal").value;
 
   if (!pelapor || !tanggal) {
-    alert("⚠️ Nama pelapor & tanggal wajib diisi");
+    alert("⚠️ Nama pelapor dan tanggal wajib diisi");
     return;
   }
 
   let rows = [];
-
-  document.querySelectorAll(".desa").forEach(desaBox => {
-    const desa = desaBox.querySelector("input").value;
-    desaBox.querySelectorAll(".poktan").forEach(p => {
+  document.querySelectorAll(".desa").forEach(d => {
+    const desa = d.querySelector("input").value;
+    d.querySelectorAll(".poktan").forEach(p => {
       rows.push({
         desa,
         poktan: p.children[0].value,
@@ -185,33 +228,21 @@ function simpan() {
     });
   });
 
-  if (rows.length === 0) {
-    alert("⚠️ Data belum diisi");
+  if (!rows.length) {
+    alert("⚠️ Belum ada data poktan");
     return;
   }
 
   fetch(SCRIPT_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      pelapor,
-      kecamatan,
-      tanggal,
-      rows
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ pelapor, kecamatan, tanggal, rows })
   })
   .then(r => r.text())
-  .then(r => {
-    console.log("RESPON:", r);
-    alert("✅ Data berhasil tersimpan");
-  })
-  .catch(err => {
-    console.error(err);
-    alert("❌ Gagal mengirim data");
-  });
+  .then(r => alert(r.startsWith("OK") ? "✅ Data tersimpan" : r))
+  .catch(() => alert("❌ Gagal mengirim data"));
 }
 </script>
+
 </body>
 </html>
