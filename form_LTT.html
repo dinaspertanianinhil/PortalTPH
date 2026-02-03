@@ -204,7 +204,7 @@ function hitung() {
 }
 </script>
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsPW9z61YYyj7ADp6ec-XfUm4NFoNPtCYglst_6tv6KtgjpIbumukuJGiLOaL5mdv5/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFQWcr7kcrOk0hjIoKMHfjrn4SOg0TuitKiFhyYB2cXLraqj34riZdmoxFMWTyBDrN/exec";
 
 function simpan() {
   const pelapor   = document.getElementById("pelapor").value.trim();
@@ -232,35 +232,36 @@ function simpan() {
   });
 
   if (rows.length === 0) {
-    alert("⚠️ Belum ada data poktan");
+    alert("⚠️ Data poktan belum diisi");
     return;
   }
 
   fetch(SCRIPT_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       pelapor,
       kecamatan,
       tanggal,
       rows
-    })
+    }),
+    headers: {
+      "Content-Type": "application/json"
+    }
   })
-  .then(r => r.text())
-  .then(r => {
-    console.log(r);
-    if (r.startsWith("OK")) {
+  .then(res => res.text())
+  .then(text => {
+    console.log("RESPON:", text);
+    if (text.startsWith("OK")) {
       alert("✅ Data berhasil disimpan");
     } else {
-      alert("❌ Error server:\n" + r);
+      alert("❌ Error server:\n" + text);
     }
   })
   .catch(err => {
     console.error(err);
-    alert("❌ Gagal mengirim data");
+    alert("❌ Gagal mengirim data (fetch)");
   });
 }
 </script>
-
 </body>
 </html>
