@@ -13,6 +13,8 @@ body {
   margin:0;
 }
 h2,h3 { margin:0 0 10px; }
+
+/* HEADER */
 .header {
   background:#ffffff;
   padding:16px;
@@ -27,6 +29,7 @@ h2,h3 { margin:0 0 10px; }
 .header .title { font-size:16px; font-weight:600; }
 .header .subtitle { font-size:13px; color:#6b7280; }
 
+/* BOX */
 .box {
   background:#fff;
   padding:16px;
@@ -34,14 +37,12 @@ h2,h3 { margin:0 0 10px; }
   border-radius:10px;
   box-shadow:0 4px 12px rgba(0,0,0,.06);
 }
-
 label {
   font-size:13px;
   font-weight:600;
   display:block;
   margin-top:12px;
 }
-
 input, select {
   width:100%;
   padding:10px 12px;
@@ -50,7 +51,6 @@ input, select {
   border:1px solid #cfd6dd;
   font-size:14px;
 }
-
 button {
   margin-top:12px;
   padding:10px 16px;
@@ -63,6 +63,7 @@ button {
 }
 button:hover { opacity:.9 }
 
+/* DESA */
 .desa {
   border:1px dashed #b6bec8;
   padding:14px;
@@ -71,21 +72,28 @@ button:hover { opacity:.9 }
   background:#fafafa;
 }
 
+/* POKTAN */
 .poktan {
   display:grid;
   grid-template-columns: 1fr 110px 170px;
   gap:10px;
   margin-top:10px;
 }
-
 @media (max-width:600px){
   .poktan { grid-template-columns: 1fr; }
+}
+
+/* REKAP */
+.rekap div {
+  font-size:14px;
+  margin-top:6px;
 }
 </style>
 </head>
 
 <body>
 
+<!-- HEADER -->
 <div class="header">
   <img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
   <div>
@@ -94,6 +102,7 @@ button:hover { opacity:.9 }
   </div>
 </div>
 
+<!-- IDENTITAS -->
 <div class="box">
   <label>Nama Pelapor</label>
   <input type="text" id="pelapor" placeholder="Nama petugas pelapor">
@@ -126,10 +135,23 @@ button:hover { opacity:.9 }
   <input type="date" id="tanggal">
 </div>
 
+<!-- DESA -->
 <div class="box">
   <h3>Data Desa & Poktan</h3>
   <div id="desaContainer"></div>
-  <button onclick="tambahDesa()">+ Tambah Desa</button>
+  <button type="button" onclick="tambahDesa()">+ Tambah Desa</button>
+</div>
+
+<!-- REKAP -->
+<div class="box">
+  <h3>Rekap Otomatis LTT (Preview)</h3>
+  <div class="rekap">
+    <div>LT Reguler : <b id="reguler">0</b> Ha</div>
+    <div>LT OPLAH : <b id="oplah">0</b> Ha</div>
+    <div>LT Pompa : <b id="pompa">0</b> Ha</div>
+    <div>LT DAS : <b id="das">0</b> Ha</div>
+    <div>LT Tusip : <b id="tusip">0</b> Ha</div>
+  </div>
 </div>
 
 <div class="box">
@@ -137,16 +159,19 @@ button:hover { opacity:.9 }
 </div>
 
 <script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsPW9z61YYyj7ADp6ec-XfUm4NFoNPtCYglst_6tv6KtgjpIbumukuJGiLOaL5mdv5/exec";
+
 function tambahDesa() {
-  const d = document.createElement("div");
-  d.className = "desa";
-  d.innerHTML = `
+  const desa = document.createElement("div");
+  desa.className = "desa";
+  desa.innerHTML = `
     <label>Desa</label>
-    <input type="text" placeholder="Nama Desa">
+    <input type="text" class="nama-desa" placeholder="Nama Desa">
+
     <div class="poktanContainer"></div>
     <button type="button" onclick="tambahPoktan(this)">+ Tambah Poktan</button>
   `;
-  document.getElementById("desaContainer").appendChild(d);
+  document.getElementById("desaContainer").appendChild(desa);
 }
 
 function tambahPoktan(btn) {
@@ -155,62 +180,58 @@ function tambahPoktan(btn) {
   p.className = "poktan";
   p.innerHTML = `
     <input type="text" placeholder="Nama Poktan">
-    <input type="number" step="0.01" placeholder="Luas (Ha)">
-    <select>
-      <option value="Reguler">Reguler</option>
-      <option value="OPLAH">OPLAH</option>
-      <option value="Pompa">Pompa</option>
-      <option value="DAS">DAS/Bendungan</option>
-      <option value="Tusip">Tusip Sawit/Kelapa</option>
+    <input type="number" step="0.01" placeholder="Luas (Ha)" oninput="hitung()">
+    <select onchange="hitung()">
+      <option value="reguler">Reguler</option>
+      <option value="oplah">OPLAH</option>
+      <option value="pompa">Pompa</option>
+      <option value="das">DAS</option>
+      <option value="tusip">Tusip</option>
     </select>
   `;
   c.appendChild(p);
 }
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsPW9z61YYyj7ADp6ec-XfUm4NFoNPtCYglst_6tv6KtgjpIbumukuJGiLOaL5mdv5/exec";
+function hitung() {
+  let t={reguler:0,oplah:0,pompa:0,das:0,tusip:0};
+  document.querySelectorAll(".poktan").forEach(p=>{
+    const luas=parseFloat(p.children[1].value)||0;
+    t[p.children[2].value]+=luas;
+  });
+  reguler.innerText=t.reguler.toFixed(2);
+  oplah.innerText=t.oplah.toFixed(2);
+  pompa.innerText=t.pompa.toFixed(2);
+  das.innerText=t.das.toFixed(2);
+  tusip.innerText=t.tusip.toFixed(2);
+}
 
 function simpan() {
-  const pelapor   = document.getElementById("pelapor").value;
-  const kecamatan = document.getElementById("kecamatan").value;
-  const tanggal   = document.getElementById("tanggal").value;
+  const data = {
+    pelapor: pelapor.value,
+    kecamatan: kecamatan.value,
+    tanggal: tanggal.value,
+    rows:[]
+  };
 
-  if (!pelapor) {
-    alert("⚠️ Nama pelapor wajib diisi");
-    return;
-  }
-
-  let rows = [];
-
-  document.querySelectorAll(".desa").forEach(d => {
-    const desa = d.querySelector("input").value;
-    d.querySelectorAll(".poktan").forEach(p => {
-      rows.push({
-        pelapor,
-        kecamatan,
-        tanggal,
+  document.querySelectorAll(".desa").forEach(d=>{
+    const desa=d.querySelector(".nama-desa").value;
+    d.querySelectorAll(".poktan").forEach(p=>{
+      data.rows.push({
         desa,
-        poktan: p.children[0].value,
-        luas: p.children[1].value,
-        jenis: p.children[2].value
+        poktan:p.children[0].value,
+        luas:p.children[1].value,
+        jenis:p.children[2].value
       });
     });
   });
 
-  if (rows.length === 0) {
-    alert("⚠️ Data belum diisi");
-    return;
-  }
-
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(rows)
-  })
-  .then(r => r.text())
-  .then(r => alert("✅ " + r))
-  .catch(() => alert("❌ Gagal mengirim data"));
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify(data)
+  }).then(r=>r.text()).then(r=>{
+    alert(r);
+  });
 }
 </script>
-
 </body>
 </html>
