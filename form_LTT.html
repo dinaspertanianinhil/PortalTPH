@@ -202,13 +202,14 @@ function hitung() {
   das.innerText = total.das.toFixed(2);
   tusip.innerText = total.tusip.toFixed(2);
 }
-
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsPW9z61YYyj7ADp6ec-XfUm4NFoNPtCYglst_6tv6KtgjpIbumukuJGiLOaL5mdv5/exec";
+</script>
+<script>
+const SCRIPT_URL = "PASTE_URL_WEB_APP_KAMU_DI_SINI";
 
 function simpan() {
-  const pelapor = pelapor.value.trim();
+  const pelapor   = document.getElementById("pelapor").value.trim();
   const kecamatan = document.getElementById("kecamatan").value;
-  const tanggal = document.getElementById("tanggal").value;
+  const tanggal   = document.getElementById("tanggal").value;
 
   if (!pelapor || !tanggal) {
     alert("⚠️ Nama pelapor dan tanggal wajib diisi");
@@ -216,11 +217,13 @@ function simpan() {
   }
 
   let rows = [];
-  document.querySelectorAll(".desa").forEach(d => {
-    const desa = d.querySelector("input").value;
-    d.querySelectorAll(".poktan").forEach(p => {
+
+  document.querySelectorAll(".desa").forEach(desaBox => {
+    const desa = desaBox.querySelector("input").value;
+
+    desaBox.querySelectorAll(".poktan").forEach(p => {
       rows.push({
-        desa,
+        desa: desa,
         poktan: p.children[0].value,
         luas: p.children[1].value,
         jenis: p.children[2].value
@@ -228,7 +231,7 @@ function simpan() {
     });
   });
 
-  if (!rows.length) {
+  if (rows.length === 0) {
     alert("⚠️ Belum ada data poktan");
     return;
   }
@@ -236,11 +239,26 @@ function simpan() {
   fetch(SCRIPT_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ pelapor, kecamatan, tanggal, rows })
+    body: JSON.stringify({
+      pelapor,
+      kecamatan,
+      tanggal,
+      rows
+    })
   })
   .then(r => r.text())
-  .then(r => alert(r.startsWith("OK") ? "✅ Data tersimpan" : r))
-  .catch(() => alert("❌ Gagal mengirim data"));
+  .then(r => {
+    console.log(r);
+    if (r.startsWith("OK")) {
+      alert("✅ Data berhasil disimpan");
+    } else {
+      alert("❌ Error server:\n" + r);
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("❌ Gagal mengirim data");
+  });
 }
 </script>
 
