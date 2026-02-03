@@ -253,13 +253,13 @@ function simpan() {
     return;
   }
 
-  const formData = new URLSearchParams();
-  formData.append("rows", JSON.stringify(rows));
-
   fetch(SCRIPT_URL, {
-    method: "POST",
-    body: formData
-  })
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(rows)
+})
   .then(r => r.text())
   .then(r => {
     console.log(r);
