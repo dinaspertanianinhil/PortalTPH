@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Prototype LTT – Sekali Input Semua Jenis</title>
+<title>Pelaporan LTT – Sekali Input Semua Jenis</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -12,127 +12,76 @@ body {
   padding:16px;
   margin:0;
 }
-
-h2,h3 {
-  margin:0 0 10px;
-}
-
-/* HEADER LOGO */
 .header {
-  background:#ffffff;
+  background:#fff;
   padding:16px;
   border-radius:10px;
   display:flex;
-  align-items:center;
   gap:16px;
   margin-bottom:16px;
-  box-shadow:0 4px 12px rgba(0,0,0,.06);
 }
-.header img {
-  width:60px;
-}
-.header .title {
-  font-size:16px;
-  font-weight:600;
-}
-.header .subtitle {
-  font-size:13px;
-  color:#6b7280;
-}
-
-/* BOX */
+.header img { width:60px; }
 .box {
   background:#fff;
   padding:16px;
   margin-bottom:16px;
   border-radius:10px;
-  box-shadow:0 4px 12px rgba(0,0,0,.06);
 }
-
-label {
-  font-size:13px;
-  font-weight:600;
-  display:block;
-  margin-top:12px;
-}
-
+label { font-size:13px; font-weight:600; margin-top:12px; display:block; }
 input, select {
   width:100%;
-  padding:10px 12px;
+  padding:10px;
   margin-top:6px;
   border-radius:8px;
-  border:1px solid #cfd6dd;
-  font-size:14px;
-  box-sizing:border-box;
+  border:1px solid #ccc;
 }
-
-input::placeholder {
-  color:#9ca3af;
-}
-
 button {
   margin-top:12px;
   padding:10px 16px;
-  border-radius:8px;
   border:none;
+  border-radius:8px;
   background:#0f766e;
   color:#fff;
   font-weight:600;
-  cursor:pointer;
 }
-button:hover { opacity:.9 }
-
-/* DESA */
 .desa {
-  border:1px dashed #b6bec8;
-  padding:14px;
-  margin-top:14px;
+  border:1px dashed #bbb;
+  padding:12px;
+  margin-top:12px;
   border-radius:8px;
-  background:#fafafa;
 }
-
-/* POKTAN */
 .poktan {
   display:grid;
-  grid-template-columns: 1fr 110px 170px;
-  gap:10px;
-  margin-top:10px;
+  grid-template-columns: 1fr 100px 160px;
+  gap:8px;
+  margin-top:8px;
 }
-
-@media (max-width:600px){
-  .poktan {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* REKAP */
-.rekap div {
-  font-size:14px;
-  margin-top:6px;
+@media(max-width:600px){
+  .poktan { grid-template-columns:1fr; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
   <div>
-    <div class="title">Form LTT Kecamatan - Kabupaten Indragiri Hilir</div>
-    <div class="subtitle">Dinas Pertanian Kabupaten Indragiri Hilir</div>
+    <b>Form LTT Kecamatan</b><br>
+    Dinas Pertanian Kab. Indragiri Hilir
   </div>
 </div>
 
-<!-- IDENTITAS -->
 <div class="box">
+  <label>Nama Pelapor</label>
+  <input type="text" id="pelapor" placeholder="Nama petugas">
+
   <label>Kecamatan</label>
-  <select>
+  <select id="kecamatan">
     <option>Batang Tuaka</option>
     <option>Concong</option>
     <option>Enok</option>
     <option>Gaung</option>
-    <option>Gaung Anak Serka</option>
     <option>Kateman</option>
     <option>Kempas</option>
     <option>Kemuning</option>
@@ -151,26 +100,13 @@ button:hover { opacity:.9 }
   </select>
 
   <label>Tanggal</label>
-  <input type="date">
+  <input type="date" id="tanggal">
 </div>
 
-<!-- DESA & POKTAN -->
 <div class="box">
   <h3>Data Desa & Poktan</h3>
   <div id="desaContainer"></div>
   <button onclick="tambahDesa()">+ Tambah Desa</button>
-</div>
-
-<!-- REKAP -->
-<div class="box">
-  <h3>Rekap Otomatis LTT (Preview)</h3>
-  <div class="rekap">
-    <div>LT Padi Reguler : <b id="reguler">0</b> Ha</div>
-    <div>LT OPLAH : <b id="oplah">0</b> Ha</div>
-    <div>LT Pompa : <b id="pompa">0</b> Ha</div>
-    <div>LT DAS/Bendungan : <b id="das">0</b> Ha</div>
-    <div>LT Tusip Sawit/Kelapa : <b id="tusip">0</b> Ha</div>
-  </div>
 </div>
 
 <div class="box">
@@ -179,66 +115,52 @@ button:hover { opacity:.9 }
 
 <script>
 function tambahDesa() {
-  const desa = document.createElement("div");
-  desa.className = "desa";
-  desa.innerHTML = `
+  const d = document.createElement("div");
+  d.className = "desa";
+  d.innerHTML = `
     <label>Desa</label>
-    <input type="text" placeholder="Nama Desa / Kelurahan">
+    <input type="text" class="desaNama">
 
     <div class="poktanContainer"></div>
-    <button type="button" onclick="tambahPoktan(this)">+ Tambah Poktan</button>
+    <button type="button" onclick="tambahPoktan(this)">+ Poktan</button>
   `;
-  document.getElementById("desaContainer").appendChild(desa);
+  document.getElementById("desaContainer").appendChild(d);
 }
 
 function tambahPoktan(btn) {
-  const container = btn.parentElement.querySelector(".poktanContainer");
+  const c = btn.parentElement.querySelector(".poktanContainer");
   const p = document.createElement("div");
   p.className = "poktan";
   p.innerHTML = `
-    <input type="text" placeholder="Nama Poktan">
-    <input type="number" step="0.01" placeholder="Luas (Ha)" oninput="hitung()">
-    <select onchange="hitung()">
-      <option value="reguler">Reguler</option>
-      <option value="oplah">OPLAH</option>
-      <option value="pompa">Pompa</option>
-      <option value="das">DAS/Bendungan</option>
-      <option value="tusip">Tusip Sawit/Kelapa</option>
+    <input placeholder="Poktan">
+    <input type="number" step="0.01" placeholder="Luas">
+    <select>
+      <option>Reguler</option>
+      <option>OPLAH</option>
+      <option>Pompa</option>
+      <option>DAS/Bendungan</option>
+      <option>Tusip</option>
     </select>
   `;
-  container.appendChild(p);
+  c.appendChild(p);
 }
 
-function hitung() {
-  let total = { reguler:0, oplah:0, pompa:0, das:0, tusip:0 };
-
-  document.querySelectorAll(".poktan").forEach(p => {
-    const luas = parseFloat(p.children[1].value) || 0;
-    const jenis = p.children[2].value;
-    total[jenis] += luas;
-  });
-
-  reguler.innerText = total.reguler.toFixed(2);
-  oplah.innerText = total.oplah.toFixed(2);
-  pompa.innerText = total.pompa.toFixed(2);
-  das.innerText = total.das.toFixed(2);
-  tusip.innerText = total.tusip.toFixed(2);
-}
-</script>
-<script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsPW9z61YYyj7ADp6ec-XfUm4NFoNPtCYglst_6tv6KtgjpIbumukuJGiLOaL5mdv5/exec";
 
 function simpan() {
-  const kecamatan = document.querySelector("select").value;
-  const tanggal = document.querySelector("input[type=date]").value;
+  const pelapor = document.getElementById("pelapor").value.trim();
+  const kecamatan = document.getElementById("kecamatan").value;
+  const tanggal = document.getElementById("tanggal").value;
 
-  let rows = [];
+  if (!pelapor) return alert("Nama pelapor wajib diisi");
 
-  document.querySelectorAll(".desa").forEach(desaBox => {
-    const desa = desaBox.querySelector("input").value;
+  let data = [];
 
-    desaBox.querySelectorAll(".poktan").forEach(p => {
-      rows.push({
+  document.querySelectorAll(".desa").forEach(d => {
+    const desa = d.querySelector(".desaNama").value;
+    d.querySelectorAll(".poktan").forEach(p => {
+      data.push({
+        pelapor,
         kecamatan,
         tanggal,
         desa,
@@ -249,32 +171,21 @@ function simpan() {
     });
   });
 
-  if (rows.length === 0) {
-    alert("⚠️ Data belum diisi");
-    return;
-  }
-
-  const formData = new URLSearchParams();
-  formData.append("rows", JSON.stringify(rows));
+  if (data.length === 0) return alert("Data belum diisi");
 
   fetch(SCRIPT_URL, {
     method: "POST",
-    body: formData
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
   })
   .then(r => r.text())
   .then(r => {
-    console.log("RESPON:", r);
-    if (r.startsWith("OK")) {
-      alert("✅ Data berhasil tersimpan ke Spreadsheet");
-    } else {
-      alert("❌ Server error:\n" + r);
-    }
+    if (r === "OK") alert("✅ Data tersimpan");
+    else alert(r);
   })
-  .catch(err => {
-    alert("❌ Gagal menyimpan (network)");
-    console.error(err);
-  });
+  .catch(() => alert("❌ Gagal koneksi"));
 }
 </script>
+
 </body>
 </html>
