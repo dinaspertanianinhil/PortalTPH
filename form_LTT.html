@@ -195,18 +195,35 @@ function tambahPoktan(btn) {
   `;
   container.appendChild(p);
 }
-
 function hitung() {
-  let total = { reguler:0, oplah:0, pompa:0, das:0, tusip:0 };
+  let total = {
+    reguler: 0,
+    oplah: 0,
+    pompa: 0,
+    das: 0,
+    tusip: 0,
+    jagung: 0,
+    jagung_polri: 0,
+    kedelai: 0
+  };
+
   document.querySelectorAll(".poktan").forEach(p => {
     const luas = parseFloat(p.children[1].value) || 0;
-    total[p.children[2].value] += luas;
+    const jenis = p.children[2].value;
+
+    if (total.hasOwnProperty(jenis)) {
+      total[jenis] += luas;
+    }
   });
+
   reguler.innerText = total.reguler.toFixed(2);
-  oplah.innerText = total.oplah.toFixed(2);
-  pompa.innerText = total.pompa.toFixed(2);
-  das.innerText = total.das.toFixed(2);
-  tusip.innerText = total.tusip.toFixed(2);
+  oplah.innerText   = total.oplah.toFixed(2);
+  pompa.innerText   = total.pompa.toFixed(2);
+  das.innerText     = total.das.toFixed(2);
+  padi.innerText    = total.tusip.toFixed(2);
+  jagung.innerText  = total.jagung.toFixed(2);
+  jagung_polri.innerText = total.jagung_polri.toFixed(2);
+  kedelai.innerText = total.kedelai.toFixed(2);
 }
 </script>
 <script>
