@@ -2,188 +2,62 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Pertanian Publik</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<title>Dashboard Harga Pangan Live</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body{
-  margin:0;
-  font-family:Inter, sans-serif;
-  background:#f4f6f9;
-  color:#222;
-}
-
-header{
-  background:linear-gradient(135deg,#1e7f4f,#2fb36f);
-  color:white;
-  padding:30px;
-}
-
-header h1{margin:0;font-size:28px;}
-header p{opacity:.9}
-
-.container{
-  padding:25px;
-  max-width:1200px;
-  margin:auto;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:20px;
-}
-
-.card{
-  background:white;
-  border-radius:18px;
-  padding:20px;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
-}
-
-.card h3{
-  font-size:14px;
-  color:#777;
-  margin-bottom:8px;
-}
-
-.card .value{
-  font-size:28px;
-  font-weight:700;
-  color:#1e7f4f;
-}
-
-.section{
-  margin-top:35px;
-}
-
-.section h2{
-  margin-bottom:15px;
-}
-
-.chart{
-  height:260px;
-  border-radius:18px;
-  background:linear-gradient(135deg,#e9f7ef,#ffffff);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:600;
-  color:#1e7f4f;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  background:white;
-  border-radius:16px;
-  overflow:hidden;
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
-}
-
-th,td{
-  padding:14px;
-  text-align:left;
-}
-
-th{
-  background:#1e7f4f;
-  color:white;
-}
-
-tr:nth-child(even){
-  background:#f2f7f4;
-}
-
-footer{
-  text-align:center;
-  padding:25px;
-  color:#777;
-}
+body{font-family:Inter,Arial;background:#f4f6f9;margin:0}
+.container{max-width:1200px;margin:auto;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{background:white;padding:16px;border-radius:16px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+.price{font-size:22px;font-weight:700;color:#1e7f4f}
+canvas{height:70px!important}
 </style>
 </head>
-
 <body>
 
-<header>
-  <h1>Dashboard Pertanian Publik</h1>
-  <p>Monitoring Produksi, LTT, Stok & Harga Pangan</p>
-</header>
-
 <div class="container">
-
-  <!-- STAT CARDS -->
-  <div class="grid">
-    <div class="card">
-      <h3>Total LTT Hari Ini</h3>
-      <div class="value">125 Ha</div>
-    </div>
-
-    <div class="card">
-      <h3>Stok Gabah</h3>
-      <div class="value">245 Ton</div>
-    </div>
-
-    <div class="card">
-      <h3>Stok Beras</h3>
-      <div class="value">180 Ton</div>
-    </div>
-
-    <div class="card">
-      <h3>Harga Rata-rata</h3>
-      <div class="value">Rp 6.200/kg</div>
-    </div>
-  </div>
-
-  <!-- CHART PLACEHOLDER -->
-  <div class="section">
-    <h2>Tren Produksi Bulanan</h2>
-    <div class="chart">📈 Grafik Produksi (Prototype)</div>
-  </div>
-
-  <div class="section">
-    <h2>LTT per Kecamatan</h2>
-    <div class="chart">📊 Grafik LTT Kecamatan (Prototype)</div>
-  </div>
-
-  <!-- TABLE -->
-  <div class="section">
-    <h2>Rekap Wilayah</h2>
-
-    <table>
-      <tr>
-        <th>Kecamatan</th>
-        <th>LTT (Ha)</th>
-        <th>Produksi (Ton)</th>
-        <th>Harga Gabah</th>
-      </tr>
-      <tr>
-        <td>Tembilahan</td>
-        <td>45</td>
-        <td>90</td>
-        <td>Rp 6.100</td>
-      </tr>
-      <tr>
-        <td>Enok</td>
-        <td>38</td>
-        <td>75</td>
-        <td>Rp 6.200</td>
-      </tr>
-      <tr>
-        <td>Reteh</td>
-        <td>42</td>
-        <td>80</td>
-        <td>Rp 6.300</td>
-      </tr>
-    </table>
-  </div>
-
+<h2>Harga Komoditas Hari Ini</h2>
+<div id="cards" class="grid"></div>
 </div>
 
-<footer>
-  © 2026 Dashboard Pertanian Publik – Prototype
-</footer>
+<script>
+const sheetURL = "PASTE_LINK_CSV_KAMU_DI_SINI";
+
+fetch(sheetURL)
+ .then(r=>r.text())
+ .then(csv=>{
+   const rows = csv.trim().split("\n").slice(1);
+   const data = {};
+
+   rows.forEach(r=>{
+     const [tanggal, komoditas, harga] = r.split(",");
+     if(!data[komoditas]) data[komoditas]=[];
+     data[komoditas].push(Number(harga));
+   });
+
+   const container = document.getElementById("cards");
+
+   Object.keys(data).forEach((k,i)=>{
+     const card = document.createElement("div");
+     card.className="card";
+     card.innerHTML = `
+       <h4>${k}</h4>
+       <div class="price">Rp ${data[k].slice(-1)[0].toLocaleString()}</div>
+       <canvas id="c${i}"></canvas>
+     `;
+     container.appendChild(card);
+
+     new Chart(document.getElementById(`c${i}`),{
+       type:"line",
+       data:{labels:data[k].map((_,i)=>i+1),
+         datasets:[{data:data[k], tension:.4}]},
+       options:{plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}}
+     });
+   });
+ });
+</script>
 
 </body>
 </html>
