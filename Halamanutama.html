@@ -1,194 +1,212 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dinas Pertanian Kabupaten Indragiri Hilir</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dinas Pertanian Kabupaten Indragiri Hilir</title>
 
-  <!-- ======================
-       GOOGLE FONT (ELEGAN & FORMAL)
-       ====================== -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<!-- ======================
+     FONT MODERN & ELEGAN
+     ====================== -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    /* ======================
-       RESET DASAR BIAR RAPI
-       ====================== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
+<style>
+/* ======================
+   RESET GLOBAL
+   ====================== */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Inter',sans-serif;
+}
 
-    /* ======================
-       BODY UTAMA
-       ====================== */
-    body {
-      background-color: #f4f6f5;
-      color: #2f3e2e;
-    }
+/* ======================
+   BODY UTAMA
+   ====================== */
+body{
+  background:#0f1e17;
+  overflow:hidden;
+}
 
-    /* ======================
-       HERO SECTION / HALAMAN DEPAN
-       ====================== */
-    .hero {
-      /* Background gambar dari link yang kamu kasih */
-      background: 
-        linear-gradient(
-          rgba(0, 60, 40, 0.65),
-          rgba(0, 60, 40, 0.65)
-        ),
-        url('https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png');
+/* ======================
+   BACKGROUND UTAMA
+   ====================== */
+.background{
+  position:fixed;
+  inset:0;
 
-      background-size: cover;
-      background-position: center;
-      min-height: 100vh;
+  /* Background gambar + gradasi futuristik */
+  background:
+    radial-gradient(circle at top right, rgba(140,255,200,0.15), transparent 50%),
+    linear-gradient(rgba(5,30,20,.75), rgba(5,30,20,.75)),
+    url('https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png');
 
-      /* Posisi konten di tengah */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+  background-size:cover;
+  background-position:center;
+  animation:bgZoom 25s ease-in-out infinite alternate;
+}
 
-      /* Animasi masuk halus */
-      animation: fadeIn 1.5s ease-in-out;
-    }
+/* ======================
+   ANIMASI BACKGROUND
+   ====================== */
+@keyframes bgZoom{
+  from{ transform:scale(1); }
+  to{ transform:scale(1.08); }
+}
 
-    /* ======================
-       KONTEN DI HERO
-       ====================== */
-    .hero-content {
-      max-width: 900px;
-      padding: 20px;
-      color: #ffffff;
-    }
+/* ======================
+   OVERLAY KABUT FUTURISTIK
+   ====================== */
+.fog{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    120deg,
+    rgba(255,255,255,.05),
+    rgba(255,255,255,.02),
+    rgba(255,255,255,.05)
+  );
+  animation:fogMove 18s linear infinite;
+}
 
-    /* ======================
-       JUDUL UTAMA
-       ====================== */
-    .hero-content h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      margin-bottom: 15px;
+@keyframes fogMove{
+  from{ transform:translateX(-30%); }
+  to{ transform:translateX(30%); }
+}
 
-      /* Animasi teks naik pelan */
-      animation: slideUp 1.2s ease forwards;
-    }
+/* ======================
+   WRAPPER KONTEN
+   ====================== */
+.wrapper{
+  position:relative;
+  z-index:2;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:40px;
+}
 
-    /* ======================
-       SUB JUDUL
-       ====================== */
-    .hero-content p {
-      font-size: 1.2rem;
-      line-height: 1.8;
-      opacity: 0.95;
+/* ======================
+   GLASS PANEL (ELEGAN)
+   ====================== */
+.panel{
+  padding:50px 60px;
+  border-radius:24px;
 
-      animation: slideUp 1.6s ease forwards;
-    }
+  /* Efek kaca */
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
 
-    /* ======================
-       GARIS AKSEN ELEGAN
-       ====================== */
-    .divider {
-      width: 120px;
-      height: 4px;
-      background-color: #9bd18b;
-      margin: 25px auto;
-      border-radius: 10px;
+  border:1px solid rgba(255,255,255,0.18);
+  box-shadow:0 30px 80px rgba(0,0,0,.45);
 
-      animation: fadeIn 2s ease-in-out;
-    }
+  animation:panelFade 1.6s ease forwards;
+}
 
-    /* ======================
-       TOMBOL CTA
-       ====================== */
-    .btn {
-      display: inline-block;
-      margin-top: 30px;
-      padding: 14px 36px;
-      background-color: #9bd18b;
-      color: #1f3d2b;
-      text-decoration: none;
-      font-weight: 600;
-      border-radius: 30px;
+/* ======================
+   ANIMASI PANEL MASUK
+   ====================== */
+@keyframes panelFade{
+  from{
+    opacity:0;
+    transform:translateY(40px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
 
-      /* Efek transisi hover */
-      transition: all 0.3s ease;
-    }
+/* ======================
+   JUDUL UTAMA
+   ====================== */
+.panel h1{
+  font-size:3.2rem;
+  font-weight:700;
+  letter-spacing:1px;
+  color:#e8fff2;
+}
 
-    .btn:hover {
-      background-color: #7bbf6a;
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-    }
+/* ======================
+   GARIS AKSEN FUTURISTIK
+   ====================== */
+.line{
+  width:160px;
+  height:3px;
+  margin:28px auto;
+  background:linear-gradient(90deg,#6be5a5,#caffea);
+  border-radius:10px;
+}
 
-    /* ======================
-       ANIMASI KEYFRAMES
-       ====================== */
+/* ======================
+   SUBTITLE
+   ====================== */
+.panel h2{
+  font-size:1.25rem;
+  font-weight:400;
+  color:#d6f5e4;
+  letter-spacing:2px;
+}
 
-    /* Fade in lembut */
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
+/* ======================
+   TAGLINE
+   ====================== */
+.panel p{
+  margin-top:18px;
+  font-size:1rem;
+  line-height:1.8;
+  color:rgba(255,255,255,.85);
+}
 
-    /* Teks naik pelan dari bawah */
-    @keyframes slideUp {
-      from {
-        transform: translateY(40px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    /* ======================
-       RESPONSIVE HP
-       ====================== */
-    @media (max-width: 768px) {
-      .hero-content h1 {
-        font-size: 2.1rem;
-      }
-
-      .hero-content p {
-        font-size: 1rem;
-      }
-    }
-  </style>
+/* ======================
+   RESPONSIVE HP
+   ====================== */
+@media(max-width:768px){
+  .panel{
+    padding:40px 30px;
+  }
+  .panel h1{
+    font-size:2.1rem;
+  }
+  .panel h2{
+    font-size:1rem;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <!-- ======================
-       HERO / HALAMAN DEPAN
-       ====================== -->
-  <section class="hero">
-    <div class="hero-content">
+<!-- BACKGROUND -->
+<div class="background">
+  <div class="fog"></div>
+</div>
 
-      <!-- Judul Dinas -->
-      <h1>Dinas Pertanian</h1>
+<!-- KONTEN UTAMA -->
+<div class="wrapper">
+  <div class="panel">
 
-      <!-- Garis aksen -->
-      <div class="divider"></div>
+    <!-- NAMA DINAS -->
+    <h1>Dinas Pertanian</h1>
 
-      <!-- Sub judul wilayah -->
-      <p>
-        Kabupaten Indragiri Hilir<br>
-        Mewujudkan Pertanian Berkelanjutan, Mandiri, dan Berdaya Saing
-      </p>
+    <!-- GARIS AKSEN -->
+    <div class="line"></div>
 
-      <!-- Tombol aksi -->
-      <a href="#" class="btn">Masuk Portal Layanan</a>
+    <!-- WILAYAH -->
+    <h2>KABUPATEN INDRAGIRI HILIR</h2>
 
-    </div>
-  </section>
+    <!-- TAGLINE -->
+    <p>
+      Membangun pertanian berkelanjutan<br>
+      berbasis kearifan lokal dan teknologi masa depan
+    </p>
+
+  </div>
+</div>
 
 </body>
 </html>
