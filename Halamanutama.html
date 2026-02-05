@@ -6,13 +6,13 @@
 <title>Dinas Pertanian Kabupaten Indragiri Hilir</title>
 
 <!-- ======================
-     FONT MODERN & ELEGAN
+     FONT MODERN & RESMI
      ====================== -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
 /* ======================
-   RESET GLOBAL
+   RESET DASAR
    ====================== */
 *{
   margin:0;
@@ -22,10 +22,11 @@
 }
 
 /* ======================
-   BODY UTAMA
+   BODY
    ====================== */
 body{
   background:#0f1e17;
+  color:#ffffff;
   overflow:hidden;
 }
 
@@ -35,16 +36,13 @@ body{
 .background{
   position:fixed;
   inset:0;
-
-  /* Background gambar + gradasi futuristik */
   background:
-    radial-gradient(circle at top right, rgba(140,255,200,0.15), transparent 50%),
-    linear-gradient(rgba(5,30,20,.75), rgba(5,30,20,.75)),
+    radial-gradient(circle at top right, rgba(140,255,200,0.18), transparent 50%),
+    linear-gradient(rgba(5,35,25,.75), rgba(5,35,25,.75)),
     url('https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png');
-
   background-size:cover;
   background-position:center;
-  animation:bgZoom 25s ease-in-out infinite alternate;
+  animation:bgZoom 30s ease-in-out infinite alternate;
 }
 
 /* ======================
@@ -56,27 +54,78 @@ body{
 }
 
 /* ======================
-   OVERLAY KABUT FUTURISTIK
+   OVERLAY KABUT HALUS
    ====================== */
 .fog{
   position:absolute;
   inset:0;
   background:linear-gradient(
     120deg,
-    rgba(255,255,255,.05),
+    rgba(255,255,255,.06),
     rgba(255,255,255,.02),
-    rgba(255,255,255,.05)
+    rgba(255,255,255,.06)
   );
-  animation:fogMove 18s linear infinite;
+  animation:fogMove 20s linear infinite;
 }
 
 @keyframes fogMove{
-  from{ transform:translateX(-30%); }
-  to{ transform:translateX(30%); }
+  from{ transform:translateX(-35%); }
+  to{ transform:translateX(35%); }
 }
 
 /* ======================
-   WRAPPER KONTEN
+   NAVBAR ATAS
+   ====================== */
+.navbar{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  z-index:10;
+  padding:18px 30px;
+
+  /* efek kaca */
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,0.15);
+}
+
+/* ======================
+   DAFTAR MENU
+   ====================== */
+.navbar ul{
+  list-style:none;
+  display:flex;
+  gap:14px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+/* ======================
+   TOMBOL MENU
+   ====================== */
+.navbar a{
+  text-decoration:none;
+  color:#eafff3;
+  font-size:0.85rem;
+  padding:8px 14px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,0.25);
+
+  transition:all .3s ease;
+}
+
+/* ======================
+   EFEK HOVER TOMBOL
+   ====================== */
+.navbar a:hover{
+  background:rgba(155,255,210,0.25);
+  color:#ffffff;
+  transform:translateY(-2px);
+}
+
+/* ======================
+   WRAPPER KONTEN TENGAH
    ====================== */
 .wrapper{
   position:relative;
@@ -85,35 +134,30 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  text-align:center;
   padding:40px;
+  text-align:center;
 }
 
 /* ======================
-   GLASS PANEL (ELEGAN)
+   PANEL KACA UTAMA
    ====================== */
 .panel{
-  padding:50px 60px;
-  border-radius:24px;
-
-  /* Efek kaca */
-  background:rgba(255,255,255,0.08);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
-
-  border:1px solid rgba(255,255,255,0.18);
-  box-shadow:0 30px 80px rgba(0,0,0,.45);
-
+  padding:55px 65px;
+  border-radius:26px;
+  background:rgba(255,255,255,0.09);
+  backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.2);
+  box-shadow:0 30px 90px rgba(0,0,0,.45);
   animation:panelFade 1.6s ease forwards;
 }
 
 /* ======================
-   ANIMASI PANEL MASUK
+   ANIMASI PANEL
    ====================== */
 @keyframes panelFade{
   from{
     opacity:0;
-    transform:translateY(40px);
+    transform:translateY(45px);
   }
   to{
     opacity:1;
@@ -122,34 +166,33 @@ body{
 }
 
 /* ======================
-   JUDUL UTAMA
+   JUDUL
    ====================== */
 .panel h1{
-  font-size:3.2rem;
+  font-size:3.1rem;
   font-weight:700;
   letter-spacing:1px;
-  color:#e8fff2;
 }
 
 /* ======================
-   GARIS AKSEN FUTURISTIK
+   GARIS AKSEN
    ====================== */
 .line{
-  width:160px;
+  width:170px;
   height:3px;
-  margin:28px auto;
+  margin:26px auto;
   background:linear-gradient(90deg,#6be5a5,#caffea);
-  border-radius:10px;
+  border-radius:12px;
 }
 
 /* ======================
-   SUBTITLE
+   SUB JUDUL
    ====================== */
 .panel h2{
   font-size:1.25rem;
   font-weight:400;
-  color:#d6f5e4;
   letter-spacing:2px;
+  color:#d9f7e8;
 }
 
 /* ======================
@@ -159,7 +202,20 @@ body{
   margin-top:18px;
   font-size:1rem;
   line-height:1.8;
-  color:rgba(255,255,255,.85);
+  color:rgba(255,255,255,.9);
+}
+
+/* ======================
+   FOOTER / COPYRIGHT
+   ====================== */
+footer{
+  position:fixed;
+  bottom:12px;
+  width:100%;
+  text-align:center;
+  font-size:0.75rem;
+  color:rgba(255,255,255,.7);
+  z-index:5;
 }
 
 /* ======================
@@ -186,27 +242,47 @@ body{
   <div class="fog"></div>
 </div>
 
-<!-- KONTEN UTAMA -->
+<!-- ======================
+     NAVBAR MENU ATAS
+     GANTI LINK href SESUAI HALAMAN
+     ====================== -->
+<nav class="navbar">
+  <ul>
+    <li><a href="https://dptphp.inhilkab.go.id/profil">Profil</a></li>
+    <li><a href="https://dptphp.inhilkab.go.id/inovasi">Inovasi</a></li>
+    <li><a href="https://dptphp.inhilkab.go.id/kinerja">Kinerja</a></li>
+    <li><a href="https://dptphp.inhilkab.go.id/program">Program</a></li>
+    <li><a href="https://dptphp.inhilkab.go.id/basis-data">Basis Data</a></li>
+    <li><a href="https://dptphp.inhilkab.go.id/publikasi">Publikasi</a></li>
+    <li><a href="https://dptphp.inhilkab.go.id/informasi-publik">Informasi Publik</a></li>
+    <li><a href="https://dptphp.inhilkab.go.id/data-pertanian">Data Pertanian</a></li>
+  </ul>
+</nav>
+
+<!-- ======================
+     KONTEN UTAMA
+     ====================== -->
 <div class="wrapper">
   <div class="panel">
 
-    <!-- NAMA DINAS -->
     <h1>Dinas Pertanian</h1>
-
-    <!-- GARIS AKSEN -->
     <div class="line"></div>
-
-    <!-- WILAYAH -->
     <h2>KABUPATEN INDRAGIRI HILIR</h2>
 
-    <!-- TAGLINE -->
     <p>
-      Membangun pertanian berkelanjutan<br>
-      berbasis kearifan lokal dan teknologi masa depan
+      Mewujudkan pertanian berkelanjutan<br>
+      melalui kearifan lokal dan inovasi masa depan
     </p>
 
   </div>
 </div>
+
+<!-- ======================
+     COPYRIGHT
+     ====================== -->
+<footer>
+  © Dinas Pertanian Kabupaten Indragiri Hilir – Riau
+</footer>
 
 </body>
 </html>
