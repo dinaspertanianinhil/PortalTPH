@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dinas Pertanian Kabupaten Indragiri Hilir</title>
+
+  <!-- ======================
+       GOOGLE FONT (ELEGAN & FORMAL)
+       ====================== -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ======================
+       RESET DASAR BIAR RAPI
+       ====================== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* ======================
+       BODY UTAMA
+       ====================== */
+    body {
+      background-color: #f4f6f5;
+      color: #2f3e2e;
+    }
+
+    /* ======================
+       HERO SECTION / HALAMAN DEPAN
+       ====================== */
+    .hero {
+      /* Background gambar dari link yang kamu kasih */
+      background: 
+        linear-gradient(
+          rgba(0, 60, 40, 0.65),
+          rgba(0, 60, 40, 0.65)
+        ),
+        url('https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png');
+
+      background-size: cover;
+      background-position: center;
+      min-height: 100vh;
+
+      /* Posisi konten di tengah */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+
+      /* Animasi masuk halus */
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    /* ======================
+       KONTEN DI HERO
+       ====================== */
+    .hero-content {
+      max-width: 900px;
+      padding: 20px;
+      color: #ffffff;
+    }
+
+    /* ======================
+       JUDUL UTAMA
+       ====================== */
+    .hero-content h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+
+      /* Animasi teks naik pelan */
+      animation: slideUp 1.2s ease forwards;
+    }
+
+    /* ======================
+       SUB JUDUL
+       ====================== */
+    .hero-content p {
+      font-size: 1.2rem;
+      line-height: 1.8;
+      opacity: 0.95;
+
+      animation: slideUp 1.6s ease forwards;
+    }
+
+    /* ======================
+       GARIS AKSEN ELEGAN
+       ====================== */
+    .divider {
+      width: 120px;
+      height: 4px;
+      background-color: #9bd18b;
+      margin: 25px auto;
+      border-radius: 10px;
+
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    /* ======================
+       TOMBOL CTA
+       ====================== */
+    .btn {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 14px 36px;
+      background-color: #9bd18b;
+      color: #1f3d2b;
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 30px;
+
+      /* Efek transisi hover */
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #7bbf6a;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+
+    /* ======================
+       ANIMASI KEYFRAMES
+       ====================== */
+
+    /* Fade in lembut */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Teks naik pelan dari bawah */
+    @keyframes slideUp {
+      from {
+        transform: translateY(40px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* ======================
+       RESPONSIVE HP
+       ====================== */
+    @media (max-width: 768px) {
+      .hero-content h1 {
+        font-size: 2.1rem;
+      }
+
+      .hero-content p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ======================
+       HERO / HALAMAN DEPAN
+       ====================== -->
+  <section class="hero">
+    <div class="hero-content">
+
+      <!-- Judul Dinas -->
+      <h1>Dinas Pertanian</h1>
+
+      <!-- Garis aksen -->
+      <div class="divider"></div>
+
+      <!-- Sub judul wilayah -->
+      <p>
+        Kabupaten Indragiri Hilir<br>
+        Mewujudkan Pertanian Berkelanjutan, Mandiri, dan Berdaya Saing
+      </p>
+
+      <!-- Tombol aksi -->
+      <a href="#" class="btn">Masuk Portal Layanan</a>
+
+    </div>
+  </section>
+
+</body>
+</html>
