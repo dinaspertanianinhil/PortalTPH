@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard LTT 2026</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0; padding: 20px;
+    }
+    h1 { text-align: center; margin-bottom: 20px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 40px;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background-color: #0f6fff;
+      color: #fff;
+    }
+    canvas {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Dashboard LTT 2026</h1>
+
+  <table id="data-table">
+    <thead></thead>
+    <tbody></tbody>
+  </table>
+
+  <canvas id="chart" width="400" height="200"></canvas>
+
+<script>
+const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwB1rhBNFnrdb8AEkhL10DnMWx5QnrGNbstddBDjmYQd9N0z4T366v9P7Tpcdah7E1fKkMNhWN2eeH/pub?output=csv";
+
+async function fetchData() {
+    const res = await fetch(csvUrl);
+    const data = await res.text();
+    const rows = data.split("\n").filter(r => r.trim() !== "").map(r => r.split(","));
+
+    // Render tabel
+    const table = document.getElementById("data-table");
+    table.innerHTML = "";
+    const thead = document.createElement("tr");
+    rows[0].forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        thead.appendChild(th);
+    });
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    rows.slice(1).forEach(r => {
+        const tr = document.createElement("tr");
+        r.forEach(cell => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    // Render chart (contoh ambil kolom pertama sebagai label, kolom kedua sebagai data numerik)
+    const labels = rows.slice(1).map(r => r[0]);
+    const values = rows.slice(1).map(r => parseFloat(r[1]) || 0);
+
+    const ctx = document.getElementById('chart').getContext('2d');
+    if(window.myChart) window.myChart.destroy(); // reset chart
+    window.myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: rows[0][1],
+                data: values,
+                backgroundColor: '#0f6fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: true } }
+        }
+    });
+}
+
+// Fetch pertama kali
+fetchData();
+
+// Auto refresh tiap 60 detik
+setInterval(fetchData, 60000);
+
+</script>
+</body>
+</html>
