@@ -6,15 +6,15 @@
 <title>Pendataan Harga Hortikultura</title>
 
 <style>
+*{box-sizing:border-box}
+
 body{
-font-family:Segoe UI,sans-serif;
+font-family:Segoe UI,system-ui,sans-serif;
 margin:0;
 padding:20px;
 background:
 linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
-url("https://voxntt.com/wp-content/uploads/2018/07/sayur-dan-buah-sehat.jpg");
-background-size:cover;
-background-attachment:fixed;
+url("https://voxntt.com/wp-content/uploads/2018/07/sayur-dan-buah-sehat.jpg") center/cover fixed;
 }
 
 .container{
@@ -23,18 +23,19 @@ margin:auto;
 }
 
 h1{
-color:white;
+color:#fff;
 text-align:center;
-margin-bottom:25px;
+margin-bottom:28px;
+line-height:1.4;
+text-shadow:0 4px 12px rgba(0,0,0,.6);
 }
 
 .card{
-background:#ffffffee;
-backdrop-filter:blur(6px);
+background:rgba(255,255,255,.94);
 border-radius:18px;
 padding:22px;
-margin-bottom:30px;
-box-shadow:0 12px 35px rgba(0,0,0,.25);
+margin-bottom:28px;
+box-shadow:0 12px 30px rgba(0,0,0,.25);
 }
 
 .section-title{
@@ -43,21 +44,21 @@ font-weight:600;
 color:#1e8449;
 border-left:6px solid #27ae60;
 padding-left:12px;
-margin-bottom:15px;
+margin-bottom:16px;
 }
 
 .grid{
 display:grid;
 grid-template-columns:2fr 1fr 1fr;
 gap:12px;
+align-items:center;
 }
 
-.header{
+.grid.header-row{
 font-weight:600;
 color:#555;
+margin-bottom:6px;
 }
-
-.row{display:contents}
 
 .label{
 padding:10px 4px;
@@ -65,6 +66,7 @@ font-size:15px;
 }
 
 input{
+width:100%;
 padding:12px;
 border-radius:10px;
 border:1px solid #ddd;
@@ -87,6 +89,7 @@ color:white;
 font-size:16px;
 font-weight:600;
 cursor:pointer;
+box-shadow:0 6px 18px rgba(39,174,96,.4);
 }
 
 button:disabled{background:#999}
@@ -94,23 +97,41 @@ button:disabled{background:#999}
 #notif{
 display:none;
 text-align:center;
-margin-top:14px;
+margin-top:16px;
 font-weight:600;
 color:#27ae60;
-font-size:16px;
+}
+
+@media(max-width:720px){
+.grid{
+grid-template-columns:1fr;
+}
+.grid.header-row{
+display:none;
+}
+.label{
+font-weight:600;
+}
+input{
+margin-bottom:6px;
+}
 }
 </style>
 </head>
 <body>
 
 <div class="container">
-<h1>DINAS PERTANIAN KABUPATEN INDRGIRI HILIR<br>📊 Pendataan Harga Komoditi Hortikultura</h1>
-
+<h1>
+DINAS PERTANIAN KABUPATEN INDRAGIRI HILIR  
+<span style="display:block;font-size:18px;font-weight:400;margin-top:6px;">
+Pendataan Harga Komoditi Hortikultura
+</span>
+</h1>
 
 <div id="formArea"></div>
 
 <button id="saveBtn">Simpan Data Harga</button>
-<div id="notif">✔ Data sedang disimpan</div>
+<div id="notif">⏳ Menyimpan data...</div>
 </div>
 
 <script>
@@ -137,57 +158,80 @@ const dataLampiran = {
 const area=document.getElementById("formArea");
 
 for(let group in dataLampiran){
-area.innerHTML+=`
-<div class="card">
-<div class="section-title">${group}</div>
-<div class="grid">
-<div class="header">Komoditi</div>
-<div class="header">Harga Grosir</div>
-<div class="header">Harga Eceran</div>
-</div>
-</div>`;
 
-const grid=area.lastElementChild.querySelector(".grid");
+const card=document.createElement("div");
+card.className="card";
+
+card.innerHTML=`
+<div class="section-title">${group}</div>
+<div class="grid header-row">
+<div>Komoditi</div>
+<div>Harga Grosir</div>
+<div>Harga Eceran</div>
+</div>
+`;
 
 dataLampiran[group].forEach(k=>{
-grid.innerHTML+=`
-<div class="row">
+const row=document.createElement("div");
+row.className="grid";
+
+row.innerHTML=`
 <div class="label">${k}</div>
-<input type="number" placeholder="Rp">
-<input type="number" placeholder="Rp">
-</div>`;
+<input type="number" inputmode="numeric" placeholder="Rp">
+<input type="number" inputmode="numeric" placeholder="Rp">
+`;
+
+card.appendChild(row);
 });
+
+area.appendChild(card);
 }
 
-const scriptURL="https://script.google.com/macros/s/AKfycbwcapAj5WFNhYVRmf3ovt7GmZcZwx9UxC_rqa7l2d9w_-sSOeiLwQAdpGyK5Gu9BA5q/exec";
+const scriptURL="https://script.google.com/macros/s/AKfycbwfuyZzk8NqdWOy13yjI5kflAqVkjymJRyG1dVeqlECcWirRqjuBhAALLP3PdGefo-p/exec";
 
-document.getElementById("saveBtn").onclick=()=>{
 const btn=document.getElementById("saveBtn");
+const notif=document.getElementById("notif");
+
+btn.onclick=async()=>{
 btn.disabled=true;
 btn.innerText="Menyimpan...";
+notif.style.display="block";
 
-document.getElementById("notif").style.display="block";
+const payload=[];
 
-const data=[];
-document.querySelectorAll(".row").forEach(r=>{
-data.push({
+document.querySelectorAll(".card .grid:not(.header-row)").forEach(r=>{
+payload.push({
 komoditi:r.children[0].innerText,
-grosir:r.children[1].value,
-eceran:r.children[2].value
+harga_grosir:r.children[1].value||0,
+harga_eceran:r.children[2].value||0
 });
 });
 
-fetch(scriptURL,{
+try{
+await fetch(scriptURL,{
 method:"POST",
-body:JSON.stringify(data)
-}).catch(()=>{});
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+tanggal:new Date().toISOString(),
+data:payload
+})
+});
+
+notif.innerText="✅ Data berhasil tersimpan";
+btn.innerText="Tersimpan ✔";
 
 setTimeout(()=>{
-btn.innerText="Tersimpan ✔";
-},800);
+btn.disabled=false;
+btn.innerText="Simpan Data Harga";
+},2500);
+
+}catch{
+notif.innerText="❌ Gagal menyimpan";
+btn.disabled=false;
+btn.innerText="Simpan Data Harga";
+}
 };
 </script>
 
 </body>
 </html>
-
