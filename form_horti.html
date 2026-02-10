@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pendataan Harga Hortikultura</title>
+
+<style>
+body{
+font-family:Segoe UI,sans-serif;
+margin:0;
+padding:20px;
+background:
+linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
+url("https://voxntt.com/wp-content/uploads/2018/07/sayur-dan-buah-sehat.jpg");
+background-size:cover;
+background-attachment:fixed;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+}
+
+h1{
+color:white;
+text-align:center;
+margin-bottom:25px;
+}
+
+.card{
+background:#ffffffee;
+backdrop-filter:blur(6px);
+border-radius:18px;
+padding:22px;
+margin-bottom:30px;
+box-shadow:0 12px 35px rgba(0,0,0,.25);
+}
+
+.section-title{
+font-size:20px;
+font-weight:600;
+color:#1e8449;
+border-left:6px solid #27ae60;
+padding-left:12px;
+margin-bottom:15px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:2fr 1fr 1fr;
+gap:12px;
+}
+
+.header{
+font-weight:600;
+color:#555;
+}
+
+.row{display:contents}
+
+.label{
+padding:10px 4px;
+font-size:15px;
+}
+
+input{
+padding:12px;
+border-radius:10px;
+border:1px solid #ddd;
+font-size:15px;
+}
+
+input:focus{
+outline:none;
+border-color:#27ae60;
+box-shadow:0 0 0 3px rgba(39,174,96,.2);
+}
+
+button{
+width:100%;
+padding:16px;
+border:none;
+border-radius:14px;
+background:#27ae60;
+color:white;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+}
+
+button:disabled{background:#999}
+
+#notif{
+display:none;
+text-align:center;
+margin-top:14px;
+font-weight:600;
+color:#27ae60;
+font-size:16px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>DINAS PERTANIAN KABUPATEN INDRGIRI HILIR<br>📊 Pendataan Harga Komoditi Hortikultura</h1>
+
+
+<div id="formArea"></div>
+
+<button id="saveBtn">Simpan Data Harga</button>
+<div id="notif">✔ Data sedang disimpan</div>
+</div>
+
+<script>
+const dataLampiran = {
+"Bahan Makanan Utama":[
+"Gabah GKP","Gabah GKS","Gabah GKG","Beras No.1","Beras No.2",
+"Beras eks Dolog","Beras Ketan Putih","Beras Ketan Hitam",
+"Jagung Kuning Pipilan","Jagung Putih Pipilan",
+"Ketela Pohon","Ketela Rambat",
+"Kacang Tanah","Kacang Hijau","Kacang Kedelai","Kacang Merah"
+],
+"Sayuran-sayuran":[
+"Kacang Panjang","Lombok/Cabe","Bawang Merah","Buncis","Bayam",
+"Bawang Daun","Kubis/Kol","Kangkung","Ketimun","Petsai/Sawi",
+"Terung","Kentang","Cabe Rawit","Cabe Keriting","Petai","Tomat","Wortel"
+],
+"Buah-buahan":[
+"Alpukat","Apel","Jambu Air","Duku","Jeruk","Durian",
+"Melon","Mangga","Pisang Barangan","Semangka","Nangka",
+"Nenas","Pepaya","Rambutan","Salak","Sawo"
+]
+};
+
+const area=document.getElementById("formArea");
+
+for(let group in dataLampiran){
+area.innerHTML+=`
+<div class="card">
+<div class="section-title">${group}</div>
+<div class="grid">
+<div class="header">Komoditi</div>
+<div class="header">Harga Grosir</div>
+<div class="header">Harga Eceran</div>
+</div>
+</div>`;
+
+const grid=area.lastElementChild.querySelector(".grid");
+
+dataLampiran[group].forEach(k=>{
+grid.innerHTML+=`
+<div class="row">
+<div class="label">${k}</div>
+<input type="number" placeholder="Rp">
+<input type="number" placeholder="Rp">
+</div>`;
+});
+}
+
+const scriptURL="ISI_URL_WEB_APP_GAS_KAMU";
+
+document.getElementById("saveBtn").onclick=()=>{
+const btn=document.getElementById("saveBtn");
+btn.disabled=true;
+btn.innerText="Menyimpan...";
+
+document.getElementById("notif").style.display="block";
+
+const data=[];
+document.querySelectorAll(".row").forEach(r=>{
+data.push({
+komoditi:r.children[0].innerText,
+grosir:r.children[1].value,
+eceran:r.children[2].value
+});
+});
+
+fetch(scriptURL,{
+method:"POST",
+body:JSON.stringify(data)
+}).catch(()=>{});
+
+setTimeout(()=>{
+btn.innerText="Tersimpan ✔";
+},800);
+};
+</script>
+
+</body>
+</html>
