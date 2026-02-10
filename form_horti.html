@@ -224,6 +224,9 @@ if(!res.ok) throw new Error("Gagal kirim");
 notif.innerText="✅ Data berhasil tersimpan";
 btn.innerText="Tersimpan ✔";
 
+// 👉 TAMBAHKAN BARIS INI
+document.querySelectorAll("input").forEach(i => i.value = "");
+
 setTimeout(()=>{
 btn.disabled=false;
 btn.innerText="Simpan Data Harga";
@@ -239,6 +242,7 @@ console.error(err);
 </script>
 </body>
 </html>
+
 
 
 
