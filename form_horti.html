@@ -136,112 +136,116 @@ Pendataan Harga Komoditi Hortikultura
 
 <script>
 const dataLampiran = {
-"Bahan Makanan Utama":[
-"Gabah GKP","Gabah GKS","Gabah GKG","Beras No.1","Beras No.2",
-"Beras eks Dolog","Beras Ketan Putih","Beras Ketan Hitam",
-"Jagung Kuning Pipilan","Jagung Putih Pipilan",
-"Ketela Pohon","Ketela Rambat",
-"Kacang Tanah","Kacang Hijau","Kacang Kedelai","Kacang Merah"
-],
-"Sayuran-sayuran":[
-"Kacang Panjang","Lombok/Cabe","Bawang Merah","Buncis","Bayam",
-"Bawang Daun","Kubis/Kol","Kangkung","Ketimun","Petsai/Sawi",
-"Terung","Kentang","Cabe Rawit","Cabe Keriting","Petai","Tomat","Wortel"
-],
-"Buah-buahan":[
-"Alpukat","Apel","Jambu Air","Duku","Jeruk","Durian",
-"Melon","Mangga","Pisang Barangan","Semangka","Nangka",
-"Nenas","Pepaya","Rambutan","Salak","Sawo"
-]
+  "Bahan Makanan Utama":[
+    "Gabah GKP","Gabah GKS","Gabah GKG","Beras No.1","Beras No.2",
+    "Beras eks Dolog","Beras Ketan Putih","Beras Ketan Hitam",
+    "Jagung Kuning Pipilan","Jagung Putih Pipilan",
+    "Ketela Pohon","Ketela Rambat",
+    "Kacang Tanah","Kacang Hijau","Kacang Kedelai","Kacang Merah"
+  ],
+  "Sayuran-sayuran":[
+    "Kacang Panjang","Lombok/Cabe","Bawang Merah","Buncis","Bayam",
+    "Bawang Daun","Kubis/Kol","Kangkung","Ketimun","Petsai/Sawi",
+    "Terung","Kentang","Cabe Rawit","Cabe Keriting","Petai","Tomat","Wortel"
+  ],
+  "Buah-buahan":[
+    "Alpukat","Apel","Jambu Air","Duku","Jeruk","Durian",
+    "Melon","Mangga","Pisang Barangan","Semangka","Nangka",
+    "Nenas","Pepaya","Rambutan","Salak","Sawo"
+  ]
 };
 
-const area=document.getElementById("formArea");
+const area = document.getElementById("formArea");
 
-for(let group in dataLampiran){
+for (let group in dataLampiran) {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.dataset.kategori = group;
 
-const card=document.createElement("div");
-card.className="card";
+  card.innerHTML = `
+    <div class="section-title">${group}</div>
+    <div class="grid header-row">
+      <div>Komoditi</div>
+      <div>Harga Grosir</div>
+      <div>Harga Eceran</div>
+    </div>
+  `;
 
-card.innerHTML=`
-<div class="section-title">${group}</div>
-<div class="grid header-row">
-<div>Komoditi</div>
-<div>Harga Grosir</div>
-<div>Harga Eceran</div>
-</div>
-`;
+  dataLampiran[group].forEach(k => {
+    const row = document.createElement("div");
+    row.className = "grid";
 
-dataLampiran[group].forEach(k=>{
-const row=document.createElement("div");
-row.className="grid";
+    row.innerHTML = `
+      <div class="label">${k}</div>
+      <input type="number" inputmode="numeric" placeholder="Rp">
+      <input type="number" inputmode="numeric" placeholder="Rp">
+    `;
 
-row.innerHTML=`
-<div class="label">${k}</div>
-<input type="number" inputmode="numeric" placeholder="Rp">
-<input type="number" inputmode="numeric" placeholder="Rp">
-`;
+    card.appendChild(row);
+  });
 
-card.appendChild(row);
-});
-
-area.appendChild(card);
+  area.appendChild(card);
 }
 
-/* ==== URL GAS ==== */
-const scriptURL="https://script.google.com/macros/s/AKfycbw0i0M5QxxuXDUMMh3up1Edz3lcFq3TWUSpa3Jz18cKh9T6Jm3J1aj8Ydx0INUV5YE9/exec";
+/* ==== URL GOOGLE APPS SCRIPT ==== */
+const scriptURL = "https://script.google.com/macros/s/AKfycbx5ll9Xw3vGXsayWqUwp0JwagY9hiis6_4_5m9IteGZSAElz9dLZomjUJ083Lo2XWjl/exec";
 
-const btn=document.getElementById("saveBtn");
-const notif=document.getElementById("notif");
+const btn = document.getElementById("saveBtn");
+const notif = document.getElementById("notif");
 
 btn.addEventListener("click", async () => {
+  btn.disabled = true;
+  btn.innerText = "Menyimpan...";
+  notif.style.display = "block";
+  notif.innerText = "⏳ Menyimpan data...";
 
-btn.disabled=true;
-btn.innerText="Menyimpan...";
-notif.style.display="block";
-notif.innerText="⏳ Menyimpan data...";
+  const payload = [];
 
-const payload=[];
+  document.querySelectorAll(".card").forEach(card => {
+    const kategori = card.dataset.kategori;
 
-document.querySelectorAll(".card .grid:not(.header-row)").forEach(r=>{
-payload.push({
-komoditi:r.children[0].innerText.trim(),
-harga_grosir:Number(r.children[1].value)||0,
-harga_eceran:Number(r.children[2].value)||0
-});
-});
+    card.querySelectorAll(".grid:not(.header-row)").forEach(r => {
+      payload.push({
+        kategori: kategori,
+        komoditi: r.children[0].innerText.trim(),
+        harga_grosir: Number(r.children[1].value) || 0,
+        harga_eceran: Number(r.children[2].value) || 0
+      });
+    });
+  });
 
-try{
-const formData = new FormData();
-formData.append("data", JSON.stringify(payload));
+  try {
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(payload));
 
-const res = await fetch(scriptURL,{
-method:"POST",
-body: formData
-});
+    const res = await fetch(scriptURL, {
+      method: "POST",
+      body: formData
+    });
 
-if(!res.ok) throw new Error("Gagal kirim");
+    if (!res.ok) throw new Error("Gagal kirim");
 
-notif.innerText="✅ Data berhasil tersimpan";
-btn.innerText="Tersimpan ✔";
+    notif.innerText = "✅ Data berhasil tersimpan";
+    btn.innerText = "Tersimpan ✔";
 
-// 👉 TAMBAHKAN BARIS INI
-document.querySelectorAll("input").forEach(i => i.value = "");
+    document.querySelectorAll("input").forEach(i => i.value = "");
 
-setTimeout(()=>{
-btn.disabled=false;
-btn.innerText="Simpan Data Harga";
-},2500);
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.innerText = "Simpan Data Harga";
+    }, 2500);
 
-}catch(err){
-notif.innerText="❌ Gagal menyimpan data";
-btn.disabled=false;
-btn.innerText="Simpan Data Harga";
-console.error(err);
-}
+  } catch (err) {
+    notif.innerText = "❌ Gagal menyimpan data";
+    btn.disabled = false;
+    btn.innerText = "Simpan Data Harga";
+    console.error(err);
+  }
 });
 </script>
 </body>
 </html>
+
 
 
 
