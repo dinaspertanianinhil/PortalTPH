@@ -187,28 +187,31 @@ card.appendChild(row);
 area.appendChild(card);
 }
 
+/* ==== URL GAS ==== */
 const scriptURL="https://script.google.com/macros/s/AKfycbwfuyZzk8NqdWOy13yjI5kflAqVkjymJRyG1dVeqlECcWirRqjuBhAALLP3PdGefo-p/exec";
 
 const btn=document.getElementById("saveBtn");
 const notif=document.getElementById("notif");
 
-btn.onclick=async()=>{
+btn.addEventListener("click", async () => {
+
 btn.disabled=true;
 btn.innerText="Menyimpan...";
 notif.style.display="block";
+notif.innerText="⏳ Menyimpan data...";
 
 const payload=[];
 
 document.querySelectorAll(".card .grid:not(.header-row)").forEach(r=>{
 payload.push({
-komoditi:r.children[0].innerText,
-harga_grosir:r.children[1].value||0,
-harga_eceran:r.children[2].value||0
+komoditi:r.children[0].innerText.trim(),
+harga_grosir:Number(r.children[1].value)||0,
+harga_eceran:Number(r.children[2].value)||0
 });
 });
 
 try{
-await fetch(scriptURL,{
+const res = await fetch(scriptURL,{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
@@ -216,6 +219,8 @@ tanggal:new Date().toISOString(),
 data:payload
 })
 });
+
+if(!res.ok) throw "error";
 
 notif.innerText="✅ Data berhasil tersimpan";
 btn.innerText="Tersimpan ✔";
@@ -225,13 +230,13 @@ btn.disabled=false;
 btn.innerText="Simpan Data Harga";
 },2500);
 
-}catch{
-notif.innerText="❌ Gagal menyimpan";
+}catch(err){
+notif.innerText="❌ Gagal menyimpan data";
 btn.disabled=false;
 btn.innerText="Simpan Data Harga";
 }
-};
+});
 </script>
-
 </body>
 </html>
+
