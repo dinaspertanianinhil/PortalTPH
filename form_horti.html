@@ -211,16 +211,15 @@ harga_eceran:Number(r.children[2].value)||0
 });
 
 try{
+const formData = new FormData();
+formData.append("data", JSON.stringify(payload));
+
 const res = await fetch(scriptURL,{
 method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-tanggal:new Date().toISOString(),
-data:payload
-})
+body: formData
 });
 
-if(!res.ok) throw "error";
+if(!res.ok) throw new Error("Gagal kirim");
 
 notif.innerText="✅ Data berhasil tersimpan";
 btn.innerText="Tersimpan ✔";
@@ -234,11 +233,13 @@ btn.innerText="Simpan Data Harga";
 notif.innerText="❌ Gagal menyimpan data";
 btn.disabled=false;
 btn.innerText="Simpan Data Harga";
+console.error(err);
 }
 });
 </script>
 </body>
 </html>
+
 
 
 
