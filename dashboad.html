@@ -6,188 +6,177 @@
 <title>Dashboard Dinas Pertanian</title>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", sans-serif;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Segoe UI, sans-serif;
 }
 
-/* Container fullscreen video */
-#video-bg {
-  position:fixed;
-  top:0; left:0;
-  width:100%;
-  height:100%;
-  z-index:-999;
+body{
   overflow:hidden;
-}
-#video-bg iframe {
-  width:177.77vh;
-  height:100vh;
-  min-width:100vw;
-  min-height:56.25vw;
-  position:absolute;
-  top:-10%;
-  left:50%;
-  transform:translateX(-50%);
+  color:white;
 }
 
-/* Layer di atas video bg */
-.overlay{
-  position:absolute;
-  top:0; left:0;
+/* VIDEO BACKGROUND */
+.video-bg{
+  position:fixed;
+  top:0;
+  left:0;
   width:100%;
   height:100%;
-  background:rgba(0,0,0,0.45);
-  backdrop-filter:blur(3px);
-  z-index:-500;
+  z-index:-2;
   pointer-events:none;
 }
 
-/* Navbar */
-nav {
-  position:fixed;
-  top:0; left:0;
+.video-bg iframe{
   width:100%;
-  background:rgba(0,0,0,.55);
-  backdrop-filter:blur(10px);
-  color:#fff;
-  display:flex;
-  justify-content:space-between;
-  padding:14px 26px;
-  z-index:10;
+  height:100%;
+  transform:scale(1.3);
 }
 
-nav .brand{font-weight:700}
+/* OVERLAY GELAP */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.35);
+  z-index:-1;
+}
 
-/* Menu */
-.menu{
+/* NAVBAR BLUR */
+header{
+  backdrop-filter:blur(12px);
+  background:rgba(0,0,0,.45);
+  padding:18px;
+  text-align:center;
+  font-weight:700;
+  letter-spacing:.5px;
+}
+
+header small{
+  display:block;
+  font-weight:400;
+  opacity:.9;
+  margin-top:4px;
+}
+
+/* CONTENT */
+main{
+  height:calc(100vh - 110px);
   display:flex;
-  gap:18px;
   align-items:center;
+  justify-content:center;
 }
-.menu a{
+
+.card{
+  background:rgba(0,0,0,.45);
+  border:1px solid rgba(255,255,255,.25);
+  backdrop-filter:blur(4px);
+  padding:45px 40px;
+  border-radius:22px;
+  text-align:center;
+  animation:fadeUp .8s ease;
+  max-width:480px;
+  width:90%;
+}
+
+/* JUDUL TAJAM */
+.card h2{
+  font-size:1.8em;
+  margin-bottom:10px;
+  text-shadow:0 3px 8px rgba(0,0,0,.9);
+}
+
+.card p{
+  opacity:.9;
+  margin-bottom:26px;
+}
+
+/* BUTTON */
+.btn{
+  display:block;
+  margin:10px 0;
+  padding:14px;
+  border-radius:12px;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.25);
   color:white;
   text-decoration:none;
   font-weight:600;
-  opacity:.9;
-  transition: .2s;
+  transition:.3s;
 }
-.menu a:hover{opacity:1.0}
 
-/* Dropdown klik */
-.dropdown{position:relative;}
-.dropbtn{cursor:pointer;}
+.btn:hover{
+  transform:translateY(-3px) scale(1.02);
+  background:rgba(255,255,255,.35);
+}
 
-/* dropdown content */
-.dropdown-content{
-  position:absolute;
-  top:42px; left:0;
-  background:rgba(255,255,255,.15);
+.logout{
+  background:rgba(220,40,40,.6);
+}
+
+.logout:hover{
+  background:rgba(255,70,70,.85);
+}
+
+footer{
   backdrop-filter:blur(12px);
-  border-radius:10px;
-  overflow:hidden;
-  max-height:0;
-  opacity:0;
-  transition:.35s ease;
-  z-index:10;
-}
-.dropdown-content a{
-  display:block;
-  padding:12px 16px;
-  color:white;
-}
-.dropdown-content a:hover{
-  background:rgba(255,255,255,.32);
-}
-.dropdown.active .dropdown-content{
-  max-height:300px;
-  opacity:1;
+  background:rgba(0,0,0,.45);
+  text-align:center;
+  padding:12px;
+  font-size:.8em;
 }
 
-/* Hero */
-.hero{
-  padding-top:100px;
-  text-align:center;
-  color:white;
-}
-.hero h1{
-  font-size:2.3em;
-  margin-bottom:6px;
-}
-.hero p{
-  font-size:1.1em;
-  opacity:.85;
+/* ANIMASI */
+@keyframes fadeUp{
+  from{opacity:0; transform:translateY(30px)}
+  to{opacity:1; transform:translateY(0)}
 }
 </style>
 </head>
 
 <body>
 
-<!-- Background YouTube Video -->
-<div id="video-bg">
-  <iframe src="https://www.youtube.com/embed/4vLmW1okekY?autoplay=1&mute=1&controls=0&loop=1&playlist=4vLmW1okekY&modestbranding=1&showinfo=0&rel=0"
-  frameborder="0" allow="autoplay; fullscreen"></iframe>
+<!-- VIDEO -->
+<div class="video-bg">
+<iframe 
+src="https://www.youtube.com/embed/NnVJqxXFsXk?autoplay=1&mute=1&loop=1&playlist=NnVJqxXFsXk&controls=0&showinfo=0&modestbranding=1"
+frameborder="0"
+allow="autoplay; fullscreen">
+</iframe>
 </div>
 
-<!-- Overlay semi gelap -->
 <div class="overlay"></div>
 
-<!-- Navbar -->
-<nav>
-  <div class="brand">🌾 DINAS PERTANIAN INHIL</div>
+<header>
+DINAS PERTANIAN KABUPATEN INDRAGIRI HILIR
+<small>Sistem Pelaporan Pertanian Digital</small>
+</header>
 
-  <div class="menu">
+<main>
+  <div class="card">
+    <h2>📊 Dashboard Utama</h2>
+    <p>Pilih menu untuk mulai bekerja</p>
 
-    <a href="#">Dashboard</a>
-
-    <div class="dropdown">
-      <span class="dropbtn" onclick="toggleDrop(this)">Input Data ▾</span>
-      <div class="dropdown-content">
-        <a href="form_stokharga_TP.html">Harga & Stok Beras</a>
-        <a href="form_horti.html">Harga Horti</a>
-        <a href="form_LTT.html">LTT</a>
-      </div>
-    </div>
-
-    <div class="dropdown">
-      <span class="dropbtn" onclick="toggleDrop(this)">Rekap ▾</span>
-      <div class="dropdown-content">
-        <a href="rekap_beras.html">Rekap Beras</a>
-        <a href="rekap_horti.html">Rekap Horti</a>
-        <a href="rekap_ltt.html">Rekap LTT</a>
-      </div>
-    </div>
-
-    <a href="#" onclick="logout()">Logout</a>
-
+    <a href="form_stokharga_TP.html" class="btn">Harga & Stok Gabah/Beras</a>
+    <a href="form_LTT.html" class="btn">Laporan LTT</a>
+    <a href="form_horti.html" class="btn">Harga Horti</a>
+    <a href="dashboard.html" class="btn">Rekapitulasi Data</a>
+    <a href="#" class="btn logout" onclick="logout()">Logout</a>
   </div>
-</nav>
+</main>
 
-<!-- Hero -->
-<section class="hero">
-  <h1>📊 Sistem Informasi Pertanian</h1>
-  <p>Monitoring Harga — Produksi — Stok — LTT</p>
-</section>
+<footer>
+© 2025 Dinas Pertanian Kabupaten Indragiri Hilir
+</footer>
 
 <script>
-function toggleDrop(el){
-  document.querySelectorAll('.dropdown').forEach(d=>{
-    if(d.contains(el)) d.classList.toggle('active');
-    else d.classList.remove('active');
-  });
+if(!localStorage.getItem("loginUser")){
+  location.href="index.html"
 }
-
-document.addEventListener('click', e=>{
-  if(!e.target.closest('.dropdown')) {
-    document.querySelectorAll('.dropdown').forEach(d=>d.classList.remove('active'));
-  }
-});
-
 function logout(){
-  localStorage.removeItem("loginUser");
-  window.location.href="index.html";
+  localStorage.removeItem("loginUser")
+  location.href="index.html"
 }
 </script>
 
