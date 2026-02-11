@@ -17,7 +17,6 @@ min-height:100vh;
 color:white;
 }
 
-/* ===== NAVBAR ===== */
 nav{
 position:fixed;
 top:0;
@@ -31,10 +30,7 @@ padding:14px 26px;
 z-index:999;
 }
 
-.brand{
-font-weight:700;
-letter-spacing:.5px;
-}
+.brand{font-weight:700}
 
 .menu{
 display:flex;
@@ -42,28 +38,23 @@ gap:22px;
 align-items:center;
 }
 
-.menu a{
+.menu a,.dropbtn{
 color:white;
 text-decoration:none;
 font-weight:600;
-opacity:.9;
-transition:.25s;
-}
-
-.menu a:hover{opacity:1}
-
-/* ===== DROPDOWN ===== */
-.dropdown{
-position:relative;
-}
-
-.dropbtn{
 cursor:pointer;
+opacity:.9;
 }
+
+.menu a:hover,.dropbtn:hover{opacity:1}
+
+/* ===== Dropdown klik ===== */
+
+.dropdown{position:relative}
 
 .dropdown-content{
 position:absolute;
-top:42px;
+top:44px;
 left:0;
 background:rgba(255,255,255,.12);
 backdrop-filter:blur(12px);
@@ -71,30 +62,27 @@ border-radius:14px;
 min-width:210px;
 overflow:hidden;
 box-shadow:0 15px 40px rgba(0,0,0,.35);
+max-height:0;
 opacity:0;
-pointer-events:none;
-transform:translateY(10px);
-transition:.3s ease;
+transition:.35s ease;
 }
 
 .dropdown-content a{
 display:block;
 padding:14px 16px;
 color:white;
-font-weight:500;
 }
 
 .dropdown-content a:hover{
 background:rgba(255,255,255,.2);
 }
 
-.dropdown:hover .dropdown-content{
+.dropdown.active .dropdown-content{
+max-height:500px;
 opacity:1;
-pointer-events:auto;
-transform:translateY(0);
 }
 
-/* ===== HERO ===== */
+/* ===== Hero ===== */
 .hero{
 padding-top:130px;
 text-align:center;
@@ -106,16 +94,7 @@ from{opacity:0;transform:translateY(20px)}
 to{opacity:1;transform:translateY(0)}
 }
 
-.hero h1{
-font-size:2.2em;
-margin-bottom:12px;
-}
-
-.hero p{
-opacity:.9;
-}
-
-/* ===== MOBILE ===== */
+/* ===== Mobile ===== */
 .mobile-btn{
 display:none;
 font-size:26px;
@@ -140,13 +119,9 @@ padding:18px 0;
 
 .dropdown-content{
 position:static;
-transform:none;
-opacity:1;
-pointer-events:auto;
 background:none;
 box-shadow:none;
 }
-.dropdown-content a{padding:10px}
 }
 </style>
 </head>
@@ -158,10 +133,11 @@ box-shadow:none;
 <div class="mobile-btn" onclick="toggleMenu()">☰</div>
 
 <div class="menu" id="menu">
+
 <a href="#">Dashboard</a>
 
 <div class="dropdown">
-<span class="dropbtn">Input Data ▾</span>
+<span class="dropbtn" onclick="toggleDrop(this)">Input Data ▾</span>
 <div class="dropdown-content">
 <a href="form_stokharga_TP.html">Harga & Stok Beras</a>
 <a href="form_horti.html">Harga Horti</a>
@@ -170,7 +146,7 @@ box-shadow:none;
 </div>
 
 <div class="dropdown">
-<span class="dropbtn">Rekap ▾</span>
+<span class="dropbtn" onclick="toggleDrop(this)">Rekap ▾</span>
 <div class="dropdown-content">
 <a href="rekap_beras.html">Rekap Beras</a>
 <a href="rekap_horti.html">Rekap Horti</a>
@@ -178,8 +154,8 @@ box-shadow:none;
 </div>
 </div>
 
-<a href="#">Laporan</a>
 <a href="#" onclick="logout()">Logout</a>
+
 </div>
 </nav>
 
@@ -192,6 +168,22 @@ box-shadow:none;
 function toggleMenu(){
 document.getElementById("menu").classList.toggle("show");
 }
+
+function toggleDrop(el){
+document.querySelectorAll(".dropdown").forEach(d=>{
+if(d.contains(el)){
+d.classList.toggle("active");
+}else{
+d.classList.remove("active");
+}
+});
+}
+
+document.addEventListener("click",e=>{
+if(!e.target.closest(".dropdown")){
+document.querySelectorAll(".dropdown").forEach(d=>d.classList.remove("active"));
+}
+});
 
 if(!localStorage.getItem("loginUser")){
 window.location.href="index.html";
