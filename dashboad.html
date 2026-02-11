@@ -3,17 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Visual</title>
+<title>Dashboard Dinas Pertanian</title>
 
 <style>
-html,body{
+*{
   margin:0;
-  height:100%;
-  font-family:Segoe UI,Arial,sans-serif;
-  overflow:hidden;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Segoe UI",sans-serif;
 }
 
-/* Video layer */
+body{
+  height:100vh;
+  overflow:hidden;
+  color:#fff;
+}
+
+/* VIDEO BACKGROUND */
 .video-bg{
   position:fixed;
   top:0;
@@ -21,75 +27,157 @@ html,body{
   width:100%;
   height:100%;
   z-index:-2;
+  overflow:hidden;
 }
 
 .video-bg iframe{
-  width:100%;
-  height:100%;
+  width:100vw;
+  height:100vh;
+  transform:scale(1.3);
   pointer-events:none;
 }
 
-/* Overlay biar tajam tapi tetap readable */
+/* DARK OVERLAY */
 .overlay{
   position:fixed;
   inset:0;
-  background:linear-gradient(
-    rgba(0,0,0,.25),
-    rgba(0,0,0,.45)
-  );
+  background:linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.65));
   z-index:-1;
 }
 
-/* Center text */
-.content{
-  height:100%;
+/* HEADER */
+header{
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(8px);
+  padding:18px;
+  text-align:center;
+  font-weight:700;
+  letter-spacing:.5px;
+}
+
+header small{
+  display:block;
+  font-weight:400;
+  opacity:.9;
+  margin-top:5px;
+}
+
+/* MAIN */
+main{
+  height:calc(100vh - 120px);
   display:flex;
   align-items:center;
   justify-content:center;
+  padding:20px;
+}
+
+/* CARD */
+.card{
+  background:rgba(255,255,255,.14);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.25);
+  padding:45px 35px;
+  border-radius:22px;
+  width:100%;
+  max-width:460px;
   text-align:center;
-  color:white;
-  animation:fade .8s ease;
+  animation:fadeUp .7s ease;
 }
 
-.content h1{
-  font-size:3rem;
-  letter-spacing:1px;
-  margin-bottom:12px;
-}
-
-.content p{
-  opacity:.85;
-  font-size:1.1rem;
-}
-
-@keyframes fade{
+@keyframes fadeUp{
   from{opacity:0;transform:translateY(25px)}
   to{opacity:1;transform:translateY(0)}
 }
 
-/* Responsive */
-@media(max-width:768px){
-  .content h1{font-size:2rem}
+.card h2{
+  font-size:1.6em;
+  margin-bottom:15px;
+}
+
+.card p{
+  opacity:.9;
+  margin-bottom:25px;
+}
+
+.btn{
+  display:block;
+  margin:10px 0;
+  padding:14px;
+  border-radius:12px;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.3);
+  color:#fff;
+  font-weight:600;
+  text-decoration:none;
+  transition:.25s ease;
+}
+
+.btn:hover{
+  background:rgba(255,255,255,.35);
+  transform:translateY(-3px);
+}
+
+.logout{
+  background:rgba(230,50,50,.55);
+}
+
+.logout:hover{
+  background:rgba(255,70,70,.75);
+}
+
+/* FOOTER */
+footer{
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(8px);
+  text-align:center;
+  padding:12px;
+  font-size:.82em;
 }
 </style>
 </head>
+
 <body>
 
+<!-- VIDEO -->
 <div class="video-bg">
-<iframe src="https://www.youtube.com/embed/NnVJqxXFsXk?autoplay=1&mute=1&controls=0&showinfo=0&modestbranding=1&loop=1&playlist=NnVJqxXFsXk&rel=0&playsinline=1"
-frameborder="0"
-allow="autoplay; fullscreen">
-</iframe>
+<iframe src="https://www.youtube.com/embed/NnVJqxXFsXk?autoplay=1&mute=1&loop=1&playlist=NnVJqxXFsXk&controls=0&showinfo=0&rel=0&modestbranding=1&vq=hd1080"
+allow="autoplay; fullscreen"></iframe>
 </div>
 
 <div class="overlay"></div>
 
-<div class="content">
-  <div>
-    <h1>Dinas Pertanian</h1>
-    <p>Visual Dashboard System</p>
-  </div>
+<header>
+DINAS PERTANIAN KABUPATEN INDRAGIRI HILIR
+<small>Sistem Laporan Stok • Produksi • Harga</small>
+</header>
+
+<main>
+<div class="card">
+<h2>📊 Dashboard Utama</h2>
+<p>Pilih menu untuk melanjutkan</p>
+
+<a href="form_stokharga_TP.html" class="btn">📝 Form Harga & Stok</a>
+<a href="form_LTT.html" class="btn">🌾 Form LTT</a>
+<a href="form_horti.html" class="btn">🥦 Form Harga Horti</a>
+<a href="dashboard.html" class="btn">📈 Rekapitulasi Data</a>
+
+<a href="#" onclick="logout()" class="btn logout">🚪 Logout</a>
 </div>
+</main>
+
+<footer>
+© 2025 Dinas Pertanian Kabupaten Indragiri Hilir
+</footer>
+
+<script>
+if(!localStorage.getItem("loginUser")){
+  window.location.href="index.html";
+}
+function logout(){
+  localStorage.removeItem("loginUser");
+  window.location.href="index.html";
+}
+</script>
 
 </body>
 </html>
