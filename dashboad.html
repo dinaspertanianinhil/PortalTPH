@@ -6,176 +6,235 @@
 <title>Dashboard Dinas Pertanian</title>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:"Segoe UI",sans-serif;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui,sans-serif}
 
 body{
-  height:100vh;
-  overflow:hidden;
-  color:#fff;
+min-height:100vh;
+color:white;
+overflow-x:hidden;
 }
 
-/* VIDEO BACKGROUND */
+/* ===== VIDEO BACKGROUND ===== */
 .video-bg{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  z-index:-2;
-  overflow:hidden;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-2;
+overflow:hidden;
 }
 
 .video-bg iframe{
-  width:100vw;
-  height:100vh;
-  transform:scale(1.3);
-  pointer-events:none;
+width:100vw;
+height:100vh;
+transform:scale(1.25);
+pointer-events:none;
 }
 
-/* DARK OVERLAY */
 .overlay{
-  position:fixed;
-  inset:0;
-  background:linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.65));
-  z-index:-1;
+position:fixed;
+inset:0;
+background:linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.65));
+z-index:-1;
 }
 
-/* HEADER */
-header{
-  background:rgba(0,0,0,.55);
-  backdrop-filter:blur(8px);
-  padding:18px;
-  text-align:center;
-  font-weight:700;
-  letter-spacing:.5px;
+/* ===== NAVBAR ===== */
+nav{
+position:fixed;
+top:0;
+width:100%;
+background:rgba(0,0,0,.45);
+backdrop-filter:blur(10px);
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:14px 26px;
+z-index:999;
 }
 
-header small{
-  display:block;
-  font-weight:400;
-  opacity:.9;
-  margin-top:5px;
+.brand{font-weight:700}
+
+.menu{
+display:flex;
+gap:22px;
+align-items:center;
 }
 
-/* MAIN */
-main{
-  height:calc(100vh - 120px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
+.menu a,.dropbtn{
+color:white;
+text-decoration:none;
+font-weight:600;
+cursor:pointer;
+opacity:.9;
 }
 
-/* CARD */
-.card{
-  background:rgba(255,255,255,.14);
-  backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,.25);
-  padding:45px 35px;
-  border-radius:22px;
-  width:100%;
-  max-width:460px;
-  text-align:center;
-  animation:fadeUp .7s ease;
+.menu a:hover,.dropbtn:hover{opacity:1}
+
+/* ===== Dropdown ===== */
+.dropdown{position:relative}
+
+.dropdown-content{
+position:absolute;
+top:44px;
+left:0;
+background:rgba(255,255,255,.14);
+backdrop-filter:blur(14px);
+border-radius:14px;
+min-width:210px;
+overflow:hidden;
+box-shadow:0 15px 40px rgba(0,0,0,.4);
+max-height:0;
+opacity:0;
+transition:.35s ease;
 }
 
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(25px)}
-  to{opacity:1;transform:translateY(0)}
+.dropdown-content a{
+display:block;
+padding:14px 16px;
+color:white;
 }
 
-.card h2{
-  font-size:1.6em;
-  margin-bottom:15px;
+.dropdown-content a:hover{
+background:rgba(255,255,255,.22);
 }
 
-.card p{
-  opacity:.9;
-  margin-bottom:25px;
+.dropdown.active .dropdown-content{
+max-height:500px;
+opacity:1;
 }
 
-.btn{
-  display:block;
-  margin:10px 0;
-  padding:14px;
-  border-radius:12px;
-  background:rgba(255,255,255,.18);
-  border:1px solid rgba(255,255,255,.3);
-  color:#fff;
-  font-weight:600;
-  text-decoration:none;
-  transition:.25s ease;
+/* ===== HERO ===== */
+.hero{
+padding-top:140px;
+text-align:center;
+animation:fade .8s ease;
 }
 
-.btn:hover{
-  background:rgba(255,255,255,.35);
-  transform:translateY(-3px);
+.hero h1{
+font-size:2.2rem;
+margin-bottom:10px;
 }
 
-.logout{
-  background:rgba(230,50,50,.55);
+.hero p{
+opacity:.9;
+font-size:1.05rem;
 }
 
-.logout:hover{
-  background:rgba(255,70,70,.75);
+@keyframes fade{
+from{opacity:0;transform:translateY(25px)}
+to{opacity:1;transform:translateY(0)}
 }
 
-/* FOOTER */
-footer{
-  background:rgba(0,0,0,.55);
-  backdrop-filter:blur(8px);
-  text-align:center;
-  padding:12px;
-  font-size:.82em;
+/* ===== Mobile ===== */
+.mobile-btn{
+display:none;
+font-size:26px;
+cursor:pointer;
+}
+
+@media(max-width:820px){
+.menu{
+display:none;
+position:absolute;
+top:70px;
+left:0;
+width:100%;
+background:rgba(0,0,0,.75);
+flex-direction:column;
+padding:18px 0;
+}
+
+.menu.show{display:flex}
+.mobile-btn{display:block}
+
+.dropdown-content{
+position:static;
+background:none;
+box-shadow:none;
+}
 }
 </style>
 </head>
 
 <body>
 
-<!-- VIDEO -->
+<!-- VIDEO BACKGROUND -->
 <div class="video-bg">
-<iframe src="https://www.youtube.com/embed/NnVJqxXFsXk?autoplay=1&mute=1&loop=1&playlist=NnVJqxXFsXk&controls=0&showinfo=0&rel=0&modestbranding=1&vq=hd1080"
-allow="autoplay; fullscreen"></iframe>
+<iframe 
+src="https://www.youtube.com/embed/NnVJqxXFsXk?autoplay=1&mute=1&loop=1&playlist=NnVJqxXFsXk&controls=0&rel=0&showinfo=0&modestbranding=1&vq=hd1080"
+allow="autoplay">
+</iframe>
 </div>
-
 <div class="overlay"></div>
 
-<header>
-DINAS PERTANIAN KABUPATEN INDRAGIRI HILIR
-<small>Sistem Laporan Stok • Produksi • Harga</small>
-</header>
+<!-- NAVBAR -->
+<nav>
+<div class="brand">🌾 DINAS PERTANIAN INHIL</div>
 
-<main>
-<div class="card">
-<h2>📊 Dashboard Utama</h2>
-<p>Pilih menu untuk melanjutkan</p>
+<div class="mobile-btn" onclick="toggleMenu()">☰</div>
 
-<a href="form_stokharga_TP.html" class="btn">📝 Form Harga & Stok</a>
-<a href="form_LTT.html" class="btn">🌾 Form LTT</a>
-<a href="form_horti.html" class="btn">🥦 Form Harga Horti</a>
-<a href="dashboard.html" class="btn">📈 Rekapitulasi Data</a>
+<div class="menu" id="menu">
 
-<a href="#" onclick="logout()" class="btn logout">🚪 Logout</a>
+<a href="#">Dashboard</a>
+
+<div class="dropdown">
+<span class="dropbtn" onclick="toggleDrop(this)">Input Data ▾</span>
+<div class="dropdown-content">
+<a href="form_stokharga_TP.html">Harga & Stok Beras</a>
+<a href="form_horti.html">Harga Horti</a>
+<a href="form_LTT.html">LTT</a>
 </div>
-</main>
+</div>
 
-<footer>
-© 2025 Dinas Pertanian Kabupaten Indragiri Hilir
-</footer>
+<div class="dropdown">
+<span class="dropbtn" onclick="toggleDrop(this)">Rekap ▾</span>
+<div class="dropdown-content">
+<a href="rekap_beras.html">Rekap Beras</a>
+<a href="rekap_horti.html">Rekap Horti</a>
+<a href="rekap_ltt.html">Rekap LTT</a>
+</div>
+</div>
+
+<a href="#" onclick="logout()">Logout</a>
+
+</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+<h1>📊 Sistem Informasi Pertanian</h1>
+<p>Monitoring Harga • Produksi • Stok • LTT Kabupaten Indragiri Hilir</p>
+</section>
 
 <script>
-if(!localStorage.getItem("loginUser")){
-  window.location.href="index.html";
+function toggleMenu(){
+document.getElementById("menu").classList.toggle("show");
 }
+
+function toggleDrop(el){
+document.querySelectorAll(".dropdown").forEach(d=>{
+if(d.contains(el)){
+d.classList.toggle("active");
+}else{
+d.classList.remove("active");
+}
+});
+}
+
+document.addEventListener("click",e=>{
+if(!e.target.closest(".dropdown")){
+document.querySelectorAll(".dropdown").forEach(d=>d.classList.remove("active"));
+}
+});
+
+if(!localStorage.getItem("loginUser")){
+window.location.href="index.html";
+}
+
 function logout(){
-  localStorage.removeItem("loginUser");
-  window.location.href="index.html";
+localStorage.removeItem("loginUser");
+window.location.href="index.html";
 }
 </script>
 
