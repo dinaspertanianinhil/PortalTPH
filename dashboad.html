@@ -3,22 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Dinas Pertanian</title>
+<title>Dashboard Visual</title>
 
 <style>
-*{
+html,body{
   margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Segoe UI, sans-serif;
-}
-
-body{
+  height:100%;
+  font-family:Segoe UI,Arial,sans-serif;
   overflow:hidden;
-  color:white;
 }
 
-/* VIDEO BACKGROUND */
+/* Video layer */
 .video-bg{
   position:fixed;
   top:0;
@@ -26,121 +21,62 @@ body{
   width:100%;
   height:100%;
   z-index:-2;
-  pointer-events:none;
 }
 
 .video-bg iframe{
   width:100%;
   height:100%;
-  transform:scale(1.3);
+  pointer-events:none;
 }
 
-/* OVERLAY GELAP */
+/* Overlay biar tajam tapi tetap readable */
 .overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.35);
+  background:linear-gradient(
+    rgba(0,0,0,.25),
+    rgba(0,0,0,.45)
+  );
   z-index:-1;
 }
 
-/* NAVBAR BLUR */
-header{
-  backdrop-filter:blur(12px);
-  background:rgba(0,0,0,.45);
-  padding:18px;
-  text-align:center;
-  font-weight:700;
-  letter-spacing:.5px;
-}
-
-header small{
-  display:block;
-  font-weight:400;
-  opacity:.9;
-  margin-top:4px;
-}
-
-/* CONTENT */
-main{
-  height:calc(100vh - 110px);
+/* Center text */
+.content{
+  height:100%;
   display:flex;
   align-items:center;
   justify-content:center;
-}
-
-.card{
-  background:rgba(0,0,0,.45);
-  border:1px solid rgba(255,255,255,.25);
-  backdrop-filter:blur(4px);
-  padding:45px 40px;
-  border-radius:22px;
   text-align:center;
-  animation:fadeUp .8s ease;
-  max-width:480px;
-  width:90%;
-}
-
-/* JUDUL TAJAM */
-.card h2{
-  font-size:1.8em;
-  margin-bottom:10px;
-  text-shadow:0 3px 8px rgba(0,0,0,.9);
-}
-
-.card p{
-  opacity:.9;
-  margin-bottom:26px;
-}
-
-/* BUTTON */
-.btn{
-  display:block;
-  margin:10px 0;
-  padding:14px;
-  border-radius:12px;
-  background:rgba(255,255,255,.18);
-  border:1px solid rgba(255,255,255,.25);
   color:white;
-  text-decoration:none;
-  font-weight:600;
-  transition:.3s;
+  animation:fade .8s ease;
 }
 
-.btn:hover{
-  transform:translateY(-3px) scale(1.02);
-  background:rgba(255,255,255,.35);
+.content h1{
+  font-size:3rem;
+  letter-spacing:1px;
+  margin-bottom:12px;
 }
 
-.logout{
-  background:rgba(220,40,40,.6);
+.content p{
+  opacity:.85;
+  font-size:1.1rem;
 }
 
-.logout:hover{
-  background:rgba(255,70,70,.85);
+@keyframes fade{
+  from{opacity:0;transform:translateY(25px)}
+  to{opacity:1;transform:translateY(0)}
 }
 
-footer{
-  backdrop-filter:blur(12px);
-  background:rgba(0,0,0,.45);
-  text-align:center;
-  padding:12px;
-  font-size:.8em;
-}
-
-/* ANIMASI */
-@keyframes fadeUp{
-  from{opacity:0; transform:translateY(30px)}
-  to{opacity:1; transform:translateY(0)}
+/* Responsive */
+@media(max-width:768px){
+  .content h1{font-size:2rem}
 }
 </style>
 </head>
-
 <body>
 
-<!-- VIDEO -->
 <div class="video-bg">
-<iframe 
-src="https://www.youtube.com/embed/NnVJqxXFsXk?autoplay=1&mute=1&loop=1&playlist=NnVJqxXFsXk&controls=0&showinfo=0&modestbranding=1"
+<iframe src="https://www.youtube.com/embed/NnVJqxXFsXk?autoplay=1&mute=1&controls=0&showinfo=0&modestbranding=1&loop=1&playlist=NnVJqxXFsXk&rel=0&playsinline=1"
 frameborder="0"
 allow="autoplay; fullscreen">
 </iframe>
@@ -148,37 +84,12 @@ allow="autoplay; fullscreen">
 
 <div class="overlay"></div>
 
-<header>
-DINAS PERTANIAN KABUPATEN INDRAGIRI HILIR
-<small>Sistem Pelaporan Pertanian Digital</small>
-</header>
-
-<main>
-  <div class="card">
-    <h2>📊 Dashboard Utama</h2>
-    <p>Pilih menu untuk mulai bekerja</p>
-
-    <a href="form_stokharga_TP.html" class="btn">Harga & Stok Gabah/Beras</a>
-    <a href="form_LTT.html" class="btn">Laporan LTT</a>
-    <a href="form_horti.html" class="btn">Harga Horti</a>
-    <a href="dashboard.html" class="btn">Rekapitulasi Data</a>
-    <a href="#" class="btn logout" onclick="logout()">Logout</a>
+<div class="content">
+  <div>
+    <h1>Dinas Pertanian</h1>
+    <p>Visual Dashboard System</p>
   </div>
-</main>
-
-<footer>
-© 2025 Dinas Pertanian Kabupaten Indragiri Hilir
-</footer>
-
-<script>
-if(!localStorage.getItem("loginUser")){
-  location.href="index.html"
-}
-function logout(){
-  localStorage.removeItem("loginUser")
-  location.href="index.html"
-}
-</script>
+</div>
 
 </body>
 </html>
