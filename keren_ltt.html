@@ -19,7 +19,7 @@ td,th{border:1px solid #ccc;padding:6px;font-size:12px}
 </div>
 
 <script>
-fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vTh8tWy51eqNOkC7loWc9vYT2HrPOboMrpD-EplUVVznhgHs5EYjCWVnWpiw02jqVzRY9TN64VWvaha/pubhtml")
+fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vTh8tWy51eqNOkC7loWc9vYT2HrPOboMrpD-EplUVVznhgHs5EYjCWVnWpiw02jqVzRY9TN64VWvaha/pub?gid=733937360&single=true&output=csv")
 .then(res=>res.text())
 .then(data=>{
   let rows=data.split("\n").map(r=>r.split(","))
