@@ -12,11 +12,6 @@ body{
   background:#f6f7f9;
 }
 
-h3{
-  text-align:center;
-  margin-bottom:12px;
-}
-
 .container{
   overflow-x:auto;
   background:white;
@@ -32,42 +27,43 @@ table{
 
 th,td{
   border:1px solid #bbb;
-  padding:6px 8px;
+  padding:6px 6px;
   font-size:13px;
-  text-align:center;
-  word-wrap:break-word;
 }
 
+/* HEADER EXCEL STYLE */
+th{
+  background:#f1f1f1;
+  text-align:center;
+  vertical-align:middle;
+  font-weight:600;
+  white-space:normal;
+  line-height:1.2;
+}
+
+/* ISI DATA */
 td{
+  text-align:center;
   white-space:normal;
 }
 
-th{
-  background:#f1f1f1;
-  position:sticky;
-  top:0;
-  font-weight:600;
-}
-
-tr:nth-child(even){
-  background:#fafafa;
-}
-
-/* kolom pertama (nama/poktan) lebih lebar */
+/* kolom teks lebar */
 td:first-child, th:first-child{
   text-align:left;
   width:220px;
 }
 
-/* kolom angka sempit */
+/* kolom angka kecil */
 td:not(:first-child), th:not(:first-child){
-  width:90px;
+  width:85px;
+}
+
+tr:nth-child(even){
+  background:#fafafa;
 }
 </style>
 </head>
 <body>
-
-<h3>Rekap LTT Harian – Internal Bidang</h3>
 
 <div class="container">
 <table id="sheet"></table>
