@@ -27,14 +27,18 @@ h3{
 table{
   border-collapse:collapse;
   width:max-content;
-  min-width:1600px;
+  min-width:1400px;
 }
 
 td,th{
   border:1px solid #ccc;
-  padding:8px 12px;
+  padding:8px 10px;
   font-size:14px;
-  white-space:nowrap;
+
+  /* wrap ala Excel */
+  white-space:normal;
+  word-break:break-word;
+  max-width:160px;
 }
 
 th{
