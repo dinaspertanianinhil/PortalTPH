@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard LTT 2026</title>
+
+<style>
+body{
+font-family:Segoe UI;
+background:#f5f7fa;
+margin:0;
+padding:20px;
+}
+
+header{
+background:#2d6a4f;
+color:white;
+padding:15px;
+border-radius:10px;
+text-align:center;
+margin-bottom:20px;
+}
+
+.card{
+background:white;
+padding:15px;
+border-radius:10px;
+margin-bottom:15px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:10px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:8px;
+font-size:13px;
+}
+
+th{
+background:#40916c;
+color:white;
+}
+
+.total{
+font-size:22px;
+font-weight:bold;
+color:#1b4332;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+<h2>Dashboard LTT 2026</h2>
+</header>
+
+<div class="card">
+Total LTT Kabupaten
+<div class="total" id="totalLTT">Loading...</div>
+</div>
+
+<div class="card">
+<h3>Rekap Jenis LTT</h3>
+<table id="tabelJenis"></table>
+</div>
+
+<div class="card">
+<h3>Rekap Kecamatan</h3>
+<table id="tabelKecamatan"></table>
+</div>
+
+<div class="card">
+<h3>Rekap Desa</h3>
+<table id="tabelDesa"></table>
+</div>
+
+<div class="card">
+<h3>Rekap Poktan</h3>
+<table id="tabelPoktan"></table>
+</div>
+
+<script>
+
+const API = "https://script.google.com/macros/s/AKfycbzVNjG48vEwjOMHLkpdZFU_-vc5V9lnwt9bOFme4YoRrx04Rr2seuzU5ATPQ_NpV5Ks/exec";
+
+async function loadDashboard(){
+const res = await fetch(API);
+const data = await res.json();
+
+document.getElementById("totalLTT").innerText = data.total_ltt + " Ha";
+
+buatTabel("tabelJenis", data.jenis, "Jenis LTT");
+buatTabel("tabelKecamatan", data.kecamatan, "Kecamatan");
+buatTabel("tabelDesa", data.desa, "Desa");
+buatTabel("tabelPoktan", data.poktan, "Poktan");
+}
+
+function buatTabel(id, obj, title){
+let html = `<tr><th>${title}</th><th>Luas</th></tr>`;
+for(let key in obj){
+html += `<tr><td>${key}</td><td>${obj[key]} Ha</td></tr>`;
+}
+document.getElementById(id).innerHTML = html;
+}
+
+loadDashboard();
+
+</script>
+
+</body>
+</html>
