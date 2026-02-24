@@ -2,75 +2,77 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard LTT</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <style>
 
 body{
 font-family:Segoe UI;
 margin:0;
-background:url("https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-green-rice-fields-with-morning-dew-and-mountains-with-image_15859864.jpg") center/cover fixed;
-}
-
-.overlay{
-background:rgba(255,255,255,0.92);
-min-height:100vh;
 padding:20px;
+background-image:url("https://png.pngtree.com/thumb_back/fh260/background/20240731/pngtree-beautiful-landscape-of-a-rice-field-and-sky-in-the-village-image_15937834.jpg");
+background-size:cover;
+background-position:center;
+background-attachment:fixed;
 }
 
-header{
+/* overlay biar tulisan tetap jelas */
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:rgba(255,255,255,0.85);
+z-index:-1;
+}
+
+.header{
 display:flex;
 align-items:center;
 gap:15px;
-margin-bottom:20px;
+margin-bottom:15px;
 }
 
-header img{
-width:65px;
-background:white;
-border-radius:10px;
-padding:4px;
+.logo{
+width:70px;
 }
 
-.title{
+.judul{
 font-size:22px;
-font-weight:700;
-color:#1b4332;
+font-weight:600;
 }
 
 .score{
 background:#2d6a4f;
 color:white;
-padding:14px;
+padding:15px;
 border-radius:10px;
-text-align:center;
 font-size:20px;
 margin-bottom:20px;
+text-align:center;
 }
 
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
 gap:15px;
 }
 
 .card{
 background:white;
 padding:15px;
-border-radius:12px;
-box-shadow:0 4px 10px rgba(0,0,0,0.1);
+border-radius:10px;
+box-shadow:0 3px 8px rgba(0,0,0,0.1);
 }
 
 .menu{
-display:flex;
-flex-wrap:wrap;
-gap:8px;
 margin-bottom:10px;
 }
 
@@ -78,50 +80,31 @@ margin-bottom:10px;
 background:#40916c;
 border:none;
 color:white;
-padding:7px 12px;
-border-radius:8px;
+padding:7px 14px;
+margin:4px;
+border-radius:6px;
 cursor:pointer;
-font-size:13px;
 }
 
 .menu button:hover{
-background:#1b4332;
+background:#2d6a4f;
 }
 
 table{
 width:100%;
 border-collapse:collapse;
-font-size:13px;
 }
 
 th{
 background:#2d6a4f;
 color:white;
-padding:7px;
+padding:6px;
 }
 
 td{
 padding:6px;
 border-bottom:1px solid #ddd;
-}
-
-.action{
-margin-bottom:10px;
-}
-
-.action button{
-background:#2d6a4f;
-border:none;
-color:white;
-padding:6px 12px;
-border-radius:6px;
-cursor:pointer;
-margin-right:6px;
-}
-
-.rank{
-font-weight:bold;
-color:#1b4332;
+text-align:center;
 }
 
 </style>
@@ -129,16 +112,14 @@ color:#1b4332;
 
 <body>
 
-<div class="overlay" id="areaDashboard">
+<div id="dashboard">
 
-<header>
-<img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
-<div>
-<div class="title">Dashboard LTT Kabupaten</div>
+<div class="header">
+<img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
+<div class="judul">Dashboard LTT Kabupaten</div>
 </div>
-</header>
 
-<div class="score" id="total">Memuat data...</div>
+<div class="score" id="total">Memuat...</div>
 
 <div class="grid">
 
@@ -149,38 +130,27 @@ color:#1b4332;
 
 <div class="card">
 <h3>Ranking Kecamatan</h3>
-<canvas id="chartRanking"></canvas>
-</div>
-
-<div class="card">
-<h3>Grafik Mingguan</h3>
-<canvas id="chartMinggu"></canvas>
-</div>
-
-<div class="card">
-<h3>Grafik Bulanan</h3>
-<canvas id="chartBulan"></canvas>
+<canvas id="chartKecamatan"></canvas>
 </div>
 
 <div class="card" style="grid-column:1/-1">
 
-<h3>Data Rekap</h3>
+<h3>Rekap Data</h3>
 
 <div class="menu">
-<button onclick="ganti('jenis_total')">Jenis LTT Kabupaten</button>
-<button onclick="ganti('jenis_kecamatan')">Jenis per Kecamatan</button>
-<button onclick="ganti('jenis_desa')">Jenis per Desa</button>
-<button onclick="ganti('kecamatan')">Rekap Kecamatan</button>
-<button onclick="ganti('desa')">Rekap Desa</button>
-<button onclick="ganti('poktan')">Rekap Poktan</button>
-</div>
-
-<div class="action">
+<button onclick="mode='jenis_total';render()">Jenis LTT Kabupaten</button>
+<button onclick="mode='jenis_kecamatan';render()">Jenis LTT Kecamatan</button>
+<button onclick="mode='jenis_desa';render()">Jenis LTT Desa</button>
+<button onclick="mode='kecamatan';render()">Rekap Kecamatan</button>
+<button onclick="mode='desa';render()">Rekap Desa</button>
+<button onclick="mode='poktan';render()">Rekap Poktan</button>
+<button onclick="mode='mingguan';render()">Rekap Mingguan</button>
+<button onclick="mode='bulanan';render()">Rekap Bulanan</button>
 <button onclick="downloadExcel()">Download Excel</button>
 <button onclick="downloadPDF()">Download PDF</button>
 </div>
 
-<div id="tabel">Memuat...</div>
+<div id="tabel">Memuat data...</div>
 
 </div>
 
@@ -193,7 +163,6 @@ const url="https://script.google.com/macros/s/AKfycby2-GIC6Rx_atSv-Y65VjJedMMYhb
 
 let DATA;
 let mode="jenis_total";
-let tabelData=[];
 
 async function load(){
 
@@ -201,67 +170,141 @@ const res=await fetch(url);
 DATA=await res.json();
 
 document.getElementById("total").innerHTML=
-"TOTAL LTT : "+DATA.total_kabupaten+" Ha";
+"Total LTT Kabupaten : "+DATA.total_kabupaten+" Ha";
 
 buatGrafik("chartJenis",DATA.jenis_total);
-buatGrafik("chartRanking",DATA.kecamatan_total);
-buatGrafik("chartMinggu",DATA.mingguan || {"M1":0});
-buatGrafik("chartBulan",DATA.bulanan || {"Jan":0});
+buatGrafik("chartKecamatan",DATA.kecamatan_total);
 
 render();
+
 }
 
 function buatGrafik(id,data){
+
+const label=Object.keys(data);
+const nilai=Object.values(data);
+
 new Chart(document.getElementById(id),{
 type:"bar",
 data:{
-labels:Object.keys(data),
-datasets:[{data:Object.values(data)}]
+labels:label,
+datasets:[{data:nilai}]
 },
-options:{responsive:true}
-});
+options:{
+plugins:{legend:{display:false}}
 }
+});
 
-function ganti(m){
-mode=m;
-render();
 }
 
 function render(){
 
 let html="<table>";
-tabelData=[];
 
-if(mode=="jenis_total"){
+if(mode==="jenis_total"){
+
 html+="<tr><th>Jenis LTT</th><th>Luas</th></tr>";
 for(let i in DATA.jenis_total){
 html+=`<tr><td>${i}</td><td>${DATA.jenis_total[i]}</td></tr>`;
-tabelData.push([i,DATA.jenis_total[i]]);
+}
+
+}
+
+if(mode==="jenis_kecamatan"){
+
+let jenisSet=new Set();
+
+for(let kec in DATA.jenis_per_kecamatan){
+for(let jenis in DATA.jenis_per_kecamatan[kec]){
+jenisSet.add(jenis);
 }
 }
 
-if(mode=="kecamatan"){
+let jenisList=[...jenisSet];
+
+html+="<tr><th>Kecamatan</th>";
+jenisList.forEach(j=>html+=`<th>${j}</th>`);
+html+="</tr>";
+
+for(let kec in DATA.jenis_per_kecamatan){
+
+html+=`<tr><td>${kec}</td>`;
+
+jenisList.forEach(j=>{
+let nilai=DATA.jenis_per_kecamatan[kec][j]||0;
+html+=`<td>${nilai}</td>`;
+});
+
+html+="</tr>";
+}
+
+}
+
+if(mode==="jenis_desa"){
+
+let jenisSet=new Set();
+
+for(let desa in DATA.jenis_per_desa){
+for(let jenis in DATA.jenis_per_desa[desa]){
+jenisSet.add(jenis);
+}
+}
+
+let jenisList=[...jenisSet];
+
+html+="<tr><th>Desa</th>";
+jenisList.forEach(j=>html+=`<th>${j}</th>`);
+html+="</tr>";
+
+for(let desa in DATA.jenis_per_desa){
+
+html+=`<tr><td>${desa}</td>`;
+
+jenisList.forEach(j=>{
+let nilai=DATA.jenis_per_desa[desa][j]||0;
+html+=`<td>${nilai}</td>`;
+});
+
+html+="</tr>";
+}
+
+}
+
+if(mode==="kecamatan"){
+
 html+="<tr><th>Kecamatan</th><th>Luas</th></tr>";
 for(let i in DATA.kecamatan_total){
 html+=`<tr><td>${i}</td><td>${DATA.kecamatan_total[i]}</td></tr>`;
-tabelData.push([i,DATA.kecamatan_total[i]]);
-}
 }
 
-if(mode=="desa"){
+}
+
+if(mode==="desa"){
+
 html+="<tr><th>Desa</th><th>Luas</th></tr>";
 for(let i in DATA.desa_total){
 html+=`<tr><td>${i}</td><td>${DATA.desa_total[i]}</td></tr>`;
-tabelData.push([i,DATA.desa_total[i]]);
-}
 }
 
-if(mode=="poktan" && DATA.poktan_total){
+}
+
+if(mode==="poktan"){
+
 html+="<tr><th>Poktan</th><th>Luas</th></tr>";
 for(let i in DATA.poktan_total){
 html+=`<tr><td>${i}</td><td>${DATA.poktan_total[i]}</td></tr>`;
-tabelData.push([i,DATA.poktan_total[i]]);
 }
+
+}
+
+if(mode==="mingguan"){
+html+="<tr><th>Minggu</th><th>Total LTT</th></tr>";
+html+="<tr><td>Minggu berjalan</td><td>"+DATA.total_kabupaten+"</td></tr>";
+}
+
+if(mode==="bulanan"){
+html+="<tr><th>Bulan</th><th>Total LTT</th></tr>";
+html+="<tr><td>Bulan berjalan</td><td>"+DATA.total_kabupaten+"</td></tr>";
 }
 
 html+="</table>";
@@ -272,7 +315,8 @@ document.getElementById("tabel").innerHTML=html;
 function downloadExcel(){
 
 let wb=XLSX.utils.book_new();
-let ws=XLSX.utils.aoa_to_sheet([["Nama","Luas"],...tabelData]);
+let table=document.querySelector("table");
+let ws=XLSX.utils.table_to_sheet(table);
 XLSX.utils.book_append_sheet(wb,ws,"Rekap");
 XLSX.writeFile(wb,"rekap_ltt.xlsx");
 
@@ -280,7 +324,8 @@ XLSX.writeFile(wb,"rekap_ltt.xlsx");
 
 async function downloadPDF(){
 
-const element=document.getElementById("areaDashboard");
+const element=document.getElementById("dashboard");
+
 const canvas=await html2canvas(element);
 const img=canvas.toDataURL("image/png");
 
