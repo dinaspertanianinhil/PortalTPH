@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Dashboard LTT 2026</title>
+<title>Dashboard LTT</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
 
 <style>
 
 body{
 font-family:Segoe UI;
 margin:0;
-background:url("https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-green-rice-fields-with-morning-dew-and-mountains-with-image_15859864.jpg") no-repeat center center fixed;
-background-size:cover;
+background:url("https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-green-rice-fields-with-morning-dew-and-mountains-with-image_15859864.jpg") center/cover fixed;
 }
 
 .overlay{
-background:rgba(255,255,255,0.9);
+background:rgba(255,255,255,0.92);
 min-height:100vh;
 padding:20px;
 }
@@ -32,10 +32,10 @@ margin-bottom:20px;
 }
 
 header img{
-width:70px;
+width:65px;
 background:white;
-border-radius:12px;
-padding:5px;
+border-radius:10px;
+padding:4px;
 }
 
 .title{
@@ -44,15 +44,10 @@ font-weight:700;
 color:#1b4332;
 }
 
-.subtitle{
-font-size:14px;
-color:#555;
-}
-
 .score{
 background:#2d6a4f;
 color:white;
-padding:15px;
+padding:14px;
 border-radius:10px;
 text-align:center;
 font-size:20px;
@@ -74,17 +69,17 @@ box-shadow:0 4px 10px rgba(0,0,0,0.1);
 
 .menu{
 display:flex;
-gap:8px;
 flex-wrap:wrap;
+gap:8px;
 margin-bottom:10px;
 }
 
 .menu button{
-background:#2d6a4f;
+background:#40916c;
 border:none;
 color:white;
-padding:6px 12px;
-border-radius:6px;
+padding:7px 12px;
+border-radius:8px;
 cursor:pointer;
 font-size:13px;
 }
@@ -102,7 +97,7 @@ font-size:13px;
 th{
 background:#2d6a4f;
 color:white;
-padding:6px;
+padding:7px;
 }
 
 td{
@@ -118,10 +113,15 @@ margin-bottom:10px;
 background:#2d6a4f;
 border:none;
 color:white;
-padding:5px 10px;
-border-radius:5px;
+padding:6px 12px;
+border-radius:6px;
 cursor:pointer;
-margin-right:5px;
+margin-right:6px;
+}
+
+.rank{
+font-weight:bold;
+color:#1b4332;
 }
 
 </style>
@@ -129,13 +129,12 @@ margin-right:5px;
 
 <body>
 
-<div class="overlay">
+<div class="overlay" id="areaDashboard">
 
 <header>
-<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQvtMhMi3IPSaJOTLYIUlxiX4QMMFIfonoCA&s">
+<img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Coat_of_arms_of_Riau.png">
 <div>
-<div class="title">Bidang Tanaman Pangan dan Hortikultura</div>
-<div class="subtitle">Dashboard LTT 2026</div>
+<div class="title">Dashboard LTT Kabupaten</div>
 </div>
 </header>
 
@@ -149,8 +148,18 @@ margin-right:5px;
 </div>
 
 <div class="card">
-<h3>Grafik Kecamatan</h3>
-<canvas id="chartKecamatan"></canvas>
+<h3>Ranking Kecamatan</h3>
+<canvas id="chartRanking"></canvas>
+</div>
+
+<div class="card">
+<h3>Grafik Mingguan</h3>
+<canvas id="chartMinggu"></canvas>
+</div>
+
+<div class="card">
+<h3>Grafik Bulanan</h3>
+<canvas id="chartBulan"></canvas>
 </div>
 
 <div class="card" style="grid-column:1/-1">
@@ -159,8 +168,8 @@ margin-right:5px;
 
 <div class="menu">
 <button onclick="ganti('jenis_total')">Jenis LTT Kabupaten</button>
-<button onclick="ganti('jenis_kecamatan')">Jenis LTT per Kecamatan</button>
-<button onclick="ganti('jenis_desa')">Jenis LTT per Desa</button>
+<button onclick="ganti('jenis_kecamatan')">Jenis per Kecamatan</button>
+<button onclick="ganti('jenis_desa')">Jenis per Desa</button>
 <button onclick="ganti('kecamatan')">Rekap Kecamatan</button>
 <button onclick="ganti('desa')">Rekap Desa</button>
 <button onclick="ganti('poktan')">Rekap Poktan</button>
@@ -168,7 +177,7 @@ margin-right:5px;
 
 <div class="action">
 <button onclick="downloadExcel()">Download Excel</button>
-<button onclick="window.print()">Download PDF</button>
+<button onclick="downloadPDF()">Download PDF</button>
 </div>
 
 <div id="tabel">Memuat...</div>
@@ -176,7 +185,6 @@ margin-right:5px;
 </div>
 
 </div>
-
 </div>
 
 <script>
@@ -185,6 +193,7 @@ const url="https://script.google.com/macros/s/AKfycby2-GIC6Rx_atSv-Y65VjJedMMYhb
 
 let DATA;
 let mode="jenis_total";
+let tabelData=[];
 
 async function load(){
 
@@ -192,17 +201,17 @@ const res=await fetch(url);
 DATA=await res.json();
 
 document.getElementById("total").innerHTML=
-"TOTAL LTT KABUPATEN : "+DATA.total_kabupaten+" Ha";
+"TOTAL LTT : "+DATA.total_kabupaten+" Ha";
 
 buatGrafik("chartJenis",DATA.jenis_total);
-buatGrafik("chartKecamatan",DATA.kecamatan_total);
+buatGrafik("chartRanking",DATA.kecamatan_total);
+buatGrafik("chartMinggu",DATA.mingguan || {"M1":0});
+buatGrafik("chartBulan",DATA.bulanan || {"Jan":0});
 
 render();
-
 }
 
 function buatGrafik(id,data){
-
 new Chart(document.getElementById(id),{
 type:"bar",
 data:{
@@ -211,7 +220,6 @@ datasets:[{data:Object.values(data)}]
 },
 options:{responsive:true}
 });
-
 }
 
 function ganti(m){
@@ -221,84 +229,42 @@ render();
 
 function render(){
 
-let html="";
+let html="<table>";
+tabelData=[];
 
 if(mode=="jenis_total"){
-
-html="<table><tr><th>Jenis LTT</th><th>Luas</th></tr>";
-
-for(let j in DATA.jenis_total){
-html+=`<tr><td>${j}</td><td>${DATA.jenis_total[j]} Ha</td></tr>`;
+html+="<tr><th>Jenis LTT</th><th>Luas</th></tr>";
+for(let i in DATA.jenis_total){
+html+=`<tr><td>${i}</td><td>${DATA.jenis_total[i]}</td></tr>`;
+tabelData.push([i,DATA.jenis_total[i]]);
 }
-
-html+="</table>";
-}
-
-if(mode=="jenis_kecamatan"){
-
-for(let kec in DATA.jenis_per_kecamatan){
-
-html+=`<h4>${kec}</h4>`;
-html+="<table><tr><th>Jenis</th><th>Luas</th></tr>";
-
-for(let j in DATA.jenis_per_kecamatan[kec]){
-html+=`<tr><td>${j}</td><td>${DATA.jenis_per_kecamatan[kec][j]} Ha</td></tr>`;
-}
-
-html+="</table><br>";
-}
-
-}
-
-if(mode=="jenis_desa"){
-
-for(let desa in DATA.jenis_per_desa){
-
-html+=`<h4>${desa}</h4>`;
-html+="<table><tr><th>Jenis</th><th>Luas</th></tr>";
-
-for(let j in DATA.jenis_per_desa[desa]){
-html+=`<tr><td>${j}</td><td>${DATA.jenis_per_desa[desa][j]} Ha</td></tr>`;
-}
-
-html+="</table><br>";
-}
-
 }
 
 if(mode=="kecamatan"){
-
-html="<table><tr><th>Kecamatan</th><th>Luas</th></tr>";
-
-for(let k in DATA.kecamatan_total){
-html+=`<tr><td>${k}</td><td>${DATA.kecamatan_total[k]} Ha</td></tr>`;
+html+="<tr><th>Kecamatan</th><th>Luas</th></tr>";
+for(let i in DATA.kecamatan_total){
+html+=`<tr><td>${i}</td><td>${DATA.kecamatan_total[i]}</td></tr>`;
+tabelData.push([i,DATA.kecamatan_total[i]]);
 }
-
-html+="</table>";
 }
 
 if(mode=="desa"){
+html+="<tr><th>Desa</th><th>Luas</th></tr>";
+for(let i in DATA.desa_total){
+html+=`<tr><td>${i}</td><td>${DATA.desa_total[i]}</td></tr>`;
+tabelData.push([i,DATA.desa_total[i]]);
+}
+}
 
-html="<table><tr><th>Desa</th><th>Luas</th></tr>";
-
-for(let d in DATA.desa_total){
-html+=`<tr><td>${d}</td><td>${DATA.desa_total[d]} Ha</td></tr>`;
+if(mode=="poktan" && DATA.poktan_total){
+html+="<tr><th>Poktan</th><th>Luas</th></tr>";
+for(let i in DATA.poktan_total){
+html+=`<tr><td>${i}</td><td>${DATA.poktan_total[i]}</td></tr>`;
+tabelData.push([i,DATA.poktan_total[i]]);
+}
 }
 
 html+="</table>";
-}
-
-if(mode=="poktan"){
-
-html="<table><tr><th>Poktan</th><th>Luas</th></tr>";
-
-for(let p in DATA.poktan_total){
-html+=`<tr><td>${p}</td><td>${DATA.poktan_total[p]} Ha</td></tr>`;
-}
-
-html+="</table>";
-}
-
 document.getElementById("tabel").innerHTML=html;
 
 }
@@ -306,24 +272,23 @@ document.getElementById("tabel").innerHTML=html;
 function downloadExcel(){
 
 let wb=XLSX.utils.book_new();
-let rows=[["Nama","Luas"]];
-
-let sumber;
-
-if(mode=="jenis_total") sumber=DATA.jenis_total;
-if(mode=="kecamatan") sumber=DATA.kecamatan_total;
-if(mode=="desa") sumber=DATA.desa_total;
-if(mode=="poktan") sumber=DATA.poktan_total;
-
-if(sumber){
-for(let i in sumber){
-rows.push([i,sumber[i]]);
-}
-}
-
-let ws=XLSX.utils.aoa_to_sheet(rows);
+let ws=XLSX.utils.aoa_to_sheet([["Nama","Luas"],...tabelData]);
 XLSX.utils.book_append_sheet(wb,ws,"Rekap");
 XLSX.writeFile(wb,"rekap_ltt.xlsx");
+
+}
+
+async function downloadPDF(){
+
+const element=document.getElementById("areaDashboard");
+const canvas=await html2canvas(element);
+const img=canvas.toDataURL("image/png");
+
+const { jsPDF } = window.jspdf;
+const pdf=new jsPDF("l","mm","a4");
+
+pdf.addImage(img,"PNG",5,5,287,200);
+pdf.save("dashboard_ltt.pdf");
 
 }
 
