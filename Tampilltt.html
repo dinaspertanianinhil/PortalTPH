@@ -168,82 +168,54 @@ margin-right:5px;
 </div>
 
 <script>
-const url="https://script.google.com/macros/s/AKfycbxSnyURO2fwz_C9UIT3G2ox2I7M45fx-jxmiUVYDZN4soXCqWP7BQMWqHR8gKNVBOq9/exec";
-let dataGlobal={};
-let mode="jenis";
+const url = "https://script.google.com/macros/s/AKfycbzVNjG48vEwjOMHLkpdZFU_-vc5V9lnwt9bOFme4YoRrx04Rr2seuzU5ATPQ_NpV5Ks/exec";
 
-async function loadData(){
-const res=await fetch(url);
-dataGlobal=await res.json();
+async function loadData() {
+  const res = await fetch(url);
+  const data = await res.json();
 
-document.getElementById("totalLTT").innerText=
-"Total LTT Kabupaten : "+dataGlobal.total+" Ha";
+  // TOTAL KABUPATEN
+  document.getElementById("totalKab").innerText =
+    (data.total_kabupaten || 0) + " Ha";
 
-buatGrafik();
-renderTabel();
-}
+  // JENIS LTT
+  let jenisHTML = "";
+  for (let j in data.jenis_total) {
+    jenisHTML += `
+      <tr>
+        <td>${j}</td>
+        <td>${data.jenis_total[j]} Ha</td>
+      </tr>
+    `;
+  }
+  document.getElementById("jenisTable").innerHTML = jenisHTML;
 
-function buatGrafik(){
-const ctx=document.getElementById("chartLTT");
+  // KECAMATAN
+  let kecHTML = "";
+  for (let k in data.kecamatan_total) {
+    kecHTML += `
+      <tr>
+        <td>${k}</td>
+        <td>${data.kecamatan_total[k]} Ha</td>
+      </tr>
+    `;
+  }
+  document.getElementById("kecamatanTable").innerHTML = kecHTML;
 
-new Chart(ctx,{
-type:"bar",
-data:{
-labels:dataGlobal.jenis.map(d=>d.nama),
-datasets:[{
-label:"Luas",
-data:dataGlobal.jenis.map(d=>d.luas)
-}]
-}
-});
-}
-
-function gantiRekap(m){
-mode=m;
-
-document.querySelectorAll(".menu button")
-.forEach(b=>b.classList.remove("active"));
-
-event.target.classList.add("active");
-
-renderTabel();
-}
-
-function renderTabel(){
-let data=dataGlobal[mode];
-
-let html="<table><tr><th>Nama</th><th>Luas</th></tr>";
-
-data.forEach(d=>{
-html+=`<tr>
-<td>${d.nama}</td>
-<td>${d.luas} Ha</td>
-</tr>`;
-});
-
-html+="</table>";
-
-document.getElementById("tabelData").innerHTML=html;
-}
-
-function downloadExcel(){
-let data=dataGlobal[mode];
-let rows=[["Nama","Luas"]];
-
-data.forEach(d=>rows.push([d.nama,d.luas]));
-
-const ws=XLSX.utils.aoa_to_sheet(rows);
-const wb=XLSX.utils.book_new();
-XLSX.utils.book_append_sheet(wb,ws,"Rekap");
-XLSX.writeFile(wb,"rekap_ltt.xlsx");
-}
-
-function downloadPDF(){
-window.print();
+  // DESA
+  let desaHTML = "";
+  for (let d in data.desa_total) {
+    desaHTML += `
+      <tr>
+        <td>${d}</td>
+        <td>${data.desa_total[d]} Ha</td>
+      </tr>
+    `;
+  }
+  document.getElementById("desaTable").innerHTML = desaHTML;
 }
 
 loadData();
 </script>
-
 </body>
 </html>
