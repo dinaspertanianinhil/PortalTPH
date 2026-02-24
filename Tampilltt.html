@@ -5,26 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard LTT 2026</title>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-
 body{
-font-family:Segoe UI, sans-serif;
+font-family:Segoe UI;
 margin:0;
-padding:20px;
 background:url("https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-green-rice-fields-with-morning-dew-and-mountains-with-image_15859864.jpg") no-repeat center center fixed;
 background-size:cover;
 }
 
 .overlay{
-background:rgba(255,255,255,0.92);
+background:rgba(255,255,255,0.9);
+min-height:100vh;
 padding:20px;
-border-radius:15px;
 }
-
-/* HEADER */
 
 header{
 display:flex;
@@ -33,46 +29,40 @@ gap:15px;
 margin-bottom:20px;
 }
 
-.logo{
+header img{
 width:70px;
 background:white;
+border-radius:12px;
 padding:5px;
-border-radius:10px;
 }
 
 .title{
-font-size:20px;
+font-size:22px;
 font-weight:700;
 color:#1b4332;
 }
 
 .subtitle{
-font-size:16px;
-font-weight:600;
+font-size:14px;
+color:#555;
 }
 
-/* TOTAL BOX */
-
-.total-box{
+.score{
 background:#2d6a4f;
 color:white;
 padding:15px;
-border-radius:12px;
-font-size:20px;
-font-weight:bold;
+border-radius:10px;
 text-align:center;
+font-size:20px;
 margin-bottom:20px;
 }
 
-/* GRID CARD */
-
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
 gap:15px;
+align-items:start;
 }
-
-/* CARD */
 
 .card{
 background:white;
@@ -81,12 +71,25 @@ border-radius:12px;
 box-shadow:0 4px 10px rgba(0,0,0,0.1);
 }
 
-.card h3{
-margin-top:0;
-color:#1b4332;
+.menu{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-bottom:15px;
 }
 
-/* TABLE */
+.menu button{
+background:#2d6a4f;
+border:none;
+color:white;
+padding:6px 12px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.menu button.active{
+background:#1b4332;
+}
 
 table{
 width:100%;
@@ -94,33 +97,30 @@ border-collapse:collapse;
 font-size:13px;
 }
 
-th,td{
-padding:6px;
-border-bottom:1px solid #ddd;
-}
-
 th{
-background:#40916c;
+background:#2d6a4f;
 color:white;
+padding:6px;
 }
 
-/* BUTTON */
+td{
+border-bottom:1px solid #ddd;
+padding:6px;
+}
 
-.btn{
+.action{
+margin-bottom:10px;
+}
+
+.action button{
 background:#2d6a4f;
 color:white;
 border:none;
-padding:6px 10px;
-border-radius:6px;
+padding:5px 10px;
+border-radius:5px;
 cursor:pointer;
-font-size:12px;
 margin-right:5px;
 }
-
-.btn:hover{
-background:#1b4332;
-}
-
 </style>
 </head>
 
@@ -129,116 +129,121 @@ background:#1b4332;
 <div class="overlay">
 
 <header>
-<img class="logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQvtMhMi3IPSaJOTLYIUlxiX4QMMFIfonoCA&s">
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQvtMhMi3IPSaJOTLYIUlxiX4QMMFIfonoCA&s">
 <div>
 <div class="title">Bidang Tanaman Pangan dan Hortikultura</div>
 <div class="subtitle">Dashboard LTT 2026</div>
 </div>
 </header>
 
-<div class="total-box" id="totalLTT">
-Loading data...
-</div>
+<div class="score" id="totalLTT">Memuat data...</div>
 
 <div class="grid">
 
 <div class="card">
-<h3>Rekap Jenis LTT</h3>
-<button class="btn" onclick="downloadExcel('jenis')">Excel</button>
-<button class="btn" onclick="downloadPDF('jenis')">PDF</button>
-<table id="tabelJenis"></table>
+<h3>Grafik LTT</h3>
+<canvas id="chartLTT"></canvas>
 </div>
 
 <div class="card">
-<h3>Rekap Kecamatan</h3>
-<button class="btn" onclick="downloadExcel('kecamatan')">Excel</button>
-<button class="btn" onclick="downloadPDF('kecamatan')">PDF</button>
-<table id="tabelKecamatan"></table>
+<h3>Data Rekap</h3>
+
+<div class="menu">
+<button onclick="gantiRekap('jenis')" class="active">Jenis LTT</button>
+<button onclick="gantiRekap('kecamatan')">Kecamatan</button>
+<button onclick="gantiRekap('desa')">Desa</button>
+<button onclick="gantiRekap('poktan')">Poktan</button>
 </div>
 
-<div class="card">
-<h3>Rekap Desa</h3>
-<button class="btn" onclick="downloadExcel('desa')">Excel</button>
-<button class="btn" onclick="downloadPDF('desa')">PDF</button>
-<table id="tabelDesa"></table>
+<div class="action">
+<button onclick="downloadExcel()">Excel</button>
+<button onclick="downloadPDF()">PDF</button>
 </div>
 
-<div class="card">
-<h3>Rekap Poktan</h3>
-<button class="btn" onclick="downloadExcel('poktan')">Excel</button>
-<button class="btn" onclick="downloadPDF('poktan')">PDF</button>
-<table id="tabelPoktan"></table>
-</div>
+<div id="tabelData">Memuat...</div>
 
 </div>
 
+</div>
 </div>
 
 <script>
+const url="https://script.google.com/macros/s/AKfycbzVNjG48vEwjOMHLkpdZFU_-vc5V9lnwt9bOFme4YoRrx04Rr2seuzU5ATPQ_NpV5Ks/exec";
 
-const API = "https://script.google.com/macros/s/AKfycbzVNjG48vEwjOMHLkpdZFU_-vc5V9lnwt9bOFme4YoRrx04Rr2seuzU5ATPQ_NpV5Ks/exec";
+let dataGlobal={};
+let mode="jenis";
 
-let globalData = {};
+async function loadData(){
+const res=await fetch(url);
+dataGlobal=await res.json();
 
-async function loadDashboard(){
-const res = await fetch(API);
-const data = await res.json();
+document.getElementById("totalLTT").innerText=
+"Total LTT Kabupaten : "+dataGlobal.total+" Ha";
 
-globalData = data;
-
-document.getElementById("totalLTT").innerText =
-"Total LTT Kabupaten : " + data.total_ltt + " Ha";
-
-buatTabel("tabelJenis", data.jenis);
-buatTabel("tabelKecamatan", data.kecamatan);
-buatTabel("tabelDesa", data.desa);
-buatTabel("tabelPoktan", data.poktan);
+buatGrafik();
+renderTabel();
 }
 
-function buatTabel(id, obj){
-let html = "<tr><th>Nama</th><th>Luas</th></tr>";
-for(let key in obj){
-html += `<tr><td>${key}</td><td>${obj[key]} Ha</td></tr>`;
-}
-document.getElementById(id).innerHTML = html;
-}
+function buatGrafik(){
+const ctx=document.getElementById("chartLTT");
 
-/* EXPORT EXCEL */
-
-function downloadExcel(type){
-const data = globalData[type];
-const arr = [["Nama","Luas"]];
-for(let k in data){
-arr.push([k, data[k]]);
+new Chart(ctx,{
+type:"bar",
+data:{
+labels:dataGlobal.jenis.map(d=>d.nama),
+datasets:[{
+label:"Luas",
+data:dataGlobal.jenis.map(d=>d.luas)
+}]
+}
+});
 }
 
-const ws = XLSX.utils.aoa_to_sheet(arr);
-const wb = XLSX.utils.book_new();
-XLSX.utils.book_append_sheet(wb, ws, "Rekap");
-XLSX.writeFile(wb, "rekap_"+type+".xlsx");
+function gantiRekap(m){
+mode=m;
+
+document.querySelectorAll(".menu button")
+.forEach(b=>b.classList.remove("active"));
+
+event.target.classList.add("active");
+
+renderTabel();
 }
 
-/* EXPORT PDF */
+function renderTabel(){
+let data=dataGlobal[mode];
 
-function downloadPDF(type){
-const { jsPDF } = window.jspdf;
-const doc = new jsPDF();
+let html="<table><tr><th>Nama</th><th>Luas</th></tr>";
 
-const data = globalData[type];
-let y = 20;
+data.forEach(d=>{
+html+=`<tr>
+<td>${d.nama}</td>
+<td>${d.luas} Ha</td>
+</tr>`;
+});
 
-doc.text("Rekap " + type.toUpperCase(), 14, 10);
+html+="</table>";
 
-for(let k in data){
-doc.text(k + " : " + data[k] + " Ha", 14, y);
-y += 8;
+document.getElementById("tabelData").innerHTML=html;
 }
 
-doc.save("rekap_"+type+".pdf");
+function downloadExcel(){
+let data=dataGlobal[mode];
+let rows=[["Nama","Luas"]];
+
+data.forEach(d=>rows.push([d.nama,d.luas]));
+
+const ws=XLSX.utils.aoa_to_sheet(rows);
+const wb=XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb,ws,"Rekap");
+XLSX.writeFile(wb,"rekap_ltt.xlsx");
 }
 
-loadDashboard();
+function downloadPDF(){
+window.print();
+}
 
+loadData();
 </script>
 
 </body>
