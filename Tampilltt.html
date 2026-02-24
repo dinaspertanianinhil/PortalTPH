@@ -5,47 +5,98 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard LTT 2026</title>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
+
 body{
-font-family:Segoe UI;
-background:#f5f7fa;
+font-family:Segoe UI, sans-serif;
 margin:0;
 padding:20px;
+background:url("https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-green-rice-fields-with-morning-dew-and-mountains-with-image_15859864.jpg") no-repeat center center fixed;
+background-size:cover;
 }
 
+.overlay{
+background:rgba(255,255,255,0.92);
+padding:20px;
+border-radius:15px;
+}
+
+/* HEADER */
+
 header{
+display:flex;
+align-items:center;
+gap:15px;
+margin-bottom:20px;
+}
+
+.logo{
+width:70px;
+background:white;
+padding:5px;
+border-radius:10px;
+}
+
+.title{
+font-size:20px;
+font-weight:700;
+color:#1b4332;
+}
+
+.subtitle{
+font-size:16px;
+font-weight:600;
+}
+
+/* TOTAL BOX */
+
+.total-box{
 background:#2d6a4f;
 color:white;
 padding:15px;
-border-radius:10px;
+border-radius:12px;
+font-size:20px;
+font-weight:bold;
 text-align:center;
 margin-bottom:20px;
 }
 
-.card{
-background:white;
-padding:15px;
-border-radius:10px;
-margin-bottom:15px;
-box-shadow:0 2px 8px rgba(0,0,0,0.1);
-}
+/* GRID CARD */
 
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:10px;
+grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+gap:15px;
 }
+
+/* CARD */
+
+.card{
+background:white;
+padding:15px;
+border-radius:12px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+.card h3{
+margin-top:0;
+color:#1b4332;
+}
+
+/* TABLE */
 
 table{
 width:100%;
 border-collapse:collapse;
-margin-top:10px;
+font-size:13px;
 }
 
 th,td{
-border:1px solid #ddd;
-padding:8px;
-font-size:13px;
+padding:6px;
+border-bottom:1px solid #ddd;
 }
 
 th{
@@ -53,67 +104,137 @@ background:#40916c;
 color:white;
 }
 
-.total{
-font-size:22px;
-font-weight:bold;
-color:#1b4332;
+/* BUTTON */
+
+.btn{
+background:#2d6a4f;
+color:white;
+border:none;
+padding:6px 10px;
+border-radius:6px;
+cursor:pointer;
+font-size:12px;
+margin-right:5px;
+}
+
+.btn:hover{
+background:#1b4332;
 }
 
 </style>
 </head>
+
 <body>
 
+<div class="overlay">
+
 <header>
-<h2>Dashboard LTT 2026</h2>
+<img class="logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQvtMhMi3IPSaJOTLYIUlxiX4QMMFIfonoCA&s">
+<div>
+<div class="title">Bidang Tanaman Pangan dan Hortikultura</div>
+<div class="subtitle">Dashboard LTT 2026</div>
+</div>
 </header>
 
-<div class="card">
-Total LTT Kabupaten
-<div class="total" id="totalLTT">Loading...</div>
+<div class="total-box" id="totalLTT">
+Loading data...
 </div>
+
+<div class="grid">
 
 <div class="card">
 <h3>Rekap Jenis LTT</h3>
+<button class="btn" onclick="downloadExcel('jenis')">Excel</button>
+<button class="btn" onclick="downloadPDF('jenis')">PDF</button>
 <table id="tabelJenis"></table>
 </div>
 
 <div class="card">
 <h3>Rekap Kecamatan</h3>
+<button class="btn" onclick="downloadExcel('kecamatan')">Excel</button>
+<button class="btn" onclick="downloadPDF('kecamatan')">PDF</button>
 <table id="tabelKecamatan"></table>
 </div>
 
 <div class="card">
 <h3>Rekap Desa</h3>
+<button class="btn" onclick="downloadExcel('desa')">Excel</button>
+<button class="btn" onclick="downloadPDF('desa')">PDF</button>
 <table id="tabelDesa"></table>
 </div>
 
 <div class="card">
 <h3>Rekap Poktan</h3>
+<button class="btn" onclick="downloadExcel('poktan')">Excel</button>
+<button class="btn" onclick="downloadPDF('poktan')">PDF</button>
 <table id="tabelPoktan"></table>
+</div>
+
+</div>
+
 </div>
 
 <script>
 
 const API = "https://script.google.com/macros/s/AKfycbzVNjG48vEwjOMHLkpdZFU_-vc5V9lnwt9bOFme4YoRrx04Rr2seuzU5ATPQ_NpV5Ks/exec";
 
+let globalData = {};
+
 async function loadDashboard(){
 const res = await fetch(API);
 const data = await res.json();
 
-document.getElementById("totalLTT").innerText = data.total_ltt + " Ha";
+globalData = data;
 
-buatTabel("tabelJenis", data.jenis, "Jenis LTT");
-buatTabel("tabelKecamatan", data.kecamatan, "Kecamatan");
-buatTabel("tabelDesa", data.desa, "Desa");
-buatTabel("tabelPoktan", data.poktan, "Poktan");
+document.getElementById("totalLTT").innerText =
+"Total LTT Kabupaten : " + data.total_ltt + " Ha";
+
+buatTabel("tabelJenis", data.jenis);
+buatTabel("tabelKecamatan", data.kecamatan);
+buatTabel("tabelDesa", data.desa);
+buatTabel("tabelPoktan", data.poktan);
 }
 
-function buatTabel(id, obj, title){
-let html = `<tr><th>${title}</th><th>Luas</th></tr>`;
+function buatTabel(id, obj){
+let html = "<tr><th>Nama</th><th>Luas</th></tr>";
 for(let key in obj){
 html += `<tr><td>${key}</td><td>${obj[key]} Ha</td></tr>`;
 }
 document.getElementById(id).innerHTML = html;
+}
+
+/* EXPORT EXCEL */
+
+function downloadExcel(type){
+const data = globalData[type];
+const arr = [["Nama","Luas"]];
+for(let k in data){
+arr.push([k, data[k]]);
+}
+
+const ws = XLSX.utils.aoa_to_sheet(arr);
+const wb = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb, ws, "Rekap");
+XLSX.writeFile(wb, "rekap_"+type+".xlsx");
+}
+
+/* EXPORT PDF */
+
+function downloadPDF(type){
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
+
+const data = globalData[type];
+let y = 20;
+
+doc.text("Rekap " + type.toUpperCase(), 14, 10);
+
+for(let k in data){
+doc.text(k + " : " + data[k] + " Ha", 14, y);
+y += 8;
+}
+
+doc.save("rekap_"+type+".pdf");
 }
 
 loadDashboard();
