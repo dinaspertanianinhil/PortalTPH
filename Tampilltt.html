@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard LTT</title>
+<title>Dashboard LTT 2026</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
+
 body{
 font-family:Segoe UI;
 margin:0;
@@ -17,7 +18,7 @@ background-size:cover;
 }
 
 .overlay{
-background:rgba(255,255,255,0.9);
+background:rgba(255,255,255,0.92);
 min-height:100vh;
 padding:20px;
 }
@@ -32,7 +33,7 @@ margin-bottom:20px;
 header img{
 width:70px;
 background:white;
-border-radius:12px;
+border-radius:10px;
 padding:5px;
 }
 
@@ -48,14 +49,15 @@ color:white;
 padding:15px;
 border-radius:10px;
 text-align:center;
-font-size:22px;
+font-size:20px;
 margin-bottom:20px;
 }
 
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
 gap:15px;
+align-items:start;
 }
 
 .card{
@@ -81,6 +83,10 @@ border-radius:6px;
 cursor:pointer;
 }
 
+.menu button.active{
+background:#1b4332;
+}
+
 table{
 width:100%;
 border-collapse:collapse;
@@ -98,6 +104,10 @@ border-bottom:1px solid #ddd;
 padding:6px;
 }
 
+.action{
+margin-bottom:10px;
+}
+
 .action button{
 background:#2d6a4f;
 color:white;
@@ -107,6 +117,7 @@ border-radius:5px;
 cursor:pointer;
 margin-right:5px;
 }
+
 </style>
 </head>
 
@@ -116,7 +127,10 @@ margin-right:5px;
 
 <header>
 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQvtMhMi3IPSaJOTLYIUlxiX4QMMFIfonoCA&s">
+<div>
 <div class="title">Bidang Tanaman Pangan dan Hortikultura</div>
+<div>Dashboard LTT 2026</div>
+</div>
 </header>
 
 <div class="score" id="totalLTT">Memuat data...</div>
@@ -124,15 +138,14 @@ margin-right:5px;
 <div class="grid">
 
 <div class="card">
-<h3>Grafik Jenis LTT</h3>
+<h3>Grafik LTT per Jenis</h3>
 <canvas id="chartLTT"></canvas>
 </div>
 
 <div class="card">
-<h3>Rekap Data</h3>
 
 <div class="menu">
-<button onclick="gantiRekap('jenis')">Jenis LTT</button>
+<button onclick="gantiRekap('jenis')" class="active">Jenis LTT</button>
 <button onclick="gantiRekap('kecamatan')">Kecamatan</button>
 <button onclick="gantiRekap('desa')">Desa</button>
 <button onclick="gantiRekap('poktan')">Poktan</button>
@@ -150,92 +163,92 @@ margin-right:5px;
 </div>
 
 <script>
-const url = "https://script.google.com/macros/s/AKfycbxo1n88k-gOsK6wyUqcWMF98NDt_ru4TBjaavmJwegWvrfvxABhuGhBeRcw318ZFi6d/exec";
 
-let dataGlobal;
+const url = "https://script.google.com/macros/s/AKfycbyTsrueWf8bbLEKjCs4ElC00ygxirMlF5liqBUEjF1CO-rpHPkqt6nd3ycaavRaPVMT/exec";
+
+let DATA;
+let mode = "jenis";
 let chart;
 
 async function loadData(){
 const res = await fetch(url);
-const data = await res.json();
-dataGlobal = data;
+DATA = await res.json();
 
-document.getElementById("totalLTT").innerText =
-"Total LTT Kabupaten : " + data.total_kabupaten + " Ha";
+document.getElementById("totalLTT").innerHTML =
+"Total LTT Kabupaten : <b>" + DATA.total_kabupaten + " Ha</b>";
 
-buatGrafik(data.jenis_total);
-tampilkanTabel(data.jenis_total);
+buatGrafik();
+render();
 }
 
-function buatGrafik(data){
-const label = Object.keys(data);
-const nilai = Object.values(data);
-
+function buatGrafik(){
 const ctx = document.getElementById("chartLTT");
 
+const label = Object.keys(DATA.jenis_total);
+const value = Object.values(DATA.jenis_total);
+
 chart = new Chart(ctx,{
-type:"bar",
+type:'bar',
 data:{
 labels:label,
-datasets:[{
-label:"LTT (Ha)",
-data:nilai
-}]
+datasets:[{data:value}]
 }
 });
 }
 
-function tampilkanTabel(data){
-let html="<table><tr><th>Nama</th><th>Luas (Ha)</th></tr>";
+function gantiRekap(m){
+mode = m;
 
-for(let k in data){
-html+=`<tr>
-<td>${k}</td>
-<td>${data[k]}</td>
-</tr>`;
+document.querySelectorAll(".menu button")
+.forEach(b=>b.classList.remove("active"));
+
+event.target.classList.add("active");
+
+render();
 }
 
-html+="</table>";
-document.getElementById("tabelData").innerHTML=html;
+function render(){
+
+let html = "<table><tr><th>Nama</th><th>Luas</th></tr>";
+
+let sumber;
+
+if(mode=="jenis") sumber = DATA.jenis_total;
+if(mode=="kecamatan") sumber = DATA.kecamatan_total;
+if(mode=="desa") sumber = DATA.desa_total;
+if(mode=="poktan") sumber = DATA.poktan_total;
+
+for(let i in sumber){
+html += "<tr><td>"+i+"</td><td>"+sumber[i]+" Ha</td></tr>";
 }
 
-function gantiRekap(mode){
+html += "</table>";
 
-if(mode==="jenis"){
-tampilkanTabel(dataGlobal.jenis_total);
-}
-
-if(mode==="kecamatan"){
-tampilkanTabel(dataGlobal.kecamatan_total);
-}
-
-if(mode==="desa"){
-tampilkanTabel(dataGlobal.desa_total);
-}
-
-if(mode==="poktan"){
-tampilkanTabel(dataGlobal.poktan_total);
-}
-
+document.getElementById("tabelData").innerHTML = html;
 }
 
 function downloadExcel(){
-const rows=[["Nama","Luas"]];
-const table=document.querySelectorAll("#tabelData tr");
 
-table.forEach((r,i)=>{
-if(i===0) return;
-const col=r.querySelectorAll("td");
-rows.push([col[0].innerText,col[1].innerText]);
-});
+let sumber;
 
-const ws=XLSX.utils.aoa_to_sheet(rows);
-const wb=XLSX.utils.book_new();
+if(mode=="jenis") sumber = DATA.jenis_total;
+if(mode=="kecamatan") sumber = DATA.kecamatan_total;
+if(mode=="desa") sumber = DATA.desa_total;
+if(mode=="poktan") sumber = DATA.poktan_total;
+
+let data = [["Nama","Luas"]];
+for(let i in sumber){
+data.push([i,sumber[i]]);
+}
+
+const ws = XLSX.utils.aoa_to_sheet(data);
+const wb = XLSX.utils.book_new();
 XLSX.utils.book_append_sheet(wb,ws,"LTT");
 XLSX.writeFile(wb,"rekap_ltt.xlsx");
 }
 
 loadData();
+
 </script>
 
 </body>
