@@ -90,6 +90,11 @@ cursor:pointer;
 background:#2d6a4f;
 }
 
+/* tombol aktif */
+.menu button.active{
+background:#1b4332;
+}
+
 table{
 width:100%;
 border-collapse:collapse;
@@ -105,6 +110,50 @@ td{
 padding:6px;
 border-bottom:1px solid #ddd;
 text-align:center;
+}
+
+/* tambahan supaya tabel tidak kepanjangan */
+#tabel{
+overflow-x:auto;
+}
+
+/* MOBILE FRIENDLY (TAMBAHAN SAJA) */
+@media (max-width:768px){
+
+body{
+padding:10px;
+}
+
+.header{
+flex-direction:column;
+align-items:flex-start;
+}
+
+.logo{
+width:55px;
+}
+
+.judul{
+font-size:18px;
+}
+
+.score{
+font-size:16px;
+}
+
+.grid{
+grid-template-columns:1fr;
+}
+
+.menu button{
+font-size:12px;
+padding:6px 10px;
+}
+
+table{
+min-width:600px;
+}
+
 }
 
 </style>
@@ -138,14 +187,14 @@ text-align:center;
 <h3>Rekap Data</h3>
 
 <div class="menu">
-<button onclick="mode='jenis_total';render()">Jenis LTT Kabupaten</button>
-<button onclick="mode='jenis_kecamatan';render()">Jenis LTT Kecamatan</button>
-<button onclick="mode='jenis_desa';render()">Jenis LTT Desa</button>
-<button onclick="mode='kecamatan';render()">Rekap Kecamatan</button>
-<button onclick="mode='desa';render()">Rekap Desa</button>
-<button onclick="mode='poktan';render()">Rekap Poktan</button>
-<button onclick="mode='mingguan';render()">Rekap Mingguan</button>
-<button onclick="mode='bulanan';render()">Rekap Bulanan</button>
+<button onclick="setMode(this,'jenis_total')">Jenis LTT Kabupaten</button>
+<button onclick="setMode(this,'jenis_kecamatan')">Jenis LTT Kecamatan</button>
+<button onclick="setMode(this,'jenis_desa')">Jenis LTT Desa</button>
+<button onclick="setMode(this,'kecamatan')">Rekap Kecamatan</button>
+<button onclick="setMode(this,'desa')">Rekap Desa</button>
+<button onclick="setMode(this,'poktan')">Rekap Poktan</button>
+<button onclick="setMode(this,'mingguan')">Rekap Mingguan</button>
+<button onclick="setMode(this,'bulanan')">Rekap Bulanan</button>
 <button onclick="downloadExcel()">Download Excel</button>
 <button onclick="downloadPDF()">Download PDF</button>
 </div>
@@ -164,16 +213,26 @@ const url="https://script.google.com/macros/s/AKfycby2-GIC6Rx_atSv-Y65VjJedMMYhb
 let DATA;
 let mode="jenis_total";
 
+function setMode(btn,m){
+mode=m;
+
+/* tandai tombol aktif */
+document.querySelectorAll(".menu button").forEach(b=>b.classList.remove("active"));
+btn.classList.add("active");
+
+render();
+}
+
 async function load(){
 
 const res=await fetch(url);
 DATA=await res.json();
 
 document.getElementById("total").innerHTML=
-"Total LTT Kabupaten : "+DATA.total_kabupaten+" Ha";
+"Total LTT Kabupaten : "+(DATA.total_kabupaten||0)+" Ha";
 
-buatGrafik("chartJenis",DATA.jenis_total);
-buatGrafik("chartKecamatan",DATA.kecamatan_total);
+buatGrafik("chartJenis",DATA.jenis_total||{});
+buatGrafik("chartKecamatan",DATA.kecamatan_total||{});
 
 render();
 
@@ -181,8 +240,8 @@ render();
 
 function buatGrafik(id,data){
 
-const label=Object.keys(data);
-const nilai=Object.values(data);
+const label=Object.keys(data||{});
+const nilai=Object.values(data||{});
 
 new Chart(document.getElementById(id),{
 type:"bar",
@@ -191,13 +250,20 @@ labels:label,
 datasets:[{data:nilai}]
 },
 options:{
-plugins:{legend:{display:false}}
+plugins:{legend:{display:false}},
+responsive:true,
+maintainAspectRatio:false
 }
 });
 
 }
 
 function render(){
+
+if(!DATA){
+document.getElementById("tabel").innerHTML="Data belum masuk...";
+return;
+}
 
 let html="<table>";
 
@@ -315,7 +381,7 @@ document.getElementById("tabel").innerHTML=html;
 function downloadExcel(){
 
 let wb=XLSX.utils.book_new();
-let table=document.querySelector("table");
+let table=document.querySelector("#tabel table");
 let ws=XLSX.utils.table_to_sheet(table);
 XLSX.utils.book_append_sheet(wb,ws,"Rekap");
 XLSX.writeFile(wb,"rekap_ltt.xlsx");
@@ -326,7 +392,7 @@ async function downloadPDF(){
 
 const element=document.getElementById("dashboard");
 
-const canvas=await html2canvas(element);
+const canvas=await html2canvas(element,{scale:2});
 const img=canvas.toDataURL("image/png");
 
 const { jsPDF } = window.jspdf;
