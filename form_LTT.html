@@ -63,6 +63,14 @@ button {
 }
 button:hover { opacity:.9 }
 
+.btn-hapus {
+  background:#dc2626;
+}
+
+.btn-hapus:hover {
+  opacity:.9;
+}
+
 /* DESA */
 .desa {
   border:1px dashed #b6bec8;
@@ -75,7 +83,7 @@ button:hover { opacity:.9 }
 /* POKTAN */
 .poktan {
   display:grid;
-  grid-template-columns: 1fr 110px 170px;
+  grid-template-columns: 1fr 110px 170px 90px;
   gap:10px;
   margin-top:10px;
 }
@@ -170,7 +178,9 @@ function tambahDesa() {
     <input type="text" placeholder="Nama Desa / Kelurahan">
 
     <div class="poktanContainer"></div>
+
     <button type="button" onclick="tambahPoktan(this)">+ Tambah Poktan</button>
+    <button type="button" class="btn-hapus" onclick="this.parentElement.remove()">Hapus Desa</button>
   `;
   document.getElementById("desaContainer").appendChild(desa);
 }
@@ -192,6 +202,7 @@ function tambahPoktan(btn) {
       <option value="jagung_polri">Jagung Polri</option>
       <option value="kedelai">Kedelai</option>
     </select>
+    <button type="button" class="btn-hapus" onclick="this.parentElement.remove();hitung();">Hapus</button>
   `;
   container.appendChild(p);
 }
@@ -226,6 +237,7 @@ function hitung() {
   kedelai.innerText = total.kedelai.toFixed(2);
 }
 </script>
+
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzb05XYKJGjg6ksbzsJMEbhTjgeVhA4LvuJ904jJo4DCm3UDwiAL9ttPc_gD7Qej3oI/exec";
 
@@ -284,5 +296,6 @@ function simpan() {
   });
 }
 </script>
+
 </body>
 </html>
