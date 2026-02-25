@@ -101,6 +101,7 @@ button:hover { opacity:.9 }
 
 <body>
 
+<!-- HEADER -->
 <div class="header">
   <img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
   <div>
@@ -109,6 +110,7 @@ button:hover { opacity:.9 }
   </div>
 </div>
 
+<!-- IDENTITAS -->
 <div class="box">
   <label>Nama Pelapor</label>
   <input type="text" id="pelapor" placeholder="Nama petugas pelapor">
@@ -141,12 +143,14 @@ button:hover { opacity:.9 }
   <input type="date" id="tanggal">
 </div>
 
+<!-- DESA -->
 <div class="box">
   <h3>Data Desa & Poktan</h3>
   <div id="desaContainer"></div>
   <button type="button" onclick="tambahDesa()">+ Tambah Desa</button>
 </div>
 
+<!-- REKAP -->
 <div class="box">
   <h3>Rekap Otomatis LTT (Preview)</h3>
   <div class="rekap">
@@ -156,6 +160,7 @@ button:hover { opacity:.9 }
     <div>LT Pompa : <b id="pompa">0</b> Ha</div>
     <div>LT DAS/Bendungan : <b id="das">0</b> Ha</div>
     <div>LT Padi Tusip Sawit/Kelapa : <b id="padi">0</b> Ha</div>
+    <div>LT GOGO : <b id="gogo">0</b> Ha</div>
     <div>LT Jagung : <b id="jagung">0</b> Ha</div>
     <div>LT Jagung Polri : <b id="jagung_polri">0</b> Ha</div>
     <div>LT Kedelai : <b id="kedelai">0</b> Ha</div>    
@@ -196,6 +201,7 @@ function tambahPoktan(btn) {
       <option value="pompa">Pompa</option>
       <option value="das">DAS/Bendungan</option>
       <option value="tusip">Tusip Sawit/Kelapa</option>
+      <option value="gogo">GOGO</option>
       <option value="jagung">Jagung</option>
       <option value="jagung_polri">Jagung Polri</option>
       <option value="kedelai">Kedelai</option>
@@ -204,6 +210,7 @@ function tambahPoktan(btn) {
   `;
   container.appendChild(p);
 }
+
 function hitung() {
   let total = {
     reguler: 0,
@@ -212,6 +219,7 @@ function hitung() {
     pompa: 0,
     das: 0,
     tusip: 0,
+    gogo: 0,
     jagung: 0,
     jagung_polri: 0,
     kedelai: 0
@@ -232,6 +240,7 @@ function hitung() {
   pompa.innerText   = total.pompa.toFixed(2);
   das.innerText     = total.das.toFixed(2);
   padi.innerText    = total.tusip.toFixed(2);
+  gogo.innerText    = total.gogo.toFixed(2);
   jagung.innerText  = total.jagung.toFixed(2);
   jagung_polri.innerText = total.jagung_polri.toFixed(2);
   kedelai.innerText = total.kedelai.toFixed(2);
@@ -286,7 +295,6 @@ function simpan() {
     console.log("RESPON:", r);
     if (r.startsWith("OK")) {
       alert("✅ Data berhasil disimpan");
-      location.reload();
     } else {
       alert("❌ Server error:\n" + r);
     }
