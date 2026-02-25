@@ -66,10 +66,7 @@ button:hover { opacity:.9 }
 .btn-hapus {
   background:#dc2626;
 }
-
-.btn-hapus:hover {
-  opacity:.9;
-}
+.btn-hapus:hover { opacity:.9; }
 
 /* DESA */
 .desa {
@@ -147,7 +144,7 @@ button:hover { opacity:.9 }
 <div class="box">
   <h3>Data Desa & Poktan</h3>
   <div id="desaContainer"></div>
-  <button type="button" onclick="tambahDesa()">+ Tambah Desa</button>
+  <button type="button" onclick="tambahDesa()">+ Tambah Desa/Kelurahan</button>
 </div>
 
 <!-- REKAP -->
@@ -176,7 +173,7 @@ function tambahDesa() {
   const desa = document.createElement("div");
   desa.className = "desa";
   desa.innerHTML = `
-    <label>Desa</label>
+    <label>Desa/Kelurahan</label>
     <input type="text" placeholder="Nama Desa / Kelurahan">
 
     <div class="poktanContainer"></div>
@@ -292,9 +289,9 @@ function simpan() {
   })
   .then(r => r.text())
   .then(r => {
-    console.log("RESPON:", r);
     if (r.startsWith("OK")) {
       alert("✅ Data berhasil disimpan");
+      location.reload(); // ini yang bikin form langsung kosong lagi
     } else {
       alert("❌ Server error:\n" + r);
     }
