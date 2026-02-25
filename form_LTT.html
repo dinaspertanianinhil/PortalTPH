@@ -101,7 +101,6 @@ button:hover { opacity:.9 }
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
   <div>
@@ -110,7 +109,6 @@ button:hover { opacity:.9 }
   </div>
 </div>
 
-<!-- IDENTITAS -->
 <div class="box">
   <label>Nama Pelapor</label>
   <input type="text" id="pelapor" placeholder="Nama petugas pelapor">
@@ -143,19 +141,18 @@ button:hover { opacity:.9 }
   <input type="date" id="tanggal">
 </div>
 
-<!-- DESA -->
 <div class="box">
   <h3>Data Desa & Poktan</h3>
   <div id="desaContainer"></div>
   <button type="button" onclick="tambahDesa()">+ Tambah Desa</button>
 </div>
 
-<!-- REKAP -->
 <div class="box">
   <h3>Rekap Otomatis LTT (Preview)</h3>
   <div class="rekap">
     <div>LT Reguler : <b id="reguler">0</b> Ha</div>
     <div>LT OPLAH : <b id="oplah">0</b> Ha</div>
+    <div>LT CSR : <b id="csr">0</b> Ha</div>
     <div>LT Pompa : <b id="pompa">0</b> Ha</div>
     <div>LT DAS/Bendungan : <b id="das">0</b> Ha</div>
     <div>LT Padi Tusip Sawit/Kelapa : <b id="padi">0</b> Ha</div>
@@ -195,6 +192,7 @@ function tambahPoktan(btn) {
     <select onchange="hitung()">
       <option value="reguler">Reguler</option>
       <option value="oplah">OPLAH</option>
+      <option value="csr">CSR</option>
       <option value="pompa">Pompa</option>
       <option value="das">DAS/Bendungan</option>
       <option value="tusip">Tusip Sawit/Kelapa</option>
@@ -210,6 +208,7 @@ function hitung() {
   let total = {
     reguler: 0,
     oplah: 0,
+    csr: 0,
     pompa: 0,
     das: 0,
     tusip: 0,
@@ -229,6 +228,7 @@ function hitung() {
 
   reguler.innerText = total.reguler.toFixed(2);
   oplah.innerText   = total.oplah.toFixed(2);
+  csr.innerText     = total.csr.toFixed(2);
   pompa.innerText   = total.pompa.toFixed(2);
   das.innerText     = total.das.toFixed(2);
   padi.innerText    = total.tusip.toFixed(2);
