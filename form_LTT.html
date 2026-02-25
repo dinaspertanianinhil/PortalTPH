@@ -286,6 +286,7 @@ function simpan() {
     console.log("RESPON:", r);
     if (r.startsWith("OK")) {
       alert("✅ Data berhasil disimpan");
+      location.reload();
     } else {
       alert("❌ Server error:\n" + r);
     }
