@@ -12,45 +12,64 @@
 <style>
 
 body{
-font-family:Segoe UI;
 margin:0;
-padding:15px;
-background:#f4f7fb;
+font-family:Inter, Segoe UI;
+background:#03170d;
+color:white;
 }
 
-.header{
+/* NAVBAR */
+
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 30px;
+background:#052e1b;
+box-shadow:0 2px 10px rgba(0,0,0,0.4);
+}
+
+.logo-area{
 display:flex;
 align-items:center;
 gap:15px;
-margin-bottom:20px;
 }
 
-.logo{
-width:60px;
+.logo-box{
+background:white;
+padding:4px;
+border-radius:10px;
 }
 
-.judul{
-font-size:22px;
-font-weight:600;
+.logo-box img{
+height:45px;
 }
 
-.menu-dashboard{
+.title{
+font-weight:700;
+font-size:15px;
+line-height:1.3;
+}
+
+/* MENU */
+
+.menu{
 display:flex;
-gap:12px;
-flex-wrap:wrap;
-margin-bottom:20px;
-position:relative;
-z-index:9999;
+gap:20px;
 }
 
-.menu-dashboard button{
-background:#2d6a4f;
+.menu button{
+background:#0c3f25;
 border:none;
 color:white;
 padding:10px 16px;
 border-radius:8px;
 cursor:pointer;
 font-weight:600;
+}
+
+.menu button:hover{
+background:#145a32;
 }
 
 .dropdown{
@@ -60,51 +79,58 @@ position:relative;
 .dropdown-content{
 display:none;
 position:absolute;
-top:48px;
+top:42px;
 left:0;
-background:#ffffff;
+background:#0b3d24;
 min-width:220px;
-box-shadow:0 8px 20px rgba(0,0,0,0.2);
 border-radius:10px;
-border:1px solid #ddd;
+box-shadow:0 10px 25px rgba(0,0,0,0.4);
 overflow:hidden;
-z-index:99999;
 }
 
 .dropdown-content button{
 width:100%;
+background:none;
 border:none;
-background:white;
+color:white;
 padding:12px;
 text-align:left;
 cursor:pointer;
-font-size:14px;
-color:#222;
 }
 
 .dropdown-content button:hover{
-background:#f1f1f1;
+background:#145a32;
+}
+
+/* DASHBOARD */
+
+.container{
+max-width:1400px;
+margin:auto;
+padding:25px;
 }
 
 .grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-gap:15px;
+gap:20px;
 }
 
 .card{
-background:white;
-padding:15px;
-border-radius:12px;
-box-shadow:0 3px 12px rgba(0,0,0,0.08);
+background:#073d25;
+padding:20px;
+border-radius:14px;
+box-shadow:0 10px 30px rgba(0,0,0,0.4);
 }
 
 .today{
-font-size:32px;
+font-size:38px;
 font-weight:700;
 text-align:center;
-color:#2d6a4f;
+color:#7CFC00;
 }
+
+/* ranking */
 
 .rank-list{
 display:flex;
@@ -118,26 +144,31 @@ justify-content:space-between;
 padding:12px;
 border-radius:10px;
 font-weight:600;
+background:#0b3d24;
 }
 
-.gold{background:#FFD700;}
-.silver{background:#C0C0C0;}
+.gold{background:#FFD700;color:black;}
+.silver{background:#C0C0C0;color:black;}
 .bronze{background:#CD7F32;color:white;}
+
+/* REKAP PAGE */
 
 .rekap-view{
 display:none;
-background:white;
-padding:20px;
-border-radius:12px;
-box-shadow:0 4px 15px rgba(0,0,0,0.1);
+max-width:1200px;
+margin:auto;
+background:#06351f;
+padding:25px;
+border-radius:15px;
+box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
 
 .back{
-background:#344e41;
+background:#145a32;
 color:white;
 border:none;
-padding:8px 12px;
-border-radius:6px;
+padding:10px 14px;
+border-radius:8px;
 cursor:pointer;
 margin-bottom:10px;
 }
@@ -145,33 +176,29 @@ margin-bottom:10px;
 table{
 width:100%;
 border-collapse:collapse;
+margin-top:10px;
 }
 
 th{
-background:#2d6a4f;
-color:white;
-padding:8px;
-border:1px solid #999;
+background:#145a32;
+padding:10px;
+border:1px solid rgba(255,255,255,0.1);
 }
 
 td{
-padding:8px;
-border:1px solid #999;
+padding:10px;
+border:1px solid rgba(255,255,255,0.1);
 text-align:center;
 }
 
 @media(max-width:700px){
 
-.judul{
-font-size:18px;
+.menu{
+flex-direction:column;
 }
 
 .today{
-font-size:26px;
-}
-
-.menu-dashboard button{
-width:100%;
+font-size:30px;
 }
 
 }
@@ -181,14 +208,20 @@ width:100%;
 
 <body>
 
-<div class="header">
-<img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
-<div class="judul">Dashboard Monitoring LTT Kabupaten</div>
+<div class="navbar">
+
+<div class="logo-area">
+<div class="logo-box">
+<img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
 </div>
 
-<div id="dashboard">
+<div class="title">
+Bidang Tanaman Pangan dan Hortikultura<br>
+Dinas Pertanian Kabupaten Indragiri Hilir
+</div>
+</div>
 
-<div class="menu-dashboard">
+<div class="menu">
 
 <div class="dropdown">
 <button onclick="toggleMenu('menu1')">Rekap Jenis LTT</button>
@@ -200,7 +233,7 @@ width:100%;
 </div>
 
 <div class="dropdown">
-<button onclick="toggleMenu('menu2')">Rekap Perbulan</button>
+<button onclick="toggleMenu('menu2')">Rekap Bulanan</button>
 <div class="dropdown-content" id="menu2">
 <button onclick="openRekap('bulan_kab')">Kabupaten</button>
 <button onclick="openRekap('bulan_kec')">Kecamatan</button>
@@ -209,7 +242,7 @@ width:100%;
 </div>
 
 <div class="dropdown">
-<button onclick="toggleMenu('menu3')">Rekap Permusim</button>
+<button onclick="toggleMenu('menu3')">Rekap Musim</button>
 <div class="dropdown-content" id="menu3">
 <button onclick="openRekap('musim_kab')">Kabupaten</button>
 <button onclick="openRekap('musim_kec')">Kecamatan</button>
@@ -218,6 +251,10 @@ width:100%;
 </div>
 
 </div>
+
+</div>
+
+<div id="dashboard" class="container">
 
 <div class="grid">
 
@@ -250,8 +287,8 @@ width:100%;
 <button class="back" onclick="kembali()">Kembali ke Dashboard</button>
 
 <div style="margin-bottom:10px;">
-<button onclick="downloadExcel()">Download Excel</button>
-<button onclick="downloadPDF()">Download PDF</button>
+<button class="back" onclick="downloadExcel()">Download Excel</button>
+<button class="back" onclick="downloadPDF()">Download PDF</button>
 </div>
 
 <div id="tabel"></div>
@@ -267,10 +304,13 @@ let mode;
 let chartStore={};
 
 function toggleMenu(id){
+
 document.querySelectorAll(".dropdown-content")
 .forEach(menu=>menu.style.display="none");
 
-document.getElementById(id).style.display="block";
+let el=document.getElementById(id);
+el.style.display="block";
+
 }
 
 document.addEventListener("click",function(e){
@@ -305,7 +345,7 @@ if(chartStore[id]) chartStore[id].destroy();
 chartStore[id]=new Chart(document.getElementById(id),{
 type:"bar",
 data:{labels:label,datasets:[{data:nilai}]},
-options:{responsive:true,plugins:{legend:{display:false}}}
+options:{plugins:{legend:{display:false}}}
 });
 
 }
@@ -374,43 +414,17 @@ html+=`<tr><td>${i}</td><td>${DATA.desa_total[i]}</td></tr>`;
 
 html+="</table>";
 document.getElementById("tabel").innerHTML=html;
+
 }
 
-/* DOWNLOAD EXCEL RAPI */
 function downloadExcel(){
-
 let table=document.querySelector("#tabel table");
 let wb=XLSX.utils.book_new();
 let ws=XLSX.utils.table_to_sheet(table);
-
-const range=XLSX.utils.decode_range(ws['!ref']);
-
-for(let r=range.s.r;r<=range.e.r;r++){
-for(let c=range.s.c;c<=range.e.c;c++){
-
-const cell=XLSX.utils.encode_cell({r:r,c:c});
-if(!ws[cell]) continue;
-
-ws[cell].s={
-border:{
-top:{style:"thin"},
-bottom:{style:"thin"},
-left:{style:"thin"},
-right:{style:"thin"}
-}
-};
-
-}
-}
-
-ws["!cols"]=[{wch:30},{wch:15}];
-
-XLSX.utils.book_append_sheet(wb,ws,"Rekap LTT");
+XLSX.utils.book_append_sheet(wb,ws,"Rekap");
 XLSX.writeFile(wb,"Rekap_LTT.xlsx");
-
 }
 
-/* DOWNLOAD PDF RAPI */
 function downloadPDF(){
 
 const { jsPDF } = window.jspdf;
