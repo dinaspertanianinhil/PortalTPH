@@ -28,10 +28,11 @@ color:white;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:12px 25px;
-background:#052e1b;
-box-shadow:0 3px 12px rgba(0,0,0,0.4);
+padding:10px 25px;
+background:white;
+box-shadow:0 3px 12px rgba(0,0,0,0.2);
 flex-wrap:wrap;
+gap:15px;
 position:relative;
 z-index:10000;
 }
@@ -40,21 +41,17 @@ z-index:10000;
 display:flex;
 align-items:center;
 gap:12px;
+flex-wrap:wrap;
 }
 
-.logo-box{
-background:white;
-padding:4px;
-border-radius:8px;
-}
-
-.logo-box img{
-height:42px;
+.logo-area img{
+height:50px;
 }
 
 .title{
 font-weight:700;
 font-size:15px;
+color:#064e3b;
 line-height:1.2;
 }
 
@@ -62,28 +59,37 @@ line-height:1.2;
 
 .menu{
 display:flex;
-gap:15px;
+gap:10px;
 flex-wrap:wrap;
+align-items:center;
+justify-content:flex-end;
 }
 
 .menu button{
-background:#0c3f25;
+background:#0f5132;
 border:none;
 color:white;
 padding:8px 14px;
 border-radius:8px;
 cursor:pointer;
 font-weight:600;
+transition:.25s;
+white-space:nowrap;
 }
+
+.menu button:hover{
+background:#198754;
+}
+
+/* DROPDOWN */
 
 .dropdown{
 position:relative;
 }
 
 .dropdown-content{
-display:none;
 position:absolute;
-top:40px;
+top:42px;
 left:0;
 background:#0f5132;
 border-radius:10px;
@@ -91,6 +97,16 @@ min-width:200px;
 box-shadow:0 8px 20px rgba(0,0,0,0.4);
 overflow:hidden;
 z-index:999999;
+opacity:0;
+transform:translateY(-10px);
+pointer-events:none;
+transition:.25s;
+}
+
+.dropdown-content.show{
+opacity:1;
+transform:translateY(0);
+pointer-events:auto;
 }
 
 .dropdown-content button{
@@ -127,13 +143,6 @@ backdrop-filter:blur(6px);
 padding:18px;
 border-radius:14px;
 box-shadow:0 5px 25px rgba(0,0,0,0.4);
-position:relative;
-z-index:1;
-}
-
-canvas{
-position:relative;
-z-index:1;
 }
 
 .today{
@@ -162,7 +171,13 @@ background:#14532d;
 .silver{background:#C0C0C0;color:black;}
 .bronze{background:#CD7F32;}
 
-/* REKAP */
+.realisasi-box{
+text-align:center;
+font-size:30px;
+font-weight:700;
+color:#4ade80;
+padding:20px 0;
+}
 
 .rekap-view{
 display:none;
@@ -172,8 +187,6 @@ background:rgba(7,61,37,0.95);
 padding:20px;
 border-radius:12px;
 box-shadow:0 5px 20px rgba(0,0,0,0.5);
-position:relative;
-z-index:5;
 }
 
 .back{
@@ -204,25 +217,16 @@ border:1px solid #ccc;
 text-align:center;
 }
 
-/* MOBILE */
+@media(max-width:900px){
 
-@media(max-width:700px){
-
-.title{
-font-size:13px;
+.navbar{
+flex-direction:column;
+align-items:flex-start;
 }
 
 .menu{
 width:100%;
-margin-top:10px;
-}
-
-.menu button{
-flex:1;
-}
-
-.today{
-font-size:28px;
+justify-content:flex-start;
 }
 
 }
@@ -235,9 +239,7 @@ font-size:28px;
 <div class="navbar">
 
 <div class="logo-area">
-<div class="logo-box">
 <img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
-</div>
 <div class="title">
 Bidang Tanaman Pangan dan Hortikultura<br>
 Dinas Pertanian Kabupaten Indragiri Hilir
@@ -245,6 +247,8 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 </div>
 
 <div class="menu">
+
+<button onclick="location.href='dashboard.html'">Dashboard Besar</button>
 
 <div class="dropdown">
 <button onclick="toggleMenu('menu1')">Rekap Jenis LTT</button>
@@ -274,7 +278,6 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 </div>
 
 </div>
-
 </div>
 
 <div id="dashboard" class="container">
@@ -294,6 +297,13 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 <div class="card">
 <h3>Total LTT Hari Ini</h3>
 <div class="today" id="today">Memuat...</div>
+</div>
+
+<div class="card">
+<h3>Total Realisasi LTT Kabupaten</h3>
+<div class="realisasi-box" id="realisasiTotal">
+Memuat...
+</div>
 </div>
 
 <div class="card">
@@ -327,18 +337,17 @@ let mode;
 let chartStore={};
 
 function toggleMenu(id){
+
 document.querySelectorAll(".dropdown-content")
-.forEach(menu=>{
-if(menu.id!==id) menu.style.display="none";
-});
-let el=document.getElementById(id);
-el.style.display=el.style.display==="block"?"none":"block";
+.forEach(menu=>menu.classList.remove("show"));
+
+document.getElementById(id).classList.toggle("show");
 }
 
 document.addEventListener("click",function(e){
 if(!e.target.closest(".dropdown")){
 document.querySelectorAll(".dropdown-content")
-.forEach(menu=>menu.style.display="none");
+.forEach(menu=>menu.classList.remove("show"));
 }
 });
 
@@ -347,7 +356,16 @@ async function load(){
 const res=await fetch(url);
 DATA=await res.json();
 
+updateDashboard();
+
+}
+
+function updateDashboard(){
+
 document.getElementById("today").innerHTML=
+DATA.total_kabupaten+" Ha";
+
+document.getElementById("realisasiTotal").innerHTML=
 DATA.total_kabupaten+" Ha";
 
 buatGrafik("chartJenis",DATA.jenis_total);
@@ -366,8 +384,17 @@ if(chartStore[id]) chartStore[id].destroy();
 
 chartStore[id]=new Chart(document.getElementById(id),{
 type:"bar",
-data:{labels:label,datasets:[{data:nilai}]},
-options:{plugins:{legend:{display:false}}}
+data:{
+labels:label,
+datasets:[{
+data:nilai,
+borderRadius:8
+}]
+},
+options:{
+plugins:{legend:{display:false}},
+animation:{duration:800}
+}
 });
 
 }
@@ -463,6 +490,8 @@ y+=8;
 pdf.save("Rekap_LTT.pdf");
 
 }
+
+setInterval(()=>{ load(); },60000);
 
 load();
 
