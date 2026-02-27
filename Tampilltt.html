@@ -2,460 +2,257 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Monitoring LTT</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard LTT</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <style>
-
 body{
 margin:0;
-font-family:Inter, Segoe UI;
-background:#03170d;
+font-family:Segoe UI,Arial;
+background:url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvxh4_NzxPObs3auPYoJIUojZJvrn6v1Akhw&s");
+background-size:cover;
+background-attachment:fixed;
 color:white;
 }
 
-/* NAVBAR */
-
-.navbar{
-background:#052e1b;
-padding:12px 15px;
-box-shadow:0 2px 10px rgba(0,0,0,0.4);
+.overlay{
+background:rgba(0,60,30,0.85);
+min-height:100vh;
 }
 
-.topbar{
+header{
 display:flex;
 align-items:center;
-gap:12px;
-margin-bottom:10px;
+gap:15px;
+padding:15px 25px;
+background:linear-gradient(90deg,#0f5132,#0b3d2e);
+box-shadow:0 4px 20px rgba(0,0,0,0.3);
 }
 
-.logo-box{
+.logo{
+height:55px;
 background:white;
-padding:4px;
+padding:6px;
 border-radius:10px;
-}
-
-.logo-box img{
-height:40px;
 }
 
 .title{
-font-weight:700;
-font-size:14px;
-line-height:1.3;
-}
-
-/* MENU SCROLL HP */
-
-.menu-scroll{
-display:flex;
-gap:10px;
-overflow-x:auto;
-padding-bottom:5px;
-}
-
-.menu-scroll::-webkit-scrollbar{
-display:none;
-}
-
-.dropdown{
-position:relative;
-flex-shrink:0;
-}
-
-.menu-btn{
-background:#0c3f25;
-border:none;
-color:white;
-padding:10px 14px;
-border-radius:8px;
-cursor:pointer;
+font-size:20px;
 font-weight:600;
+}
+
+nav{
+display:flex;
+gap:20px;
+padding:10px 25px;
+background:#0b3d2e;
+position:sticky;
+top:0;
+z-index:10;
+}
+
+.menu{
+position:relative;
+cursor:pointer;
+}
+
+.menu:hover .submenu{
+display:block;
+}
+
+.submenu{
+display:none;
+position:absolute;
+top:30px;
+background:#0f5132;
+padding:10px;
+border-radius:10px;
+box-shadow:0 10px 25px rgba(0,0,0,0.4);
+}
+
+.submenu div{
+padding:8px 15px;
 white-space:nowrap;
 }
 
-.dropdown-content{
-display:none;
-position:absolute;
-top:42px;
-left:0;
-background:#0b3d24;
-min-width:200px;
-border-radius:10px;
-box-shadow:0 10px 25px rgba(0,0,0,0.4);
-z-index:999;
+.submenu div:hover{
+background:#198754;
+border-radius:6px;
 }
-
-.dropdown-content button{
-width:100%;
-background:none;
-border:none;
-color:white;
-padding:12px;
-text-align:left;
-cursor:pointer;
-}
-
-.dropdown-content button:hover{
-background:#145a32;
-}
-
-/* DASHBOARD */
 
 .container{
-padding:15px;
-max-width:1400px;
-margin:auto;
+padding:25px;
 }
 
 .grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-gap:15px;
+display:flex;
+gap:20px;
+overflow-x:auto;
 }
 
 .card{
-background:#073d25;
-padding:18px;
-border-radius:14px;
-box-shadow:0 10px 25px rgba(0,0,0,0.4);
+min-width:420px;
+background:rgba(0,0,0,0.25);
+backdrop-filter:blur(10px);
+border-radius:20px;
+padding:20px;
+box-shadow:0 10px 40px rgba(0,0,0,0.4);
 }
 
-.today{
-font-size:34px;
-font-weight:700;
-text-align:center;
-color:#7CFC00;
+.card h2{
+margin-top:0;
 }
 
-/* ranking */
-
-.rank-list{
-display:flex;
-flex-direction:column;
-gap:8px;
-}
-
-.rank-item{
-display:flex;
-justify-content:space-between;
-padding:10px;
+canvas{
+background:rgba(255,255,255,0.03);
 border-radius:10px;
-background:#0b3d24;
-font-weight:600;
+padding:10px;
 }
 
-.gold{background:#FFD700;color:black;}
-.silver{background:#C0C0C0;color:black;}
-.bronze{background:#CD7F32;color:white;}
-
-/* REKAP */
-
-.rekap-view{
-display:none;
-background:#06351f;
-padding:15px;
-margin:15px;
-border-radius:12px;
+@media(max-width:768px){
+.card{
+min-width:350px;
 }
-
-.back{
-background:#145a32;
-color:white;
-border:none;
-padding:10px 14px;
-border-radius:8px;
-cursor:pointer;
-margin-bottom:10px;
 }
-
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:10px;
-}
-
-th{
-background:#145a32;
-padding:8px;
-border:1px solid rgba(255,255,255,0.1);
-}
-
-td{
-padding:8px;
-border:1px solid rgba(255,255,255,0.1);
-text-align:center;
-}
-
 </style>
 </head>
 
 <body>
 
-<div class="navbar">
+<div class="overlay">
 
-<div class="topbar">
-<div class="logo-box">
-<img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
-</div>
+<header>
+<img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
 <div class="title">
 Bidang Tanaman Pangan dan Hortikultura<br>
 Dinas Pertanian Kabupaten Indragiri Hilir
 </div>
-</div>
+</header>
 
-<div class="menu-scroll">
+<nav>
+<div class="menu">Dashboard</div>
 
-<div class="dropdown">
-<button class="menu-btn" onclick="toggleMenu('menu1')">
+<div class="menu">
 Rekap Jenis LTT
-</button>
-<div class="dropdown-content" id="menu1">
-<button onclick="openRekap('jenis_total')">Kabupaten</button>
-<button onclick="openRekap('jenis_kecamatan')">Kecamatan</button>
-<button onclick="openRekap('jenis_desa')">Desa</button>
+<div class="submenu">
+<div>Kabupaten</div>
+<div>Kecamatan</div>
+<div>Desa</div>
 </div>
 </div>
 
-<div class="dropdown">
-<button class="menu-btn" onclick="toggleMenu('menu2')">
+<div class="menu">
 Rekap Bulanan
-</button>
-<div class="dropdown-content" id="menu2">
-<button onclick="openRekap('bulan_kab')">Kabupaten</button>
-<button onclick="openRekap('bulan_kec')">Kecamatan</button>
-<button onclick="openRekap('bulan_desa')">Desa</button>
+<div class="submenu">
+<div>Kabupaten</div>
+<div>Kecamatan</div>
+<div>Desa</div>
 </div>
 </div>
 
-<div class="dropdown">
-<button class="menu-btn" onclick="toggleMenu('menu3')">
-Rekap Musim
-</button>
-<div class="dropdown-content" id="menu3">
-<button onclick="openRekap('musim_kab')">Kabupaten</button>
-<button onclick="openRekap('musim_kec')">Kecamatan</button>
-<button onclick="openRekap('musim_desa')">Desa</button>
+<div class="menu">
+Rekap Musiman
+<div class="submenu">
+<div>Kabupaten</div>
+<div>Kecamatan</div>
+<div>Desa</div>
 </div>
 </div>
 
-</div>
+</nav>
 
-</div>
-
-<div id="dashboard" class="container">
+<div class="container">
 
 <div class="grid">
 
 <div class="card">
-<h3>Grafik Jenis LTT</h3>
+<h2>Grafik Jenis LTT</h2>
 <canvas id="chartJenis"></canvas>
 </div>
 
 <div class="card">
-<h3>Grafik Ranking Kecamatan</h3>
+<h2>Ranking Kecamatan</h2>
 <canvas id="chartKecamatan"></canvas>
 </div>
 
 <div class="card">
-<h3>Total LTT Hari Ini</h3>
-<div class="today" id="today">Memuat...</div>
-</div>
-
-<div class="card">
-<h3>Ranking Realisasi</h3>
-<div class="rank-list" id="ranking"></div>
+<h2>Rekap Bulanan</h2>
+<canvas id="chartBulanan"></canvas>
 </div>
 
 </div>
 
 </div>
-
-<div id="rekap" class="rekap-view">
-
-<button class="back" onclick="kembali()">Kembali ke Dashboard</button>
-
-<div style="margin-bottom:10px;">
-<button class="back" onclick="downloadExcel()">Download Excel</button>
-<button class="back" onclick="downloadPDF()">Download PDF</button>
-</div>
-
-<div id="tabel"></div>
-
 </div>
 
 <script>
 
-const url="https://script.google.com/macros/s/AKfycby2-GIC6Rx_atSv-Y65VjJedMMYhbJFuI_qYMrvFgWXzdWME8yrfnsIsU1bsvsDtgHg/exec";
+const urlAPI="https://script.google.com/macros/s/AKfycby2-GIC6Rx_atSv-Y65VjJedMMYhbJFuI_qYMrvFgWXzdWME8yrfnsIsU1bsvsDtgHg/exec";
 
-let DATA;
-let mode;
-let chartStore={};
+async function loadData(){
+const res=await fetch(urlAPI);
+const result=await res.json();
+const data=result.data || result;
 
-function toggleMenu(id){
-
-document.querySelectorAll(".dropdown-content")
-.forEach(menu=>menu.style.display="none");
-
-let el=document.getElementById(id);
-el.style.display="block";
-
+olahData(data);
 }
 
-document.addEventListener("click",function(e){
-if(!e.target.closest(".dropdown")){
-document.querySelectorAll(".dropdown-content")
-.forEach(menu=>menu.style.display="none");
-}
+function olahData(data){
+
+let jenis={};
+let kecamatan={};
+let bulan={};
+
+data.forEach(d=>{
+
+let luas=Number(d["LUAS TAMBAH TANAM"] || d["LUAS_TAMBAH_TANAM"])||0;
+let jenisLTT=d["JENIS LTT"];
+let kec=d["KECAMATAN"];
+let tanggal=new Date(d["TANGGAL"]);
+let bln=tanggal.toLocaleString("id-ID",{month:"short"});
+
+if(!jenis[jenisLTT]) jenis[jenisLTT]=0;
+jenis[jenisLTT]+=luas;
+
+if(!kecamatan[kec]) kecamatan[kec]=0;
+kecamatan[kec]+=luas;
+
+if(!bulan[bln]) bulan[bln]=0;
+bulan[bln]+=luas;
+
 });
 
-async function load(){
-
-const res=await fetch(url);
-DATA=await res.json();
-
-document.getElementById("today").innerHTML=
-DATA.total_kabupaten+" Ha";
-
-buatGrafik("chartJenis",DATA.jenis_total);
-buatGrafik("chartKecamatan",DATA.kecamatan_total);
-
-buatRanking();
-
+buatChart("chartJenis",jenis);
+buatChart("chartKecamatan",kecamatan);
+buatChart("chartBulanan",bulan);
 }
 
-function buatGrafik(id,data){
+function buatChart(id,data){
 
-const label=Object.keys(data);
-const nilai=Object.values(data);
-
-if(chartStore[id]) chartStore[id].destroy();
-
-chartStore[id]=new Chart(document.getElementById(id),{
+new Chart(document.getElementById(id),{
 type:"bar",
-data:{labels:label,datasets:[{data:nilai}]},
-options:{plugins:{legend:{display:false}}}
+data:{
+labels:Object.keys(data),
+datasets:[{
+data:Object.values(data),
+borderWidth:1
+}]
+},
+options:{
+plugins:{
+legend:{display:false}
+},
+scales:{
+y:{beginAtZero:true}
+}
+}
 });
 
 }
 
-function buatRanking(){
-
-let sorted=Object.entries(DATA.kecamatan_total)
-.sort((a,b)=>b[1]-a[1]);
-
-let html="";
-
-sorted.forEach((row,i)=>{
-
-let kelas="rank-item";
-if(i==0) kelas+=" gold";
-else if(i==1) kelas+=" silver";
-else if(i==2) kelas+=" bronze";
-
-html+=`<div class="${kelas}">
-<span>${i+1}. ${row[0]}</span>
-<span>${row[1]} Ha</span>
-</div>`;
-
-});
-
-document.getElementById("ranking").innerHTML=html;
-
-}
-
-function openRekap(m){
-mode=m;
-document.getElementById("dashboard").style.display="none";
-document.getElementById("rekap").style.display="block";
-render();
-}
-
-function kembali(){
-document.getElementById("dashboard").style.display="block";
-document.getElementById("rekap").style.display="none";
-}
-
-function render(){
-
-let html="<table>";
-
-if(mode==="jenis_total"){
-html+="<tr><th>Jenis LTT</th><th>Luas</th></tr>";
-for(let i in DATA.jenis_total){
-html+=`<tr><td>${i}</td><td>${DATA.jenis_total[i]}</td></tr>`;
-}
-}
-
-if(mode==="jenis_kecamatan"){
-html+="<tr><th>Kecamatan</th><th>LTT</th></tr>";
-for(let i in DATA.kecamatan_total){
-html+=`<tr><td>${i}</td><td>${DATA.kecamatan_total[i]}</td></tr>`;
-}
-}
-
-if(mode==="jenis_desa"){
-html+="<tr><th>Desa</th><th>LTT</th></tr>";
-for(let i in DATA.desa_total){
-html+=`<tr><td>${i}</td><td>${DATA.desa_total[i]}</td></tr>`;
-}
-}
-
-html+="</table>";
-document.getElementById("tabel").innerHTML=html;
-
-}
-
-function downloadExcel(){
-let table=document.querySelector("#tabel table");
-let wb=XLSX.utils.book_new();
-let ws=XLSX.utils.table_to_sheet(table);
-XLSX.utils.book_append_sheet(wb,ws,"Rekap");
-XLSX.writeFile(wb,"Rekap_LTT.xlsx");
-}
-
-function downloadPDF(){
-
-const { jsPDF } = window.jspdf;
-const pdf=new jsPDF("l","mm","a4");
-
-let table=document.querySelector("#tabel table");
-let rows=table.querySelectorAll("tr");
-
-let startX=14;
-let startY=20;
-let colWidth=120;
-let rowHeight=10;
-
-pdf.setFontSize(14);
-pdf.text("Rekap Data LTT",14,10);
-
-rows.forEach((row,rowIndex)=>{
-
-let cols=row.querySelectorAll("th,td");
-
-cols.forEach((col,colIndex)=>{
-
-let text=col.innerText;
-let x=startX+(colIndex*colWidth);
-let y=startY+(rowIndex*rowHeight);
-
-pdf.rect(x,y,colWidth,rowHeight);
-pdf.text(text,x+4,y+6);
-
-});
-
-});
-
-pdf.save("Rekap_LTT.pdf");
-
-}
-
-load();
+loadData();
 
 </script>
 
