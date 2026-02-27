@@ -2,12 +2,11 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Monitoring LTT Kabupaten</title>
+<title>Dashboard Monitoring LTT</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <style>
@@ -15,21 +14,8 @@
 body{
 font-family:Segoe UI;
 margin:0;
-padding:20px;
-background-image:url("https://png.pngtree.com/thumb_back/fh260/background/20240731/pngtree-beautiful-landscape-of-a-rice-field-and-sky-in-the-village-image_15937834.jpg");
-background-size:cover;
-background-attachment:fixed;
-}
-
-body::before{
-content:"";
-position:fixed;
-top:0;
-left:0;
-right:0;
-bottom:0;
-background:rgba(255,255,255,0.9);
-z-index:-1;
+padding:15px;
+background:#f4f7fb;
 }
 
 .header{
@@ -40,7 +26,7 @@ margin-bottom:20px;
 }
 
 .logo{
-width:70px;
+width:60px;
 }
 
 .judul{
@@ -50,9 +36,11 @@ font-weight:600;
 
 .menu-dashboard{
 display:flex;
-gap:10px;
+gap:12px;
 flex-wrap:wrap;
 margin-bottom:20px;
+position:relative;
+z-index:9999;
 }
 
 .menu-dashboard button{
@@ -72,33 +60,35 @@ position:relative;
 .dropdown-content{
 display:none;
 position:absolute;
-top:45px;
+top:48px;
 left:0;
-background:white;
-min-width:200px;
-box-shadow:0 6px 15px rgba(0,0,0,0.2);
+background:#ffffff;
+min-width:220px;
+box-shadow:0 8px 20px rgba(0,0,0,0.2);
 border-radius:10px;
 border:1px solid #ddd;
-z-index:999;
+overflow:hidden;
+z-index:99999;
 }
 
 .dropdown-content button{
 width:100%;
 border:none;
 background:white;
-padding:10px;
+padding:12px;
 text-align:left;
 cursor:pointer;
+font-size:14px;
 color:#222;
 }
 
 .dropdown-content button:hover{
-background:#f2f2f2;
+background:#f1f1f1;
 }
 
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
 gap:15px;
 }
 
@@ -106,14 +96,50 @@ gap:15px;
 background:white;
 padding:15px;
 border-radius:12px;
-box-shadow:0 5px 15px rgba(0,0,0,0.1);
+box-shadow:0 3px 12px rgba(0,0,0,0.08);
 }
 
-.scoreToday{
-font-size:30px;
+.today{
+font-size:32px;
 font-weight:700;
 text-align:center;
 color:#2d6a4f;
+}
+
+.rank-list{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.rank-item{
+display:flex;
+justify-content:space-between;
+padding:12px;
+border-radius:10px;
+font-weight:600;
+}
+
+.gold{background:#FFD700;}
+.silver{background:#C0C0C0;}
+.bronze{background:#CD7F32;color:white;}
+
+.rekap-view{
+display:none;
+background:white;
+padding:20px;
+border-radius:12px;
+box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+
+.back{
+background:#344e41;
+color:white;
+border:none;
+padding:8px 12px;
+border-radius:6px;
+cursor:pointer;
+margin-bottom:10px;
 }
 
 table{
@@ -124,31 +150,30 @@ border-collapse:collapse;
 th{
 background:#2d6a4f;
 color:white;
-padding:6px;
+padding:8px;
+border:1px solid #999;
 }
 
 td{
-padding:6px;
-border-bottom:1px solid #ddd;
+padding:8px;
+border:1px solid #999;
 text-align:center;
 }
 
-.gold{background:#FFD700;font-weight:bold;}
-.silver{background:#C0C0C0;font-weight:bold;}
-.bronze{background:#CD7F32;color:white;font-weight:bold;}
+@media(max-width:700px){
 
-.download-area{
-margin-bottom:10px;
+.judul{
+font-size:18px;
 }
 
-.download-area button{
-background:#344e41;
-color:white;
-border:none;
-padding:8px 12px;
-border-radius:6px;
-cursor:pointer;
-margin-right:5px;
+.today{
+font-size:26px;
+}
+
+.menu-dashboard button{
+width:100%;
+}
+
 }
 
 </style>
@@ -156,39 +181,39 @@ margin-right:5px;
 
 <body>
 
-<div id="dashboard">
-
 <div class="header">
 <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
 <div class="judul">Dashboard Monitoring LTT Kabupaten</div>
 </div>
+
+<div id="dashboard">
 
 <div class="menu-dashboard">
 
 <div class="dropdown">
 <button onclick="toggleMenu('menu1')">Rekap Jenis LTT</button>
 <div class="dropdown-content" id="menu1">
-<button onclick="mode='jenis_total';render()">Kabupaten</button>
-<button onclick="mode='jenis_kecamatan';render()">Kecamatan</button>
-<button onclick="mode='jenis_desa';render()">Desa</button>
+<button onclick="openRekap('jenis_total')">Kabupaten</button>
+<button onclick="openRekap('jenis_kecamatan')">Kecamatan</button>
+<button onclick="openRekap('jenis_desa')">Desa</button>
 </div>
 </div>
 
 <div class="dropdown">
 <button onclick="toggleMenu('menu2')">Rekap Perbulan</button>
 <div class="dropdown-content" id="menu2">
-<button onclick="mode='bulan_kab';render()">Kabupaten</button>
-<button onclick="mode='bulan_kec';render()">Kecamatan</button>
-<button onclick="mode='bulan_desa';render()">Desa</button>
+<button onclick="openRekap('bulan_kab')">Kabupaten</button>
+<button onclick="openRekap('bulan_kec')">Kecamatan</button>
+<button onclick="openRekap('bulan_desa')">Desa</button>
 </div>
 </div>
 
 <div class="dropdown">
 <button onclick="toggleMenu('menu3')">Rekap Permusim</button>
 <div class="dropdown-content" id="menu3">
-<button onclick="mode='musim_kab';render()">Kabupaten</button>
-<button onclick="mode='musim_kec';render()">Kecamatan</button>
-<button onclick="mode='musim_desa';render()">Desa</button>
+<button onclick="openRekap('musim_kab')">Kabupaten</button>
+<button onclick="openRekap('musim_kec')">Kecamatan</button>
+<button onclick="openRekap('musim_desa')">Desa</button>
 </div>
 </div>
 
@@ -202,33 +227,35 @@ margin-right:5px;
 </div>
 
 <div class="card">
-<h3>Ranking Kecamatan</h3>
+<h3>Grafik Ranking Kecamatan</h3>
 <canvas id="chartKecamatan"></canvas>
 </div>
 
 <div class="card">
-<h3>Papan Skor Total Hari Ini</h3>
-<div class="scoreToday" id="todayScore">Memuat...</div>
+<h3>Total LTT Hari Ini</h3>
+<div class="today" id="today">Memuat...</div>
 </div>
 
 <div class="card">
 <h3>Ranking Realisasi</h3>
-<div id="liveScore"></div>
+<div class="rank-list" id="ranking"></div>
 </div>
 
-<div class="card" style="grid-column:1/-1">
-<h3>Rekap Data</h3>
+</div>
 
-<div class="download-area">
+</div>
+
+<div id="rekap" class="rekap-view">
+
+<button class="back" onclick="kembali()">Kembali ke Dashboard</button>
+
+<div style="margin-bottom:10px;">
 <button onclick="downloadExcel()">Download Excel</button>
 <button onclick="downloadPDF()">Download PDF</button>
 </div>
 
-<div id="tabel">Memuat...</div>
+<div id="tabel"></div>
 
-</div>
-
-</div>
 </div>
 
 <script>
@@ -236,22 +263,14 @@ margin-right:5px;
 const url="https://script.google.com/macros/s/AKfycby2-GIC6Rx_atSv-Y65VjJedMMYhbJFuI_qYMrvFgWXzdWME8yrfnsIsU1bsvsDtgHg/exec";
 
 let DATA;
-let mode="jenis_total";
+let mode;
 let chartStore={};
 
 function toggleMenu(id){
-
 document.querySelectorAll(".dropdown-content")
 .forEach(menu=>menu.style.display="none");
 
-let menu=document.getElementById(id);
-
-if(menu.style.display==="block"){
-menu.style.display="none";
-}else{
-menu.style.display="block";
-}
-
+document.getElementById(id).style.display="block";
 }
 
 document.addEventListener("click",function(e){
@@ -266,20 +285,17 @@ async function load(){
 const res=await fetch(url);
 DATA=await res.json();
 
-document.getElementById("todayScore").innerHTML=
+document.getElementById("today").innerHTML=
 DATA.total_kabupaten+" Ha";
 
 buatGrafik("chartJenis",DATA.jenis_total);
 buatGrafik("chartKecamatan",DATA.kecamatan_total);
 
-papanSkor();
-render();
+buatRanking();
 
 }
 
 function buatGrafik(id,data){
-
-if(!data) return;
 
 const label=Object.keys(data);
 const nilai=Object.values(data);
@@ -294,32 +310,41 @@ options:{responsive:true,plugins:{legend:{display:false}}}
 
 }
 
-function papanSkor(){
+function buatRanking(){
 
-let html="<table>";
-html+="<tr><th>Rank</th><th>Kecamatan</th><th>LTT</th></tr>";
-
-let sorted = Object.entries(DATA.kecamatan_total)
+let sorted=Object.entries(DATA.kecamatan_total)
 .sort((a,b)=>b[1]-a[1]);
+
+let html="";
 
 sorted.forEach((row,i)=>{
 
-let kelas="";
-if(i==0) kelas="gold";
-else if(i==1) kelas="silver";
-else if(i==2) kelas="bronze";
+let kelas="rank-item";
+if(i==0) kelas+=" gold";
+else if(i==1) kelas+=" silver";
+else if(i==2) kelas+=" bronze";
 
-html+=`<tr class="${kelas}">
-<td>${i+1}</td>
-<td>${row[0]}</td>
-<td>${row[1]}</td>
-</tr>`;
+html+=`<div class="${kelas}">
+<span>${i+1}. ${row[0]}</span>
+<span>${row[1]} Ha</span>
+</div>`;
+
 });
 
-html+="</table>";
+document.getElementById("ranking").innerHTML=html;
 
-document.getElementById("liveScore").innerHTML=html;
+}
 
+function openRekap(m){
+mode=m;
+document.getElementById("dashboard").style.display="none";
+document.getElementById("rekap").style.display="block";
+render();
+}
+
+function kembali(){
+document.getElementById("dashboard").style.display="block";
+document.getElementById("rekap").style.display="none";
 }
 
 function render(){
@@ -334,100 +359,92 @@ html+=`<tr><td>${i}</td><td>${DATA.jenis_total[i]}</td></tr>`;
 }
 
 if(mode==="jenis_kecamatan"){
-
-let jenisSet=new Set();
-
-for(let kec in DATA.jenis_per_kecamatan){
-for(let jenis in DATA.jenis_per_kecamatan[kec]){
-jenisSet.add(jenis);
+html+="<tr><th>Kecamatan</th><th>LTT</th></tr>";
+for(let i in DATA.kecamatan_total){
+html+=`<tr><td>${i}</td><td>${DATA.kecamatan_total[i]}</td></tr>`;
 }
-}
-
-let jenisList=[...jenisSet];
-
-html+="<tr><th>Kecamatan</th>";
-jenisList.forEach(j=>html+=`<th>${j}</th>`);
-html+="</tr>";
-
-for(let kec in DATA.jenis_per_kecamatan){
-
-html+=`<tr><td>${kec}</td>`;
-
-jenisList.forEach(j=>{
-let nilai=DATA.jenis_per_kecamatan[kec][j]||0;
-html+=`<td>${nilai}</td>`;
-});
-
-html+="</tr>";
-}
-
 }
 
 if(mode==="jenis_desa"){
-
-let jenisSet=new Set();
-
-for(let desa in DATA.jenis_per_desa){
-for(let jenis in DATA.jenis_per_desa[desa]){
-jenisSet.add(jenis);
+html+="<tr><th>Desa</th><th>LTT</th></tr>";
+for(let i in DATA.desa_total){
+html+=`<tr><td>${i}</td><td>${DATA.desa_total[i]}</td></tr>`;
 }
-}
-
-let jenisList=[...jenisSet];
-
-html+="<tr><th>Desa</th>";
-jenisList.forEach(j=>html+=`<th>${j}</th>`);
-html+="</tr>";
-
-for(let desa in DATA.jenis_per_desa){
-
-html+=`<tr><td>${desa}</td>`;
-
-jenisList.forEach(j=>{
-let nilai=DATA.jenis_per_desa[desa][j]||0;
-html+=`<td>${nilai}</td>`;
-});
-
-html+="</tr>";
-}
-
-}
-
-if(mode==="bulan_kab" || mode==="bulan_kec" || mode==="bulan_desa"){
-html+="<tr><th>Bulan Berjalan</th><th>Total LTT</th></tr>";
-html+=`<tr><td>Bulan Ini</td><td>${DATA.total_kabupaten}</td></tr>`;
-}
-
-if(mode==="musim_kab" || mode==="musim_kec" || mode==="musim_desa"){
-html+="<tr><th>Musim Berjalan</th><th>Total LTT</th></tr>";
-html+=`<tr><td>Musim Ini</td><td>${DATA.total_kabupaten}</td></tr>`;
 }
 
 html+="</table>";
-
 document.getElementById("tabel").innerHTML=html;
-
 }
 
+/* DOWNLOAD EXCEL RAPI */
 function downloadExcel(){
-let wb=XLSX.utils.book_new();
+
 let table=document.querySelector("#tabel table");
+let wb=XLSX.utils.book_new();
 let ws=XLSX.utils.table_to_sheet(table);
-XLSX.utils.book_append_sheet(wb,ws,"Rekap");
-XLSX.writeFile(wb,"rekap_ltt.xlsx");
+
+const range=XLSX.utils.decode_range(ws['!ref']);
+
+for(let r=range.s.r;r<=range.e.r;r++){
+for(let c=range.s.c;c<=range.e.c;c++){
+
+const cell=XLSX.utils.encode_cell({r:r,c:c});
+if(!ws[cell]) continue;
+
+ws[cell].s={
+border:{
+top:{style:"thin"},
+bottom:{style:"thin"},
+left:{style:"thin"},
+right:{style:"thin"}
+}
+};
+
+}
 }
 
-async function downloadPDF(){
+ws["!cols"]=[{wch:30},{wch:15}];
 
-const element=document.getElementById("tabel");
-const canvas=await html2canvas(element);
-const img=canvas.toDataURL("image/png");
+XLSX.utils.book_append_sheet(wb,ws,"Rekap LTT");
+XLSX.writeFile(wb,"Rekap_LTT.xlsx");
+
+}
+
+/* DOWNLOAD PDF RAPI */
+function downloadPDF(){
 
 const { jsPDF } = window.jspdf;
 const pdf=new jsPDF("l","mm","a4");
 
-pdf.addImage(img,"PNG",10,10,270,120);
-pdf.save("rekap_ltt.pdf");
+let table=document.querySelector("#tabel table");
+let rows=table.querySelectorAll("tr");
+
+let startX=14;
+let startY=20;
+let colWidth=120;
+let rowHeight=10;
+
+pdf.setFontSize(14);
+pdf.text("Rekap Data LTT",14,10);
+
+rows.forEach((row,rowIndex)=>{
+
+let cols=row.querySelectorAll("th,td");
+
+cols.forEach((col,colIndex)=>{
+
+let text=col.innerText;
+let x=startX+(colIndex*colWidth);
+let y=startY+(rowIndex*rowHeight);
+
+pdf.rect(x,y,colWidth,rowHeight);
+pdf.text(text,x+4,y+6);
+
+});
+
+});
+
+pdf.save("Rekap_LTT.pdf");
 
 }
 
