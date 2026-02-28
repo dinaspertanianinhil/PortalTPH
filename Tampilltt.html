@@ -22,8 +22,6 @@ background-attachment:fixed;
 color:white;
 }
 
-/* NAVBAR */
-
 .navbar{
 display:flex;
 justify-content:space-between;
@@ -55,8 +53,6 @@ color:#064e3b;
 line-height:1.2;
 }
 
-/* MENU */
-
 .menu{
 display:flex;
 gap:10px;
@@ -80,8 +76,6 @@ white-space:nowrap;
 .menu button:hover{
 background:#198754;
 }
-
-/* DROPDOWN */
 
 .dropdown{
 position:relative;
@@ -122,8 +116,6 @@ cursor:pointer;
 .dropdown-content button:hover{
 background:#198754;
 }
-
-/* DASHBOARD */
 
 .container{
 max-width:1400px;
@@ -337,10 +329,8 @@ let mode;
 let chartStore={};
 
 function toggleMenu(id){
-
 document.querySelectorAll(".dropdown-content")
 .forEach(menu=>menu.classList.remove("show"));
-
 document.getElementById(id).classList.toggle("show");
 }
 
@@ -352,12 +342,9 @@ document.querySelectorAll(".dropdown-content")
 });
 
 async function load(){
-
 const res=await fetch(url);
 DATA=await res.json();
-
 updateDashboard();
-
 }
 
 function updateDashboard(){
@@ -372,7 +359,6 @@ buatGrafik("chartJenis",DATA.jenis_total);
 buatGrafik("chartKecamatan",DATA.kecamatan_total);
 
 buatRanking();
-
 }
 
 function buatGrafik(id,data){
@@ -392,7 +378,19 @@ borderRadius:8
 }]
 },
 options:{
-plugins:{legend:{display:false}},
+plugins:{
+legend:{display:false}
+},
+scales:{
+x:{
+ticks:{color:"#ffffff"},
+grid:{color:"rgba(255,255,255,0.1)"}
+},
+y:{
+ticks:{color:"#ffffff"},
+grid:{color:"rgba(255,255,255,0.1)"}
+}
+},
 animation:{duration:800}
 }
 });
@@ -492,7 +490,6 @@ pdf.save("Rekap_LTT.pdf");
 }
 
 setInterval(()=>{ load(); },60000);
-
 load();
 
 </script>
