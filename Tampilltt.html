@@ -31,7 +31,6 @@ background:white;
 box-shadow:0 3px 12px rgba(0,0,0,0.2);
 flex-wrap:wrap;
 gap:15px;
-position:relative;
 z-index:10000;
 }
 
@@ -39,7 +38,6 @@ z-index:10000;
 display:flex;
 align-items:center;
 gap:12px;
-flex-wrap:wrap;
 }
 
 .logo-area img{
@@ -57,8 +55,6 @@ line-height:1.2;
 display:flex;
 gap:10px;
 flex-wrap:wrap;
-align-items:center;
-justify-content:flex-end;
 }
 
 .menu button{
@@ -69,8 +65,6 @@ padding:8px 14px;
 border-radius:8px;
 cursor:pointer;
 font-weight:600;
-transition:.25s;
-white-space:nowrap;
 }
 
 .menu button:hover{
@@ -131,14 +125,13 @@ gap:20px;
 
 .card{
 background:rgba(7,61,37,0.9);
-backdrop-filter:blur(6px);
 padding:18px;
 border-radius:14px;
 box-shadow:0 5px 25px rgba(0,0,0,0.4);
 }
 
-.today{
-font-size:34px;
+.score{
+font-size:30px;
 font-weight:700;
 text-align:center;
 color:#4ade80;
@@ -163,14 +156,6 @@ background:#14532d;
 .silver{background:#C0C0C0;color:black;}
 .bronze{background:#CD7F32;}
 
-.realisasi-box{
-text-align:center;
-font-size:30px;
-font-weight:700;
-color:#4ade80;
-padding:20px 0;
-}
-
 .rekap-view{
 display:none;
 max-width:1200px;
@@ -178,16 +163,6 @@ margin:auto;
 background:rgba(7,61,37,0.95);
 padding:20px;
 border-radius:12px;
-box-shadow:0 5px 20px rgba(0,0,0,0.5);
-}
-
-.back{
-background:#198754;
-border:none;
-padding:8px 12px;
-border-radius:6px;
-cursor:pointer;
-color:white;
 }
 
 table{
@@ -209,20 +184,6 @@ border:1px solid #ccc;
 text-align:center;
 }
 
-@media(max-width:900px){
-
-.navbar{
-flex-direction:column;
-align-items:flex-start;
-}
-
-.menu{
-width:100%;
-justify-content:flex-start;
-}
-
-}
-
 </style>
 </head>
 
@@ -240,7 +201,7 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 
 <div class="menu">
 
-<button onclick="location.href='dashboad.html'">Kembali ke DashBoard Utama</button>
+<button onclick="location.href='dashboad.html'">Dashboard</button>
 
 <div class="dropdown">
 <button onclick="toggleMenu('menu1')">Rekap Jenis LTT</button>
@@ -287,15 +248,13 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 </div>
 
 <div class="card">
-<h3>Total LTT Hari Ini</h3>
-<div class="today" id="today">Memuat...</div>
+<h3>Total Hari Ini (Reguler + Oplah)</h3>
+<div class="score" id="scorePadi">Memuat...</div>
 </div>
 
 <div class="card">
-<h3>Total Realisasi LTT Kabupaten</h3>
-<div class="realisasi-box" id="realisasiTotal">
-Memuat...
-</div>
+<h3>Total Semua LTT</h3>
+<div class="score" id="scoreSemua">Memuat...</div>
 </div>
 
 <div class="card">
@@ -309,7 +268,7 @@ Memuat...
 
 <div id="rekap" class="rekap-view">
 
-<button class="back" onclick="kembali()">Kembali</button>
+<button onclick="kembali()">Kembali</button>
 
 <div style="margin:10px 0;">
 <button onclick="downloadExcel()">Download Excel</button>
@@ -349,16 +308,26 @@ updateDashboard();
 
 function updateDashboard(){
 
-document.getElementById("today").innerHTML=
-DATA.total_kabupaten+" Ha";
-
-document.getElementById("realisasiTotal").innerHTML=
-DATA.total_kabupaten+" Ha";
-
 buatGrafik("chartJenis",DATA.jenis_total);
 buatGrafik("chartKecamatan",DATA.kecamatan_total);
 
 buatRanking();
+
+/* papan skor padi */
+let reguler = DATA.jenis_total.reguler || 0;
+let oplah = DATA.jenis_total.oplah || 0;
+
+document.getElementById("scorePadi").innerHTML =
+reguler + oplah + " Ha";
+
+/* papan skor semua jenis */
+let totalSemua = 0;
+for(let i in DATA.jenis_total){
+totalSemua += DATA.jenis_total[i];
+}
+document.getElementById("scoreSemua").innerHTML =
+totalSemua + " Ha";
+
 }
 
 function buatGrafik(id,data){
@@ -370,31 +339,9 @@ if(chartStore[id]) chartStore[id].destroy();
 
 chartStore[id]=new Chart(document.getElementById(id),{
 type:"bar",
-data:{
-labels:label,
-datasets:[{
-data:nilai,
-borderRadius:8
-}]
-},
-options:{
-plugins:{
-legend:{display:false}
-},
-scales:{
-x:{
-ticks:{color:"#ffffff"},
-grid:{color:"rgba(255,255,255,0.1)"}
-},
-y:{
-ticks:{color:"#ffffff"},
-grid:{color:"rgba(255,255,255,0.1)"}
-}
-},
-animation:{duration:800}
-}
+data:{labels:label,datasets:[{data:nilai,borderRadius:8}]},
+options:{plugins:{legend:{display:false}}}
 });
-
 }
 
 function buatRanking(){
@@ -437,23 +384,29 @@ function render(){
 let html="<table>";
 
 if(mode==="jenis_total"){
-html+="<tr><th>Jenis LTT</th><th>Luas</th></tr>";
-for(let i in DATA.jenis_total){
-html+=`<tr><td>${i}</td><td>${DATA.jenis_total[i]}</td></tr>`;
-}
+let r = DATA.jenis_total.reguler || 0;
+let o = DATA.jenis_total.oplah || 0;
+html+="<tr><th>Jenis</th><th>Luas</th></tr>";
+html+=`<tr><td>Reguler</td><td>${r}</td></tr>`;
+html+=`<tr><td>Oplah</td><td>${o}</td></tr>`;
+html+=`<tr><td><b>Total</b></td><td><b>${r+o}</b></td></tr>`;
 }
 
 if(mode==="jenis_kecamatan"){
-html+="<tr><th>Kecamatan</th><th>LTT</th></tr>";
-for(let i in DATA.kecamatan_total){
-html+=`<tr><td>${i}</td><td>${DATA.kecamatan_total[i]}</td></tr>`;
+html+="<tr><th>Kecamatan</th><th>Reguler</th><th>Oplah</th><th>Total</th></tr>";
+for(let i in DATA.jenis_per_kecamatan){
+let r=DATA.jenis_per_kecamatan[i].reguler||0;
+let o=DATA.jenis_per_kecamatan[i].oplah||0;
+html+=`<tr><td>${i}</td><td>${r}</td><td>${o}</td><td><b>${r+o}</b></td></tr>`;
 }
 }
 
 if(mode==="jenis_desa"){
-html+="<tr><th>Desa</th><th>LTT</th></tr>";
-for(let i in DATA.desa_total){
-html+=`<tr><td>${i}</td><td>${DATA.desa_total[i]}</td></tr>`;
+html+="<tr><th>Desa</th><th>Reguler</th><th>Oplah</th><th>Total</th></tr>";
+for(let i in DATA.jenis_per_desa){
+let r=DATA.jenis_per_desa[i].reguler||0;
+let o=DATA.jenis_per_desa[i].oplah||0;
+html+=`<tr><td>${i}</td><td>${r}</td><td>${o}</td><td><b>${r+o}</b></td></tr>`;
 }
 }
 
@@ -470,23 +423,16 @@ XLSX.writeFile(wb,"Rekap_LTT.xlsx");
 }
 
 function downloadPDF(){
-
 const { jsPDF } = window.jspdf;
 const pdf=new jsPDF("l","mm","a4");
-
 let table=document.querySelector("#tabel table");
 let rows=table.querySelectorAll("tr");
-
 let y=20;
-
 rows.forEach(row=>{
-let text=row.innerText;
-pdf.text(text,14,y);
+pdf.text(row.innerText,14,y);
 y+=8;
 });
-
 pdf.save("Rekap_LTT.pdf");
-
 }
 
 setInterval(()=>{ load(); },60000);
