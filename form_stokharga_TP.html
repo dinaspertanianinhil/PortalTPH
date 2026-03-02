@@ -670,40 +670,24 @@
     }
 
 // Kirim ke Google Apps Script
-const form = document.getElementById("dataForm");
-const submitBtn = document.getElementById("submitBtn");
+  const form = document.getElementById("dataForm");
 
 form.addEventListener("submit", async function(e) {
   e.preventDefault();
 
-  // Cegah klik berkali-kali
-  submitBtn.disabled = true;
-  submitBtn.innerText = "Menyimpan...";
-
   const formData = new FormData(form);
 
   try {
-    let res = await fetch("https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec", {
+    let res = await fetch("https://script.google.com/macros/s/AKfycbwRucDgSwLenBAfNycremHBCF_INCzbmhfiimAeo3_K7G_8wFriImj0fWHzB_0n_pbODw/exec", {
       method: "POST",
       body: formData
     });
 
     let result = await res.json();
-
     alert(result.message || "✅ Data berhasil dikirim ke Spreadsheet!");
-
     form.reset();
-
-    // Tombol kembali normal
-    submitBtn.disabled = false;
-    submitBtn.innerText = "Simpan Data";
-
   } catch (err) {
     alert("❌ Gagal menyimpan data: " + err);
-
-    // Aktifkan kembali tombol jika gagal
-    submitBtn.disabled = false;
-    submitBtn.innerText = "Simpan Data";
   }
 });
 </script>
