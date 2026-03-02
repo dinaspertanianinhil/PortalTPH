@@ -670,10 +670,15 @@
     }
 
 // Kirim ke Google Apps Script
-  const form = document.getElementById("dataForm");
+const form = document.getElementById("dataForm");
+const submitBtn = form.querySelector("button[type='submit']");
 
 form.addEventListener("submit", async function(e) {
   e.preventDefault();
+
+  // Cegah klik berulang
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Menyimpan...";
 
   const formData = new FormData(form);
 
@@ -684,10 +689,16 @@ form.addEventListener("submit", async function(e) {
     });
 
     let result = await res.json();
+
     alert(result.message || "✅ Data berhasil dikirim ke Spreadsheet!");
     form.reset();
+
   } catch (err) {
     alert("❌ Gagal menyimpan data: " + err);
+  } finally {
+    // Aktifkan kembali tombol setelah proses selesai
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Simpan Data";
   }
 });
 </script>
