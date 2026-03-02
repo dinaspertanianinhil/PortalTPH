@@ -63,6 +63,11 @@ button {
 }
 button:hover { opacity:.9 }
 
+button:disabled {
+  background:#9ca3af;
+  cursor:not-allowed;
+}
+
 .btn-hapus {
   background:#dc2626;
 }
@@ -98,7 +103,6 @@ button:hover { opacity:.9 }
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
   <div>
@@ -107,7 +111,6 @@ button:hover { opacity:.9 }
   </div>
 </div>
 
-<!-- IDENTITAS -->
 <div class="box">
   <label>Nama Pelapor</label>
   <input type="text" id="pelapor" placeholder="Nama petugas pelapor">
@@ -140,14 +143,12 @@ button:hover { opacity:.9 }
   <input type="date" id="tanggal">
 </div>
 
-<!-- DESA -->
 <div class="box">
   <h3>Data Desa & Poktan</h3>
   <div id="desaContainer"></div>
   <button type="button" onclick="tambahDesa()">+ Tambah Desa/Kelurahan</button>
 </div>
 
-<!-- REKAP -->
 <div class="box">
   <h3>Rekap Otomatis LTT (Preview)</h3>
   <div class="rekap">
@@ -165,7 +166,7 @@ button:hover { opacity:.9 }
 </div>
 
 <div class="box">
-  <button onclick="simpan()">Simpan Laporan</button>
+  <button id="btnSimpan" onclick="simpan()">Simpan Laporan</button>
 </div>
 
 <script>
@@ -248,6 +249,10 @@ function hitung() {
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzb05XYKJGjg6ksbzsJMEbhTjgeVhA4LvuJ904jJo4DCm3UDwiAL9ttPc_gD7Qej3oI/exec";
 
 function simpan() {
+  const btn = document.getElementById("btnSimpan");
+
+  if (btn.disabled) return;
+
   const pelapor   = document.getElementById("pelapor").value.trim();
   const kecamatan = document.getElementById("kecamatan").value;
   const tanggal   = document.getElementById("tanggal").value;
@@ -277,6 +282,9 @@ function simpan() {
     return;
   }
 
+  btn.disabled = true;
+  btn.innerText = "Menyimpan...";
+
   const data = new URLSearchParams();
   data.append("pelapor", pelapor);
   data.append("kecamatan", kecamatan);
@@ -291,13 +299,17 @@ function simpan() {
   .then(r => {
     if (r.startsWith("OK")) {
       alert("✅ Data berhasil disimpan");
-      location.reload(); // ini yang bikin form langsung kosong lagi
+      location.reload();
     } else {
+      btn.disabled = false;
+      btn.innerText = "Simpan Laporan";
       alert("❌ Server error:\n" + r);
     }
   })
   .catch(err => {
     console.error(err);
+    btn.disabled = false;
+    btn.innerText = "Simpan Laporan";
     alert("❌ Gagal mengirim data");
   });
 }
