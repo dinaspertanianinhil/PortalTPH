@@ -113,7 +113,7 @@ button:disabled {
 
 <div class="box">
   <label>Nama Pelapor</label>
-  <input type="text" id="pelapor" placeholder="Nama petugas pelapor">
+  <input type="text" id="pelapor" placeholder="Nama petugas pelapor" oninput="formatKapital(this)">
 
   <label>Kecamatan</label>
   <select id="kecamatan">
@@ -170,12 +170,28 @@ button:disabled {
 </div>
 
 <script>
+
+/* FORMAT OTOMATIS KAPITAL AWAL KATA */
+function formatKapital(el) {
+  let text = el.value;
+
+  text = text
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trimStart()
+    .replace(/\b\w/g, function (char) {
+      return char.toUpperCase();
+    });
+
+  el.value = text;
+}
+
 function tambahDesa() {
   const desa = document.createElement("div");
   desa.className = "desa";
   desa.innerHTML = `
     <label>Desa/Kelurahan</label>
-    <input type="text" placeholder="Nama Desa / Kelurahan">
+    <input type="text" placeholder="Nama Desa / Kelurahan" oninput="formatKapital(this)">
 
     <div class="poktanContainer"></div>
 
@@ -190,7 +206,7 @@ function tambahPoktan(btn) {
   const p = document.createElement("div");
   p.className = "poktan";
   p.innerHTML = `
-    <input type="text" placeholder="Nama Poktan">
+    <input type="text" placeholder="Nama Poktan" oninput="formatKapital(this)">
     <input type="number" step="0.01" placeholder="Luas (Ha)" oninput="hitung()">
     <select onchange="hitung()">
       <option value="reguler">Reguler</option>
