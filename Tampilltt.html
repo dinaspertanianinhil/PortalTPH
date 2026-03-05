@@ -2,73 +2,60 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Monitoring LTT</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard LTT</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 
 body{
+font-family:Segoe UI, Arial;
 margin:0;
-font-family:Inter,Segoe UI;
-background:
-linear-gradient(rgba(3,20,13,0.75),rgba(3,20,13,0.75)),
-url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvxh4_NzxPObs3auPYoJIUojZJvrn6v1Akhw&s");
+background:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvxh4_NzxPObs3auPYoJIUojZJvrn6v1Akhw&s');
 background-size:cover;
-background-attachment:fixed;
-color:white;
 }
 
-.navbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:10px 25px;
+.overlay{
+background:rgba(255,255,255,0.95);
+min-height:100vh;
+}
+
+/* HEADER PUTIH */
+.header{
 background:white;
-box-shadow:0 3px 12px rgba(0,0,0,0.2);
-flex-wrap:wrap;
-gap:15px;
-z-index:10000;
+color:#1b5e20;
+text-align:center;
+padding:25px;
+border-bottom:4px solid #2e7d32;
 }
 
-.logo-area{
-display:flex;
-align-items:center;
-gap:12px;
+.header img{
+width:70px;
+display:block;
+margin:auto;
+margin-bottom:10px;
 }
 
-.logo-area img{
-height:50px;
-}
-
-.title{
-font-weight:700;
-font-size:15px;
-color:#064e3b;
-line-height:1.2;
-}
-
+/* MENU HIJAU */
 .menu{
+background:#2e7d32;
 display:flex;
-gap:10px;
 flex-wrap:wrap;
 }
 
 .menu button{
-background:#0f5132;
+background:none;
 border:none;
 color:white;
-padding:8px 14px;
-border-radius:8px;
+padding:14px 18px;
 cursor:pointer;
-font-weight:600;
+font-size:14px;
 }
 
 .menu button:hover{
-background:#198754;
+background:#1b5e20;
 }
 
 .dropdown{
@@ -76,112 +63,113 @@ position:relative;
 }
 
 .dropdown-content{
+display:none;
 position:absolute;
-top:42px;
-left:0;
-background:#0f5132;
-border-radius:10px;
-min-width:200px;
-box-shadow:0 8px 20px rgba(0,0,0,0.4);
-overflow:hidden;
-z-index:999999;
-opacity:0;
-transform:translateY(-10px);
-pointer-events:none;
-transition:.25s;
+background:white;
+min-width:220px;
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
+z-index:10;
 }
 
-.dropdown-content.show{
-opacity:1;
-transform:translateY(0);
-pointer-events:auto;
-}
-
-.dropdown-content button{
-width:100%;
-border:none;
-background:none;
-color:white;
+.dropdown-content a{
+display:block;
 padding:10px;
-text-align:left;
+text-decoration:none;
+color:black;
 cursor:pointer;
 }
 
-.dropdown-content button:hover{
-background:#198754;
+.dropdown-content a:hover{
+background:#e8f5e9;
+}
+
+.dropdown:hover .dropdown-content{
+display:block;
 }
 
 .container{
-max-width:1400px;
+width:95%;
 margin:auto;
 padding:20px;
 }
 
-.grid{
+.card-area{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-gap:20px;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:15px;
+margin-bottom:20px;
 }
 
 .card{
-background:rgba(7,61,37,0.9);
-padding:18px;
-border-radius:14px;
-box-shadow:0 5px 25px rgba(0,0,0,0.4);
-}
-
-.score{
-font-size:30px;
-font-weight:700;
-text-align:center;
-color:#4ade80;
-}
-
-.rank-list{
-display:flex;
-flex-direction:column;
-gap:8px;
-}
-
-.rank-item{
-display:flex;
-justify-content:space-between;
-padding:10px;
-border-radius:8px;
-font-weight:600;
-background:#14532d;
-}
-
-.gold{background:#FFD700;color:black;}
-.silver{background:#C0C0C0;color:black;}
-.bronze{background:#CD7F32;}
-
-.rekap-view{
-display:none;
-max-width:1200px;
-margin:auto;
-background:rgba(7,61,37,0.95);
+background:white;
 padding:20px;
-border-radius:12px;
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,0.1);
+text-align:center;
+border-top:4px solid #43a047;
+}
+
+.table-box{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,0.1);
+overflow:auto;
 }
 
 table{
 width:100%;
 border-collapse:collapse;
-background:white;
-color:black;
+}
+
+th,td{
+padding:8px;
+border:1px solid #ddd;
+font-size:13px;
 }
 
 th{
-background:#198754;
+background:#2e7d32;
 color:white;
-padding:8px;
 }
 
-td{
-padding:8px;
-border:1px solid #ccc;
-text-align:center;
+/* DOWNLOAD DROPDOWN */
+.download-group{
+position:relative;
+display:inline-block;
+margin-bottom:10px;
+}
+
+.download-btn{
+background:#43a047;
+color:white;
+border:none;
+padding:8px 14px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.download-menu{
+display:none;
+position:absolute;
+background:white;
+min-width:150px;
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
+z-index:5;
+}
+
+.download-menu a{
+display:block;
+padding:8px 10px;
+cursor:pointer;
+}
+
+.download-menu a:hover{
+background:#e8f5e9;
+}
+
+.download-group:hover .download-menu{
+display:block;
 }
 
 </style>
@@ -189,254 +177,379 @@ text-align:center;
 
 <body>
 
-<div class="navbar">
+<div class="overlay">
 
-<div class="logo-area">
+<div class="header">
 <img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
-<div class="title">
-Bidang Tanaman Pangan dan Hortikultura<br>
-Dinas Pertanian Kabupaten Indragiri Hilir
-</div>
+<h2>Bidang Tanaman Pangan dan Hortikultura</h2>
+<small>Dinas Pertanian Kabupaten Indragiri Hilir</small>
 </div>
 
 <div class="menu">
 
-<button onclick="location.href='dashboad.html'">Dashboard</button>
-
 <div class="dropdown">
-<button onclick="toggleMenu('menu1')">Rekap Jenis LTT</button>
-<div class="dropdown-content" id="menu1">
-<button onclick="openRekap('jenis_total')">Kabupaten</button>
-<button onclick="openRekap('jenis_kecamatan')">Kecamatan</button>
-<button onclick="openRekap('jenis_desa')">Desa</button>
+<button>Rekap Harian ▾</button>
+<div class="dropdown-content">
+<a onclick="loadData('harian_kabupaten')">Rekap Kabupaten</a>
+<a onclick="loadData('harian_kecamatan')">Rekap Kecamatan</a>
+<a onclick="loadData('harian_desa')">Rekap Desa</a>
 </div>
 </div>
 
 <div class="dropdown">
-<button onclick="toggleMenu('menu2')">Rekap Bulanan</button>
-<div class="dropdown-content" id="menu2">
-<button onclick="openRekap('bulan_kab')">Kabupaten</button>
-<button onclick="openRekap('bulan_kec')">Kecamatan</button>
-<button onclick="openRekap('bulan_desa')">Desa</button>
+<button>Rekap Jenis LTT ▾</button>
+<div class="dropdown-content">
+<a onclick="loadData('jenis_kabupaten')">Rekap Kabupaten</a>
+<a onclick="loadData('jenis_kecamatan')">Rekap Kecamatan</a>
+<a onclick="loadData('jenis_desa')">Rekap Desa</a>
 </div>
 </div>
 
 <div class="dropdown">
-<button onclick="toggleMenu('menu3')">Rekap Musim Tanam</button>
-<div class="dropdown-content" id="menu3">
-<button onclick="openRekap('musim_kab')">Kabupaten</button>
-<button onclick="openRekap('musim_kec')">Kecamatan</button>
-<button onclick="openRekap('musim_desa')">Desa</button>
+<button>Rekap Bulanan ▾</button>
+<div class="dropdown-content">
+<a onclick="loadData('bulanan_kabupaten')">Rekap Kabupaten</a>
+<a onclick="loadData('bulanan_kecamatan')">Rekap Kecamatan</a>
+<a onclick="loadData('bulanan_desa')">Rekap Desa</a>
 </div>
 </div>
 
-</div>
+<button onclick="loadData('musiman')">Rekap Musiman</button>
+
 </div>
 
-<div id="dashboard" class="container">
+<div class="container">
 
-<div class="grid">
-
-<div class="card">
-<h3>Grafik Jenis LTT</h3>
-<canvas id="chartJenis"></canvas>
-</div>
+<div class="card-area">
 
 <div class="card">
-<h3>Grafik Ranking Kecamatan</h3>
-<canvas id="chartKecamatan"></canvas>
+Total LTT
+<h2 id="ltt">0</h2>
 </div>
 
 <div class="card">
-<h3>Total Hari Ini (Reguler + Oplah)</h3>
-<div class="score" id="scorePadi">Memuat...</div>
+Oplah
+<h2 id="oplah">0</h2>
 </div>
 
 <div class="card">
-<h3>Total Semua LTT</h3>
-<div class="score" id="scoreSemua">Memuat...</div>
+Reguler
+<h2 id="reguler">0</h2>
 </div>
 
 <div class="card">
-<h3>Ranking Realisasi</h3>
-<div class="rank-list" id="ranking"></div>
+Jagung
+<h2 id="jagung">0</h2>
 </div>
 
 </div>
 
+<div class="table-box">
+
+<div class="download-group">
+<button class="download-btn">Download ▾</button>
+<div class="download-menu">
+<a onclick="downloadExcel()">Excel</a>
+<a onclick="downloadPDF()">PDF</a>
+</div>
 </div>
 
-<div id="rekap" class="rekap-view">
+<table id="tabelData">
+<thead></thead>
+<tbody></tbody>
+</table>
 
-<button onclick="kembali()">Kembali</button>
-
-<div style="margin:10px 0;">
-<button onclick="downloadExcel()">Download Excel</button>
-<button onclick="downloadPDF()">Download PDF</button>
 </div>
 
-<div id="tabel"></div>
+</div>
 
 </div>
 
 <script>
 
-const url="https://script.google.com/macros/s/AKfycbzzHUitpqsg-v_1-PtKuLL8kw4mAxmGqztE1LD7T_OcELVTjqLG-G__puXGqssaUB6A/exec";
+const url = "https://script.google.com/macros/s/AKfycbzzHUitpqsg-v_1-PtKuLL8kw4mAxmGqztE1LD7T_OcELVTjqLG-G__puXGqssaUB6A/exec";
 
-let DATA;
-let mode;
-let chartStore={};
+let masterData = {};
+let currentData = [];
 
-function toggleMenu(id){
-document.querySelectorAll(".dropdown-content")
-.forEach(menu=>menu.classList.remove("show"));
-document.getElementById(id).classList.toggle("show");
-}
+fetch(url)
+.then(r => r.json())
+.then(data => {
 
-document.addEventListener("click",function(e){
-if(!e.target.closest(".dropdown")){
-document.querySelectorAll(".dropdown-content")
-.forEach(menu=>menu.classList.remove("show"));
-}
+masterData = data;
+
+document.getElementById("ltt").innerText = data.total_kabupaten || 0;
+document.getElementById("oplah").innerText = data.jenis_total?.oplah || 0;
+document.getElementById("reguler").innerText = data.jenis_total?.reguler || 0;
+document.getElementById("jagung").innerText = data.jenis_total?.jagung || 0;
+
 });
 
-async function load(){
-const res=await fetch(url);
-DATA=await res.json();
-updateDashboard();
+function today(){
+return new Date().toISOString().split("T")[0];
 }
 
-function updateDashboard(){
+function loadData(mode){
 
-buatGrafik("chartJenis",DATA.jenis_total);
-buatGrafik("chartKecamatan",DATA.kecamatan_total);
+let data = [];
 
-buatRanking();
-
-/* papan skor padi */
-let reguler = DATA.jenis_total.reguler || 0;
-let oplah = DATA.jenis_total.oplah || 0;
-
-document.getElementById("scorePadi").innerHTML =
-reguler + oplah + " Ha";
-
-/* papan skor semua jenis */
-let totalSemua = 0;
-for(let i in DATA.jenis_total){
-totalSemua += DATA.jenis_total[i];
+if(mode === "harian_kabupaten"){
+for(let kec in masterData.jenis_per_kecamatan){
+let j = masterData.jenis_per_kecamatan[kec];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+data.push({
+Tanggal: today(),
+Kecamatan:kec,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
 }
-document.getElementById("scoreSemua").innerHTML =
-totalSemua + " Ha";
-
 }
 
-function buatGrafik(id,data){
+if(mode === "harian_kecamatan"){
+for(let desa in masterData.jenis_per_desa){
+let j = masterData.jenis_per_desa[desa];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+data.push({
+Tanggal: today(),
+Kecamatan:j.kecamatan || "-",
+Desa:desa,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+}
 
-const label=Object.keys(data);
-const nilai=Object.values(data);
+if(mode === "harian_desa"){
+for(let desa in masterData.jenis_per_desa){
+let j = masterData.jenis_per_desa[desa];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+data.push({
+Tanggal: today(),
+Desa:desa,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+}
 
-if(chartStore[id]) chartStore[id].destroy();
-
-chartStore[id]=new Chart(document.getElementById(id),{
-type:"bar",
-data:{labels:label,datasets:[{data:nilai,borderRadius:8}]},
-options:{plugins:{legend:{display:false}}}
+if(mode === "jenis_kabupaten"){
+let reg = masterData.jenis_total.reguler || 0;
+let opl = masterData.jenis_total.oplah || 0;
+let jag = masterData.jenis_total.jagung || 0;
+data.push({
+Tanggal: today(),
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
 });
 }
 
-function buatRanking(){
+if(mode === "jenis_kecamatan"){
+for(let kec in masterData.jenis_per_kecamatan){
+let j = masterData.jenis_per_kecamatan[kec];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+data.push({
+Tanggal: today(),
+Kecamatan:kec,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+}
 
-let sorted=Object.entries(DATA.kecamatan_total)
-.sort((a,b)=>b[1]-a[1]);
+if(mode === "jenis_desa"){
+for(let desa in masterData.jenis_per_desa){
+let j = masterData.jenis_per_desa[desa];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+data.push({
+Tanggal: today(),
+Desa:desa,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+}
 
-let html="";
+if(mode === "bulanan_kabupaten"){
+let reg = masterData.jenis_total.reguler || 0;
+let opl = masterData.jenis_total.oplah || 0;
+let jag = masterData.jenis_total.jagung || 0;
+data.push({
+Bulan:"Bulan Ini",
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
 
-sorted.forEach((row,i)=>{
+if(mode === "bulanan_kecamatan"){
+for(let kec in masterData.jenis_per_kecamatan){
+let j = masterData.jenis_per_kecamatan[kec];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+data.push({
+Bulan:"Bulan Ini",
+Kecamatan:kec,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+}
 
-let kelas="rank-item";
-if(i==0) kelas+=" gold";
-else if(i==1) kelas+=" silver";
-else if(i==2) kelas+=" bronze";
+if(mode === "bulanan_desa"){
+for(let desa in masterData.jenis_per_desa){
+let j = masterData.jenis_per_desa[desa];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+data.push({
+Bulan:"Bulan Ini",
+Desa:desa,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+}
 
-html+=`<div class="${kelas}">
-<span>${i+1}. ${row[0]}</span>
-<span>${row[1]} Ha</span>
-</div>`;
+if(mode === "musiman"){
+for(let desa in masterData.jenis_per_desa){
+let j = masterData.jenis_per_desa[desa];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+let total = reg + opl + jag;
+data.push({
+Tahun:2026,
+Musim_Tanam:"MT1",
+Kecamatan:j.kecamatan || "-",
+Desa:desa,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: total,
+Target_Musim:500,
+Realisasi:total,
+Persentase:((total/500)*100).toFixed(1)+"%"
+});
+}
+}
+
+currentData = data;
+renderTable(data);
+
+}
+
+function renderTable(data){
+
+const head = document.querySelector("#tabelData thead");
+const body = document.querySelector("#tabelData tbody");
+
+head.innerHTML="";
+body.innerHTML="";
+
+if(data.length === 0) return;
+
+let columns = Object.keys(data[0]);
+
+let tr = "<tr>";
+columns.forEach(c => tr += `<th>${c}</th>`);
+tr += "</tr>";
+head.innerHTML = tr;
+
+data.forEach(row=>{
+let tr = "<tr>";
+columns.forEach(c => tr += `<td>${row[c]}</td>`);
+tr += "</tr>";
+body.innerHTML += tr;
 });
 
-document.getElementById("ranking").innerHTML=html;
-}
-
-function openRekap(m){
-mode=m;
-document.getElementById("dashboard").style.display="none";
-document.getElementById("rekap").style.display="block";
-render();
-}
-
-function kembali(){
-document.getElementById("dashboard").style.display="block";
-document.getElementById("rekap").style.display="none";
-}
-
-function render(){
-
-let html="<table>";
-
-if(mode==="jenis_total"){
-let r = DATA.jenis_total.reguler || 0;
-let o = DATA.jenis_total.oplah || 0;
-html+="<tr><th>Jenis</th><th>Luas</th></tr>";
-html+=`<tr><td>Reguler</td><td>${r}</td></tr>`;
-html+=`<tr><td>Oplah</td><td>${o}</td></tr>`;
-html+=`<tr><td><b>Total</b></td><td><b>${r+o}</b></td></tr>`;
-}
-
-if(mode==="jenis_kecamatan"){
-html+="<tr><th>Kecamatan</th><th>Reguler</th><th>Oplah</th><th>Total</th></tr>";
-for(let i in DATA.jenis_per_kecamatan){
-let r=DATA.jenis_per_kecamatan[i].reguler||0;
-let o=DATA.jenis_per_kecamatan[i].oplah||0;
-html+=`<tr><td>${i}</td><td>${r}</td><td>${o}</td><td><b>${r+o}</b></td></tr>`;
-}
-}
-
-if(mode==="jenis_desa"){
-html+="<tr><th>Desa</th><th>Reguler</th><th>Oplah</th><th>Total</th></tr>";
-for(let i in DATA.jenis_per_desa){
-let r=DATA.jenis_per_desa[i].reguler||0;
-let o=DATA.jenis_per_desa[i].oplah||0;
-html+=`<tr><td>${i}</td><td>${r}</td><td>${o}</td><td><b>${r+o}</b></td></tr>`;
-}
-}
-
-html+="</table>";
-document.getElementById("tabel").innerHTML=html;
 }
 
 function downloadExcel(){
-let table=document.querySelector("#tabel table");
-let wb=XLSX.utils.book_new();
-let ws=XLSX.utils.table_to_sheet(table);
-XLSX.utils.book_append_sheet(wb,ws,"Rekap");
-XLSX.writeFile(wb,"Rekap_LTT.xlsx");
+
+let csv = "";
+let columns = Object.keys(currentData[0] || {});
+csv += columns.join(",") + "\n";
+
+currentData.forEach(row=>{
+csv += columns.map(c=>row[c]).join(",") + "\n";
+});
+
+let blob = new Blob([csv], {type:"text/csv"});
+let a = document.createElement("a");
+a.href = URL.createObjectURL(blob);
+a.download = "rekap_ltt.xlsx";
+a.click();
+
 }
 
 function downloadPDF(){
-const { jsPDF } = window.jspdf;
-const pdf=new jsPDF("l","mm","a4");
-let table=document.querySelector("#tabel table");
-let rows=table.querySelectorAll("tr");
-let y=20;
-rows.forEach(row=>{
-pdf.text(row.innerText,14,y);
-y+=8;
-});
-pdf.save("Rekap_LTT.pdf");
-}
 
-setInterval(()=>{ load(); },60000);
-load();
+const { jsPDF } = window.jspdf;
+let doc = new jsPDF();
+
+let columns = Object.keys(currentData[0] || {});
+let y = 20;
+
+doc.setFontSize(14);
+doc.text("Rekap LTT", 14, 10);
+
+doc.setFontSize(9);
+
+doc.text(columns.join(" | "), 14, y);
+y += 6;
+
+currentData.forEach(row=>{
+let line = columns.map(c=>row[c]).join(" | ");
+doc.text(line, 14, y);
+y += 6;
+if(y > 280){
+doc.addPage();
+y = 20;
+}
+});
+
+doc.save("rekap_ltt.pdf");
+
+}
 
 </script>
 
