@@ -304,12 +304,11 @@ let jag = j.jagung || 0;
 
 data.push({
 Tanggal: today(),
-Kecamatan:kec,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
+Kecamatan: getKecamatanFromDesa(desa),
+Desa: desa,
+Reguler: reg,
+Oplah: opl,
+Jagung: jag
 });
 }
 }
