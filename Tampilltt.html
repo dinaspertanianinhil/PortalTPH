@@ -1,548 +1,114 @@
 <!DOCTYPE html>
+
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard LTT</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+<title>Dashboard LTT - Maintenance</title>
 
 <style>
 
 body{
-font-family:Segoe UI, Arial;
 margin:0;
-background:url('https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-rice-fields-with-green-rice-with-dew-and-mountains-image_15860694.jpg');
+font-family:Segoe UI, Arial, sans-serif;
+background:url("https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-rice-fields-with-green-rice-with-dew-and-mountains-image_15860694.jpg");
 background-size:cover;
 background-position:center;
 background-attachment:fixed;
 }
 
 .overlay{
-background:rgba(255,255,255,0.6);
+background:rgba(255,255,255,0.75);
 min-height:100vh;
-}
-
-.header{
-background:white;
-color:#1b5e20;
-text-align:center;
-padding:25px;
-border-bottom:4px solid #2e7d32;
-}
-
-.header img{
-width:70px;
-display:block;
-margin:auto;
-margin-bottom:10px;
-}
-
-.menu{
-background:#2e7d32;
 display:flex;
-flex-wrap:wrap;
-}
-
-.menu button{
-background:none;
-border:none;
-color:white;
-padding:14px 18px;
-cursor:pointer;
-font-size:14px;
-}
-
-.menu button:hover{
-background:#1b5e20;
-}
-
-.dropdown{
-position:relative;
-}
-
-.dropdown-content{
-display:none;
-position:absolute;
-background:white;
-min-width:220px;
-box-shadow:0 4px 10px rgba(0,0,0,0.2);
-z-index:10;
-}
-
-.dropdown-content a{
-display:block;
-padding:10px;
-text-decoration:none;
-color:black;
-cursor:pointer;
-}
-
-.dropdown-content a:hover{
-background:#e8f5e9;
-}
-
-.dropdown:hover .dropdown-content{
-display:block;
-}
-
-.container{
-width:95%;
-margin:auto;
-padding:20px;
-}
-
-.card-area{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:15px;
-margin-bottom:20px;
-}
-
-.card{
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 3px 10px rgba(0,0,0,0.1);
+align-items:center;
+justify-content:center;
 text-align:center;
-border-top:4px solid #43a047;
-}
-
-.table-box{
-background:white;
 padding:20px;
-border-radius:10px;
-box-shadow:0 3px 10px rgba(0,0,0,0.1);
-overflow:auto;
 }
 
-table{
-width:100%;
-border-collapse:collapse;
+.box{
+background:white;
+padding:40px;
+border-radius:12px;
+max-width:600px;
+box-shadow:0 8px 25px rgba(0,0,0,0.15);
 }
 
-th,td{
-padding:8px;
-border:1px solid #ddd;
-font-size:13px;
+.logo{
+width:80px;
+margin-bottom:15px;
 }
 
-th{
-background:#2e7d32;
-color:white;
-}
-
-.download-group{
-position:relative;
-display:inline-block;
+h1{
+color:#1b5e20;
 margin-bottom:10px;
 }
 
-.download-btn{
-background:#43a047;
-color:white;
-border:none;
-padding:8px 14px;
-border-radius:6px;
-cursor:pointer;
+h3{
+margin-top:0;
+color:#2e7d32;
+font-weight:normal;
 }
 
-.download-menu{
-display:none;
-position:absolute;
-background:white;
-min-width:150px;
-box-shadow:0 4px 10px rgba(0,0,0,0.2);
-z-index:5;
+.message{
+margin-top:20px;
+font-size:16px;
+color:#444;
+line-height:1.6;
 }
 
-.download-menu a{
-display:block;
-padding:8px 10px;
-cursor:pointer;
+.footer{
+margin-top:25px;
+font-size:13px;
+color:#777;
 }
 
-.download-menu a:hover{
-background:#e8f5e9;
+.loader{
+margin:25px auto;
+border:6px solid #e0e0e0;
+border-top:6px solid #2e7d32;
+border-radius:50%;
+width:45px;
+height:45px;
+animation:spin 1s linear infinite;
 }
 
-.download-group:hover .download-menu{
-display:block;
+@keyframes spin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
 }
 
 </style>
+
 </head>
 
 <body>
 
 <div class="overlay">
 
-<div class="header">
-<img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
-<h2>Bidang Tanaman Pangan dan Hortikultura</h2>
-<small>Dinas Pertanian Kabupaten Indragiri Hilir</small>
+<div class="box">
+
+<img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
+
+<h1>Dashboard LTT</h1>
+<h3>Dinas Pertanian Kabupaten Indragiri Hilir</h3>
+
+<div class="loader"></div>
+
+<div class="message">
+Dashboard saat ini sedang dalam proses <b>maintenance dan perbaikan sistem</b>.<br><br>
+Kami sedang melakukan pembaruan agar sistem dapat berjalan lebih stabil dan akurat.
+Silakan kembali lagi nanti.
 </div>
 
-<div class="menu">
-<button onclick="window.location.href='dashboad.html'">Kembali Ke Dashboard</button>
-
-<div class="dropdown">
-<button>Rekap Harian ▾</button>
-<div class="dropdown-content">
-<a onclick="loadData('harian_kabupaten')">Rekap Kabupaten</a>
-<a onclick="loadData('harian_kecamatan')">Rekap Kecamatan</a>
-<a onclick="loadData('harian_desa')">Rekap Desa</a>
-</div>
-</div>
-
-<div class="dropdown">
-<button>Rekap Jenis LTT ▾</button>
-<div class="dropdown-content">
-<a onclick="loadData('jenis_kabupaten')">Rekap Kabupaten</a>
-<a onclick="loadData('jenis_kecamatan')">Rekap Kecamatan</a>
-<a onclick="loadData('jenis_desa')">Rekap Desa</a>
-</div>
-</div>
-
-<div class="dropdown">
-<button>Rekap Bulanan ▾</button>
-<div class="dropdown-content">
-<a onclick="loadData('bulanan_kabupaten')">Rekap Kabupaten</a>
-<a onclick="loadData('bulanan_kecamatan')">Rekap Kecamatan</a>
-<a onclick="loadData('bulanan_desa')">Rekap Desa</a>
-</div>
-</div>
-
-<button onclick="loadData('musiman')">Rekap Musiman</button>
-
-</div>
-
-<div class="container">
-
-<div class="card-area">
-
-<div class="card">
-Total LTT
-<h2 id="ltt">0</h2>
-</div>
-
-<div class="card">
-Oplah
-<h2 id="oplah">0</h2>
-</div>
-
-<div class="card">
-Reguler
-<h2 id="reguler">0</h2>
-</div>
-
-<div class="card">
-Jagung
-<h2 id="jagung">0</h2>
-</div>
-
-</div>
-
-<div class="table-box">
-
-<div class="download-group">
-<button class="download-btn">Download ▾</button>
-<div class="download-menu">
-<a onclick="downloadExcel()">Excel</a>
-<a onclick="downloadPDF()">PDF</a>
-</div>
-</div>
-
-<table id="tabelData">
-<thead></thead>
-<tbody></tbody>
-</table>
-
+<div class="footer">
+Terima kasih atas pengertiannya.
 </div>
 
 </div>
 
 </div>
-<script>
 
-const url = "https://script.google.com/macros/s/AKfycbw6gDiLEAfeZNoGO2HDUR8PwYqWxwAiJOgNWAHL0YDcPFwoYntbc3jaDQ19zzXI1zeI/exec";
-
-let masterData = [];
-let currentData = [];
-
-function today(){
-return new Date().toISOString().split("T")[0];
-}
-
-fetch(url)
-.then(r=>r.json())
-.then(data=>{
-
-if(data.data_harian){
-masterData = data.data_harian;
-}else if(Array.isArray(data)){
-masterData = data;
-}else{
-masterData = [];
-}
-
-hitungCard(masterData);
-
-})
-.catch(err=>{
-console.log("Load error",err);
-});
-
-/* ======================== */
-/* HITUNG CARD */
-/* ======================== */
-
-function hitungCard(data){
-
-let total=0;
-let oplah=0;
-let reguler=0;
-let jagung=0;
-
-data.forEach(r=>{
-
-let luas = Number(r.luas) || 0;
-
-let jenis = (r.jenis || "")
-.toLowerCase()
-.trim();
-
-total += luas;
-
-if(jenis.includes("oplah")) oplah += luas;
-if(jenis.includes("reguler")) reguler += luas;
-if(jenis.includes("jagung")) jagung += luas;
-
-});
-
-document.getElementById("ltt").innerText = total;
-document.getElementById("oplah").innerText = oplah;
-document.getElementById("reguler").innerText = reguler;
-document.getElementById("jagung").innerText = jagung;
-
-}
-
-/* ======================== */
-/* NORMALISASI JENIS */
-/* ======================== */
-
-function normalJenis(j){
-
-return (j || "lainnya")
-.toLowerCase()
-.trim()
-.replace(/\s+/g,"_")
-.replace(/[^\w]/g,"");
-
-}
-
-/* ======================== */
-/* PIVOT DATA */
-/* ======================== */
-
-function pivot(data,group){
-
-let hasil={};
-
-data.forEach(r=>{
-
-let kec = r.kecamatan || "-";
-let desa = r.desa || "-";
-let jenis = normalJenis(r.jenis);
-let luas = Number(r.luas) || 0;
-
-let key="";
-
-if(group==="kabupaten") key="kab";
-if(group==="kecamatan") key=kec;
-if(group==="desa") key=kec+"|"+desa;
-
-if(!hasil[key]){
-
-hasil[key]={};
-
-if(group!=="kabupaten") hasil[key]["Kecamatan"]=kec;
-
-if(group==="desa") hasil[key]["Desa"]=desa;
-
-}
-
-/* buat kolom jenis otomatis */
-
-if(!hasil[key][jenis]){
-hasil[key][jenis]=0;
-}
-
-hasil[key][jenis]+=luas;
-
-});
-
-return Object.values(hasil);
-
-}
-
-/* ======================== */
-/* LOAD MENU */
-/* ======================== */
-
-function loadData(mode){
-
-let data=[];
-
-if(mode==="harian_kabupaten"){
-data=pivot(masterData,"kabupaten").map(r=>({...r,Tanggal:today()}));
-}
-
-if(mode==="harian_kecamatan"){
-data=pivot(masterData,"kecamatan").map(r=>({...r,Tanggal:today()}));
-}
-
-if(mode==="harian_desa"){
-data=pivot(masterData,"desa").map(r=>({...r,Tanggal:today()}));
-}
-
-if(mode==="jenis_kabupaten"){
-data=pivot(masterData,"kabupaten");
-}
-
-if(mode==="jenis_kecamatan"){
-data=pivot(masterData,"kecamatan");
-}
-
-if(mode==="jenis_desa"){
-data=pivot(masterData,"desa");
-}
-
-if(mode==="bulanan_kabupaten"){
-data=pivot(masterData,"kabupaten").map(r=>({...r,Bulan:"Bulan Ini"}));
-}
-
-if(mode==="bulanan_kecamatan"){
-data=pivot(masterData,"kecamatan").map(r=>({...r,Bulan:"Bulan Ini"}));
-}
-
-if(mode==="bulanan_desa"){
-data=pivot(masterData,"desa").map(r=>({...r,Bulan:"Bulan Ini"}));
-}
-
-if(mode==="musiman"){
-data=pivot(masterData,"desa").map(r=>({
-...r,
-Tahun:new Date().getFullYear(),
-Musim_Tanam:"MT1"
-}));
-}
-
-currentData=data;
-
-renderTable(data);
-
-}
-
-/* ======================== */
-/* TABEL */
-/* ======================== */
-
-function renderTable(data){
-
-const head=document.querySelector("#tabelData thead");
-const body=document.querySelector("#tabelData tbody");
-
-head.innerHTML="";
-body.innerHTML="";
-
-if(data.length===0) return;
-
-let columns=Object.keys(data[0]);
-
-let tr="<tr>";
-
-columns.forEach(c=>tr+=`<th>${c}</th>`);
-
-tr+="</tr>";
-
-head.innerHTML=tr;
-
-data.forEach(row=>{
-
-let tr="<tr>";
-
-columns.forEach(c=>tr+=`<td>${row[c] ?? 0}</td>`);
-
-tr+="</tr>";
-
-body.innerHTML+=tr;
-
-});
-
-}
-
-/* ======================== */
-/* DOWNLOAD */
-/* ======================== */
-
-function downloadExcel(){
-
-if(currentData.length===0){
-alert("Data belum dimuat");
-return;
-}
-
-let columns=Object.keys(currentData[0]);
-
-let csv=columns.join(",")+"\n";
-
-currentData.forEach(r=>{
-csv+=columns.map(c=>r[c]).join(",")+"\n";
-});
-
-let blob=new Blob([csv],{type:"text/csv"});
-
-let a=document.createElement("a");
-
-a.href=URL.createObjectURL(blob);
-
-a.download="rekap_ltt.csv";
-
-a.click();
-
-}
-
-function downloadPDF(){
-
-if(currentData.length===0){
-alert("Data belum dimuat");
-return;
-}
-
-const { jsPDF } = window.jspdf;
-
-let doc=new jsPDF("landscape");
-
-let columns=Object.keys(currentData[0]);
-
-let rows=currentData.map(r=>columns.map(c=>r[c]));
-
-doc.text("Rekap LTT Kabupaten Indragiri Hilir",14,15);
-
-doc.autoTable({
-head:[columns],
-body:rows,
-startY:20
-});
-
-doc.save("rekap_ltt.pdf");
-
-}
-
-</script>
 </body>
 </html>
