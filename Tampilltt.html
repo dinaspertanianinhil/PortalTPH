@@ -266,7 +266,6 @@ Jagung
 </div>
 
 </div>
-
 <script>
 
 const url = "https://script.google.com/macros/s/AKfycbw6gDiLEAfeZNoGO2HDUR8PwYqWxwAiJOgNWAHL0YDcPFwoYntbc3jaDQ19zzXI1zeI/exec";
@@ -282,22 +281,26 @@ fetch(url)
 .then(r=>r.json())
 .then(data=>{
 
-/* memperbaiki struktur API yang berbeda */
-if(Array.isArray(data)){
+/* baca API Apps Script */
+
+if(data.data_harian){
+masterData = data.data_harian;
+}else if(Array.isArray(data)){
 masterData = data;
-}else if(Array.isArray(data.data)){
-masterData = data.data;
 }else{
 masterData = [];
 }
 
-/* hitung skor */
 hitungCard(masterData);
 
 })
 .catch(err=>{
 console.log("Load error",err);
 });
+
+/* ======================== */
+/* HITUNG CARD */
+/* ======================== */
 
 function hitungCard(data){
 
@@ -308,8 +311,8 @@ let jagung=0;
 
 data.forEach(r=>{
 
-let luas = Number(r["LUAS TAMBAH TANAM"]) || 0;
-let jenis = (r["JENIS LTT"] || "").toLowerCase();
+let luas = Number(r.luas) || 0;
+let jenis = (r.jenis || "").toLowerCase();
 
 total += luas;
 
@@ -326,16 +329,20 @@ document.getElementById("jagung").innerText = jagung;
 
 }
 
+/* ======================== */
+/* PIVOT DATA */
+/* ======================== */
+
 function pivot(data,group){
 
 let hasil={};
 
 data.forEach(r=>{
 
-let kec = r["KECAMATAN"] || "-";
-let desa = r["DESA"] || "-";
-let jenis = (r["JENIS LTT"] || "lainnya").toLowerCase().replace(/ /g,"_");
-let luas = Number(r["LUAS TAMBAH TANAM"]) || 0;
+let kec = r.kecamatan || "-";
+let desa = r.desa || "-";
+let jenis = (r.jenis || "lainnya").toLowerCase().replace(/ /g,"_");
+let luas = Number(r.luas) || 0;
 
 let key="";
 
@@ -347,13 +354,13 @@ if(!hasil[key]){
 
 hasil[key]={};
 
-if(group!=="kabupaten") hasil[key["Kecamatan"]]=kec;
+if(group!=="kabupaten") hasil[key]["Kecamatan"]=kec;
 
 if(group==="desa") hasil[key]["Desa"]=desa;
 
 }
 
-/* otomatis membuat kolom jenis LTT baru */
+/* otomatis buat kolom jenis */
 
 if(!hasil[key][jenis]){
 hasil[key][jenis]=0;
@@ -366,6 +373,10 @@ hasil[key][jenis]+=luas;
 return Object.values(hasil);
 
 }
+
+/* ======================== */
+/* LOAD MENU */
+/* ======================== */
 
 function loadData(mode){
 
@@ -408,7 +419,11 @@ data=pivot(masterData,"desa").map(r=>({...r,Bulan:"Bulan Ini"}));
 }
 
 if(mode==="musiman"){
-data=pivot(masterData,"desa").map(r=>({...r,Tahun:new Date().getFullYear(),Musim_Tanam:"MT1"}));
+data=pivot(masterData,"desa").map(r=>({
+...r,
+Tahun:new Date().getFullYear(),
+Musim_Tanam:"MT1"
+}));
 }
 
 currentData=data;
@@ -416,6 +431,10 @@ currentData=data;
 renderTable(data);
 
 }
+
+/* ======================== */
+/* TABEL */
+/* ======================== */
 
 function renderTable(data){
 
@@ -450,6 +469,10 @@ body.innerHTML+=tr;
 });
 
 }
+
+/* ======================== */
+/* DOWNLOAD */
+/* ======================== */
 
 function downloadExcel(){
 
