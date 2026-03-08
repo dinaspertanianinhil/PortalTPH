@@ -273,12 +273,14 @@ const url = "https://script.google.com/macros/s/AKfycbzzHUitpqsg-v_1-PtKuLL8kw4m
 
 let masterData = {};
 let currentData = [];
+let rawData = [];
 
 fetch(url)
 .then(r => r.json())
 .then(data => {
 
 masterData = data;
+rawData = data.data_harian || [];
 
 document.getElementById("ltt").innerText = data.total_kabupaten || 0;
 document.getElementById("oplah").innerText = data.jenis_total?.oplah || 0;
@@ -291,198 +293,148 @@ function today(){
 return new Date().toISOString().split("T")[0];
 }
 
+/* ===============================
+PIVOT DATA DARI SHEET MENTAH
+=============================== */
+
+function pivotData(data, level){
+
+let hasil = {};
+
+data.forEach(r => {
+
+let kec = r["KECAMATAN"] || "-";
+let desa = r["DESA"] || "-";
+let tanggal = r["TANGGAL"] || today();
+
+let jenis = (r["JENIS LTT"] || "lainnya")
+.toLowerCase()
+.replace(/ /g,"_");
+
+let luas = Number(r["LUAS TAMBAH TANAM"]) || 0;
+
+let key;
+
+if(level === "kabupaten") key = "kabupaten";
+if(level === "kecamatan") key = kec;
+if(level === "desa") key = kec+"|"+desa;
+
+if(!hasil[key]){
+
+hasil[key] = {
+Tanggal:tanggal,
+Kecamatan:kec,
+Desa:desa
+};
+
+}
+
+if(!hasil[key][jenis]){
+hasil[key][jenis] = 0;
+}
+
+hasil[key][jenis] += luas;
+
+});
+
+return Object.values(hasil);
+
+}
+
+/* ===============================
+LOAD DATA MENU
+=============================== */
+
 function loadData(mode){
 
 let data = [];
 
 if(mode === "harian_kabupaten"){
-for(let kec in masterData.jenis_per_kecamatan){
-let j = masterData.jenis_per_kecamatan[kec] || {};
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
 
-data.push({
-Tanggal: today(),
-Kecamatan: getKecamatanFromDesa(desa),
-Desa: desa,
-Reguler: reg,
-Oplah: opl,
-Jagung: jag
-});
-}
+data = pivotData(rawData,"kabupaten");
+
 }
 
 if(mode === "harian_kecamatan"){
-for(let desa in masterData.jenis_per_desa){
-let j = masterData.jenis_per_desa[desa] || {};
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
 
-data.push({
-Tanggal: today(),
-Kecamatan:"-",
-Desa:desa,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
-});
-}
+data = pivotData(rawData,"kecamatan");
+
 }
 
 if(mode === "harian_desa"){
-for(let desa in masterData.jenis_per_desa){
-let j = masterData.jenis_per_desa[desa] || {};
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
 
-data.push({
-Tanggal: today(),
-Desa:desa,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
-});
-}
+data = pivotData(rawData,"desa");
+
 }
 
 if(mode === "jenis_kabupaten"){
-let reg = masterData.jenis_total?.reguler || 0;
-let opl = masterData.jenis_total?.oplah || 0;
-let jag = masterData.jenis_total?.jagung || 0;
 
-data.push({
-Tanggal: today(),
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
-});
+data = pivotData(rawData,"kabupaten");
+
 }
 
 if(mode === "jenis_kecamatan"){
-for(let kec in masterData.jenis_per_kecamatan){
-let j = masterData.jenis_per_kecamatan[kec] || {};
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
 
-data.push({
-Tanggal: today(),
-Kecamatan:kec,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
-});
-}
+data = pivotData(rawData,"kecamatan");
+
 }
 
 if(mode === "jenis_desa"){
-for(let desa in masterData.jenis_per_desa){
-let j = masterData.jenis_per_desa[desa] || {};
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
 
-data.push({
-Tanggal: today(),
-Desa:desa,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
-});
-}
+data = pivotData(rawData,"desa");
+
 }
 
 if(mode === "bulanan_kabupaten"){
-let reg = masterData.jenis_total?.reguler || 0;
-let opl = masterData.jenis_total?.oplah || 0;
-let jag = masterData.jenis_total?.jagung || 0;
 
-data.push({
-Bulan:"Bulan Ini",
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
+data = pivotData(rawData,"kabupaten");
+
+data.forEach(d=>{
+d.Bulan="Bulan Ini";
 });
+
 }
 
 if(mode === "bulanan_kecamatan"){
-for(let kec in masterData.jenis_per_kecamatan){
-let j = masterData.jenis_per_kecamatan[kec] || {};
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
 
-data.push({
-Bulan:"Bulan Ini",
-Kecamatan:kec,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
+data = pivotData(rawData,"kecamatan");
+
+data.forEach(d=>{
+d.Bulan="Bulan Ini";
 });
-}
+
 }
 
 if(mode === "bulanan_desa"){
-for(let desa in masterData.jenis_per_desa){
-let j = masterData.jenis_per_desa[desa] || {};
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
 
-data.push({
-Bulan:"Bulan Ini",
-Desa:desa,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
+data = pivotData(rawData,"desa");
+
+data.forEach(d=>{
+d.Bulan="Bulan Ini";
 });
-}
+
 }
 
 if(mode === "musiman"){
-for(let desa in masterData.jenis_per_desa){
-let j = masterData.jenis_per_desa[desa] || {};
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
 
-data.push({
-Tahun:2026,
-Musim_Tanam:"MT1",
-Kecamatan:"-",
-Desa:desa,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
+data = pivotData(rawData,"desa");
+
+data.forEach(d=>{
+d.Tahun = new Date().getFullYear();
+d.Musim_Tanam="MT1";
 });
-}
+
 }
 
 currentData = data;
+
 renderTable(data);
 
 }
+
+/* ===============================
+RENDER TABLE
+=============================== */
 
 function renderTable(data){
 
@@ -497,18 +449,30 @@ if(data.length === 0) return;
 let columns = Object.keys(data[0]);
 
 let tr = "<tr>";
+
 columns.forEach(c => tr += `<th>${c}</th>`);
+
 tr += "</tr>";
+
 head.innerHTML = tr;
 
 data.forEach(row=>{
+
 let tr = "<tr>";
-columns.forEach(c => tr += `<td>${row[c]}</td>`);
+
+columns.forEach(c => tr += `<td>${row[c] || 0}</td>`);
+
 tr += "</tr>";
+
 body.innerHTML += tr;
+
 });
 
 }
+
+/* ===============================
+DOWNLOAD EXCEL
+=============================== */
 
 function downloadExcel(){
 
@@ -518,6 +482,7 @@ return;
 }
 
 let columns = Object.keys(currentData[0]);
+
 let csv = columns.join(",") + "\n";
 
 currentData.forEach(row=>{
@@ -525,12 +490,20 @@ csv += columns.map(c=>row[c]).join(",") + "\n";
 });
 
 let blob = new Blob([csv], {type:"text/csv"});
+
 let a = document.createElement("a");
+
 a.href = URL.createObjectURL(blob);
+
 a.download = "rekap_ltt.csv";
+
 a.click();
 
 }
+
+/* ===============================
+DOWNLOAD PDF
+=============================== */
 
 function downloadPDF(){
 
@@ -544,6 +517,7 @@ const { jsPDF } = window.jspdf;
 let doc = new jsPDF("landscape");
 
 let columns = Object.keys(currentData[0]);
+
 let rows = currentData.map(r => columns.map(c => r[c]));
 
 doc.text("Rekap LTT Kabupaten Indragiri Hilir",14,15);
