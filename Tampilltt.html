@@ -298,161 +298,6 @@ function loadData(mode){
 
 let data = [];
 
-if(mode === "harian_kabupaten"){
-for(let kec in masterData.jenis_per_kecamatan){
-let j = masterData.jenis_per_kecamatan[kec];
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
-data.push({
-Tanggal: today(),
-Kecamatan:kec,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
-});
-}
-}
-
-if(mode === "harian_kecamatan"){
-for(let desa in masterData.jenis_per_desa){
-let j = masterData.jenis_per_desa[desa];
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
-data.push({
-Tanggal: today(),
-Kecamatan:"-",
-Desa:desa,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
-});
-}
-}
-
-if(mode === "harian_desa"){
-for(let desa in masterData.jenis_per_desa){
-let j = masterData.jenis_per_desa[desa];
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
-data.push({
-Tanggal: today(),
-Desa:desa,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
-});
-}
-}
-
-if(mode === "jenis_kabupaten"){
-let reg = masterData.jenis_total.reguler || 0;
-let opl = masterData.jenis_total.oplah || 0;
-let jag = masterData.jenis_total.jagung || 0;
-data.push({
-Tanggal: today(),
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
-});
-}
-
-if(mode === "jenis_kecamatan"){
-for(let kec in masterData.jenis_per_kecamatan){
-let j = masterData.jenis_per_kecamatan[kec];
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
-data.push({
-Tanggal: today(),
-Kecamatan:kec,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
-});
-}
-}
-
-if(mode === "jenis_desa"){
-for(let desa in masterData.jenis_per_desa){
-let j = masterData.jenis_per_desa[desa];
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
-data.push({
-Tanggal: today(),
-Desa:desa,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
-});
-}
-}
-
-if(mode === "bulanan_kabupaten"){
-let reg = masterData.jenis_total.reguler || 0;
-let opl = masterData.jenis_total.oplah || 0;
-let jag = masterData.jenis_total.jagung || 0;
-data.push({
-Bulan:"Bulan Ini",
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
-});
-}
-
-if(mode === "bulanan_kecamatan"){
-for(let kec in masterData.jenis_per_kecamatan){
-let j = masterData.jenis_per_kecamatan[kec];
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
-data.push({
-Bulan:"Bulan Ini",
-Kecamatan:kec,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
-});
-}
-}
-
-if(mode === "bulanan_desa"){
-for(let desa in masterData.jenis_per_desa){
-let j = masterData.jenis_per_desa[desa];
-let reg = j.reguler || 0;
-let opl = j.oplah || 0;
-let jag = j.jagung || 0;
-data.push({
-Bulan:"Bulan Ini",
-Desa:desa,
-Reguler:reg,
-Oplah:opl,
-Jagung:jag,
-Total_Padi: reg + opl,
-Total_LTT: reg + opl + jag
-});
-}
-}
-
 if(mode === "musiman"){
 for(let desa in masterData.jenis_per_desa){
 let j = masterData.jenis_per_desa[desa];
@@ -460,6 +305,7 @@ let reg = j.reguler || 0;
 let opl = j.oplah || 0;
 let jag = j.jagung || 0;
 let total = reg + opl + jag;
+
 data.push({
 Tahun:2026,
 Musim_Tanam:"MT1",
@@ -469,10 +315,7 @@ Reguler:reg,
 Oplah:opl,
 Jagung:jag,
 Total_Padi: reg + opl,
-Total_LTT: total,
-Target_Musim:500,
-Realisasi:total,
-Persentase:((total/500)*100).toFixed(1)+"%"
+Total_LTT: total
 });
 }
 }
