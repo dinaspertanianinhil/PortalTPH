@@ -271,69 +271,80 @@ Jagung
 
 const url = "https://script.google.com/macros/s/AKfycbzzHUitpqsg-v_1-PtKuLL8kw4mAxmGqztE1LD7T_OcELVTjqLG-G__puXGqssaUB6A/exec";
 
-let masterData = {};
+let masterData = [];
 let currentData = [];
-let rawData = [];
-
-fetch(url)
-.then(r => r.json())
-.then(data => {
-
-masterData = data;
-rawData = data.data_harian || [];
-
-document.getElementById("ltt").innerText = data.total_kabupaten || 0;
-document.getElementById("oplah").innerText = data.jenis_total?.oplah || 0;
-document.getElementById("reguler").innerText = data.jenis_total?.reguler || 0;
-document.getElementById("jagung").innerText = data.jenis_total?.jagung || 0;
-
-});
 
 function today(){
 return new Date().toISOString().split("T")[0];
 }
 
-/* ===============================
-PIVOT DATA DARI SHEET MENTAH
-=============================== */
+fetch(url)
+.then(r=>r.json())
+.then(data=>{
 
-function pivotData(data, level){
+masterData = data.data || [];
 
-let hasil = {};
+hitungCard(masterData);
 
-data.forEach(r => {
+});
 
-let kec = r["KECAMATAN"] || "-";
-let desa = r["DESA"] || "-";
-let tanggal = r["TANGGAL"] || today();
+function hitungCard(data){
 
-let jenis = (r["JENIS LTT"] || "lainnya")
-.toLowerCase()
-.replace(/ /g,"_");
+let total=0;
+let oplah=0;
+let reguler=0;
+let jagung=0;
 
-let luas = Number(r["LUAS TAMBAH TANAM"]) || 0;
+data.forEach(r=>{
 
-let key;
+let luas = Number(r["LUAS TAMBAH TANAM"])||0;
+let jenis = (r["JENIS LTT"]||"").toLowerCase();
 
-if(level === "kabupaten") key = "kabupaten";
-if(level === "kecamatan") key = kec;
-if(level === "desa") key = kec+"|"+desa;
+total += luas;
+
+if(jenis.includes("oplah")) oplah+=luas;
+if(jenis.includes("reguler")) reguler+=luas;
+if(jenis.includes("jagung")) jagung+=luas;
+
+});
+
+document.getElementById("ltt").innerText = total;
+document.getElementById("oplah").innerText = oplah;
+document.getElementById("reguler").innerText = reguler;
+document.getElementById("jagung").innerText = jagung;
+
+}
+
+function pivot(data,group){
+
+let hasil={};
+
+data.forEach(r=>{
+
+let kec = r["KECAMATAN"]||"-";
+let desa = r["DESA"]||"-";
+let tanggal = r["TANGGAL"]||today();
+let jenis = (r["JENIS LTT"]||"lainnya").toLowerCase().replace(/ /g,"_");
+let luas = Number(r["LUAS TAMBAH TANAM"])||0;
+
+let key="";
+
+if(group==="kabupaten") key="kab";
+if(group==="kecamatan") key=kec;
+if(group==="desa") key=kec+"|"+desa;
 
 if(!hasil[key]){
 
-hasil[key] = {
-Tanggal:tanggal,
-Kecamatan:kec,
-Desa:desa
-};
+hasil[key]={};
+
+if(group!=="kabupaten") hasil[key]["Kecamatan"]=kec;
+if(group==="desa") hasil[key]["Desa"]=desa;
 
 }
 
-if(!hasil[key][jenis]){
-hasil[key][jenis] = 0;
-}
+if(!hasil[key][jenis]) hasil[key][jenis]=0;
 
-hasil[key][jenis] += luas;
+hasil[key][jenis]+=luas;
 
 });
 
@@ -341,184 +352,167 @@ return Object.values(hasil);
 
 }
 
-/* ===============================
-LOAD DATA MENU
-=============================== */
-
 function loadData(mode){
 
-let data = [];
+let data=[];
 
-if(mode === "harian_kabupaten"){
+if(mode==="harian_kabupaten"){
 
-data = pivotData(rawData,"kabupaten");
+data=pivot(masterData,"kabupaten");
 
-}
-
-if(mode === "harian_kecamatan"){
-
-data = pivotData(rawData,"kecamatan");
+data=data.map(r=>({...r,Tanggal:today()}));
 
 }
 
-if(mode === "harian_desa"){
+if(mode==="harian_kecamatan"){
 
-data = pivotData(rawData,"desa");
+data=pivot(masterData,"kecamatan");
 
-}
-
-if(mode === "jenis_kabupaten"){
-
-data = pivotData(rawData,"kabupaten");
+data=data.map(r=>({...r,Tanggal:today()}));
 
 }
 
-if(mode === "jenis_kecamatan"){
+if(mode==="harian_desa"){
 
-data = pivotData(rawData,"kecamatan");
+data=pivot(masterData,"desa");
 
-}
-
-if(mode === "jenis_desa"){
-
-data = pivotData(rawData,"desa");
+data=data.map(r=>({...r,Tanggal:today()}));
 
 }
 
-if(mode === "bulanan_kabupaten"){
+if(mode==="jenis_kabupaten"){
 
-data = pivotData(rawData,"kabupaten");
-
-data.forEach(d=>{
-d.Bulan="Bulan Ini";
-});
+data=pivot(masterData,"kabupaten");
 
 }
 
-if(mode === "bulanan_kecamatan"){
+if(mode==="jenis_kecamatan"){
 
-data = pivotData(rawData,"kecamatan");
-
-data.forEach(d=>{
-d.Bulan="Bulan Ini";
-});
+data=pivot(masterData,"kecamatan");
 
 }
 
-if(mode === "bulanan_desa"){
+if(mode==="jenis_desa"){
 
-data = pivotData(rawData,"desa");
-
-data.forEach(d=>{
-d.Bulan="Bulan Ini";
-});
+data=pivot(masterData,"desa");
 
 }
 
-if(mode === "musiman"){
+if(mode==="bulanan_kabupaten"){
 
-data = pivotData(rawData,"desa");
+data=pivot(masterData,"kabupaten");
 
-data.forEach(d=>{
-d.Tahun = new Date().getFullYear();
-d.Musim_Tanam="MT1";
-});
+data=data.map(r=>({...r,Bulan:"Bulan Ini"}));
 
 }
 
-currentData = data;
+if(mode==="bulanan_kecamatan"){
+
+data=pivot(masterData,"kecamatan");
+
+data=data.map(r=>({...r,Bulan:"Bulan Ini"}));
+
+}
+
+if(mode==="bulanan_desa"){
+
+data=pivot(masterData,"desa");
+
+data=data.map(r=>({...r,Bulan:"Bulan Ini"}));
+
+}
+
+if(mode==="musiman"){
+
+data=pivot(masterData,"desa");
+
+data=data.map(r=>({...r,Tahun:2026,Musim_Tanam:"MT1"}));
+
+}
+
+currentData=data;
 
 renderTable(data);
 
 }
 
-/* ===============================
-RENDER TABLE
-=============================== */
-
 function renderTable(data){
 
-const head = document.querySelector("#tabelData thead");
-const body = document.querySelector("#tabelData tbody");
+const head=document.querySelector("#tabelData thead");
+const body=document.querySelector("#tabelData tbody");
 
 head.innerHTML="";
 body.innerHTML="";
 
-if(data.length === 0) return;
+if(data.length===0) return;
 
-let columns = Object.keys(data[0]);
+let columns=Object.keys(data[0]);
 
-let tr = "<tr>";
+let tr="<tr>";
 
-columns.forEach(c => tr += `<th>${c}</th>`);
+columns.forEach(c=>tr+=`<th>${c}</th>`);
 
-tr += "</tr>";
+tr+="</tr>";
 
-head.innerHTML = tr;
+head.innerHTML=tr;
 
 data.forEach(row=>{
 
-let tr = "<tr>";
+let tr="<tr>";
 
-columns.forEach(c => tr += `<td>${row[c] || 0}</td>`);
+columns.forEach(c=>tr+=`<td>${row[c]||0}</td>`);
 
-tr += "</tr>";
+tr+="</tr>";
 
-body.innerHTML += tr;
+body.innerHTML+=tr;
 
 });
 
 }
 
-/* ===============================
-DOWNLOAD EXCEL
-=============================== */
-
 function downloadExcel(){
 
-if(currentData.length === 0){
+if(currentData.length===0){
 alert("Data belum dimuat");
 return;
 }
 
-let columns = Object.keys(currentData[0]);
+let columns=Object.keys(currentData[0]);
 
-let csv = columns.join(",") + "\n";
+let csv=columns.join(",")+"\n";
 
-currentData.forEach(row=>{
-csv += columns.map(c=>row[c]).join(",") + "\n";
+currentData.forEach(r=>{
+
+csv+=columns.map(c=>r[c]).join(",")+"\n";
+
 });
 
-let blob = new Blob([csv], {type:"text/csv"});
+let blob=new Blob([csv],{type:"text/csv"});
 
-let a = document.createElement("a");
+let a=document.createElement("a");
 
-a.href = URL.createObjectURL(blob);
+a.href=URL.createObjectURL(blob);
 
-a.download = "rekap_ltt.csv";
+a.download="rekap_ltt.csv";
 
 a.click();
 
 }
 
-/* ===============================
-DOWNLOAD PDF
-=============================== */
-
 function downloadPDF(){
 
-if(currentData.length === 0){
+if(currentData.length===0){
 alert("Data belum dimuat");
 return;
 }
 
 const { jsPDF } = window.jspdf;
 
-let doc = new jsPDF("landscape");
+let doc=new jsPDF("landscape");
 
-let columns = Object.keys(currentData[0]);
+let columns=Object.keys(currentData[0]);
 
-let rows = currentData.map(r => columns.map(c => r[c]));
+let rows=currentData.map(r=>columns.map(c=>r[c]));
 
 doc.text("Rekap LTT Kabupaten Indragiri Hilir",14,15);
 
@@ -533,6 +527,5 @@ doc.save("rekap_ltt.pdf");
 }
 
 </script>
-
 </body>
 </html>
