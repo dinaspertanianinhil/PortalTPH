@@ -282,10 +282,21 @@ fetch(url)
 .then(r=>r.json())
 .then(data=>{
 
-masterData = data.data || [];
+/* memperbaiki struktur API yang berbeda */
+if(Array.isArray(data)){
+masterData = data;
+}else if(Array.isArray(data.data)){
+masterData = data.data;
+}else{
+masterData = [];
+}
 
+/* hitung skor */
 hitungCard(masterData);
 
+})
+.catch(err=>{
+console.log("Load error",err);
 });
 
 function hitungCard(data){
@@ -297,14 +308,14 @@ let jagung=0;
 
 data.forEach(r=>{
 
-let luas = Number(r["LUAS TAMBAH TANAM"])||0;
-let jenis = (r["JENIS LTT"]||"").toLowerCase();
+let luas = Number(r["LUAS TAMBAH TANAM"]) || 0;
+let jenis = (r["JENIS LTT"] || "").toLowerCase();
 
 total += luas;
 
-if(jenis.includes("oplah")) oplah+=luas;
-if(jenis.includes("reguler")) reguler+=luas;
-if(jenis.includes("jagung")) jagung+=luas;
+if(jenis.includes("oplah")) oplah += luas;
+if(jenis.includes("reguler")) reguler += luas;
+if(jenis.includes("jagung")) jagung += luas;
 
 });
 
@@ -321,11 +332,10 @@ let hasil={};
 
 data.forEach(r=>{
 
-let kec = r["KECAMATAN"]||"-";
-let desa = r["DESA"]||"-";
-let tanggal = r["TANGGAL"]||today();
-let jenis = (r["JENIS LTT"]||"lainnya").toLowerCase().replace(/ /g,"_");
-let luas = Number(r["LUAS TAMBAH TANAM"])||0;
+let kec = r["KECAMATAN"] || "-";
+let desa = r["DESA"] || "-";
+let jenis = (r["JENIS LTT"] || "lainnya").toLowerCase().replace(/ /g,"_");
+let luas = Number(r["LUAS TAMBAH TANAM"]) || 0;
 
 let key="";
 
@@ -337,12 +347,17 @@ if(!hasil[key]){
 
 hasil[key]={};
 
-if(group!=="kabupaten") hasil[key]["Kecamatan"]=kec;
+if(group!=="kabupaten") hasil[key["Kecamatan"]]=kec;
+
 if(group==="desa") hasil[key]["Desa"]=desa;
 
 }
 
-if(!hasil[key][jenis]) hasil[key][jenis]=0;
+/* otomatis membuat kolom jenis LTT baru */
+
+if(!hasil[key][jenis]){
+hasil[key][jenis]=0;
+}
 
 hasil[key][jenis]+=luas;
 
@@ -357,77 +372,43 @@ function loadData(mode){
 let data=[];
 
 if(mode==="harian_kabupaten"){
-
-data=pivot(masterData,"kabupaten");
-
-data=data.map(r=>({...r,Tanggal:today()}));
-
+data=pivot(masterData,"kabupaten").map(r=>({...r,Tanggal:today()}));
 }
 
 if(mode==="harian_kecamatan"){
-
-data=pivot(masterData,"kecamatan");
-
-data=data.map(r=>({...r,Tanggal:today()}));
-
+data=pivot(masterData,"kecamatan").map(r=>({...r,Tanggal:today()}));
 }
 
 if(mode==="harian_desa"){
-
-data=pivot(masterData,"desa");
-
-data=data.map(r=>({...r,Tanggal:today()}));
-
+data=pivot(masterData,"desa").map(r=>({...r,Tanggal:today()}));
 }
 
 if(mode==="jenis_kabupaten"){
-
 data=pivot(masterData,"kabupaten");
-
 }
 
 if(mode==="jenis_kecamatan"){
-
 data=pivot(masterData,"kecamatan");
-
 }
 
 if(mode==="jenis_desa"){
-
 data=pivot(masterData,"desa");
-
 }
 
 if(mode==="bulanan_kabupaten"){
-
-data=pivot(masterData,"kabupaten");
-
-data=data.map(r=>({...r,Bulan:"Bulan Ini"}));
-
+data=pivot(masterData,"kabupaten").map(r=>({...r,Bulan:"Bulan Ini"}));
 }
 
 if(mode==="bulanan_kecamatan"){
-
-data=pivot(masterData,"kecamatan");
-
-data=data.map(r=>({...r,Bulan:"Bulan Ini"}));
-
+data=pivot(masterData,"kecamatan").map(r=>({...r,Bulan:"Bulan Ini"}));
 }
 
 if(mode==="bulanan_desa"){
-
-data=pivot(masterData,"desa");
-
-data=data.map(r=>({...r,Bulan:"Bulan Ini"}));
-
+data=pivot(masterData,"desa").map(r=>({...r,Bulan:"Bulan Ini"}));
 }
 
 if(mode==="musiman"){
-
-data=pivot(masterData,"desa");
-
-data=data.map(r=>({...r,Tahun:2026,Musim_Tanam:"MT1"}));
-
+data=pivot(masterData,"desa").map(r=>({...r,Tahun:new Date().getFullYear(),Musim_Tanam:"MT1"}));
 }
 
 currentData=data;
@@ -460,7 +441,7 @@ data.forEach(row=>{
 
 let tr="<tr>";
 
-columns.forEach(c=>tr+=`<td>${row[c]||0}</td>`);
+columns.forEach(c=>tr+=`<td>${row[c] ?? 0}</td>`);
 
 tr+="</tr>";
 
@@ -482,9 +463,7 @@ let columns=Object.keys(currentData[0]);
 let csv=columns.join(",")+"\n";
 
 currentData.forEach(r=>{
-
 csv+=columns.map(c=>r[c]).join(",")+"\n";
-
 });
 
 let blob=new Blob([csv],{type:"text/csv"});
