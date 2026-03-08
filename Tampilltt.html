@@ -191,6 +191,7 @@ display:block;
 
 <div class="menu">
 <button onclick="window.location.href='dashboad.html'">Kembali Ke Dashboard</button>
+
 <div class="dropdown">
 <button>Rekap Harian ▾</button>
 <div class="dropdown-content">
@@ -323,7 +324,7 @@ let opl = j.oplah || 0;
 let jag = j.jagung || 0;
 data.push({
 Tanggal: today(),
-Kecamatan:j.kecamatan || "-",
+Kecamatan:"-",
 Desa:desa,
 Reguler:reg,
 Oplah:opl,
@@ -462,7 +463,7 @@ let total = reg + opl + jag;
 data.push({
 Tahun:2026,
 Musim_Tanam:"MT1",
-Kecamatan:j.kecamatan || "-",
+Kecamatan:"-",
 Desa:desa,
 Reguler:reg,
 Oplah:opl,
@@ -541,12 +542,8 @@ doc.autoTable({
 head:[columns],
 body:rows,
 startY:20,
-styles:{
-fontSize:8
-},
-headStyles:{
-fillColor:[46,125,50]
-}
+styles:{fontSize:8},
+headStyles:{fillColor:[46,125,50]}
 });
 
 doc.save("rekap_ltt.pdf");
