@@ -281,8 +281,6 @@ fetch(url)
 .then(r=>r.json())
 .then(data=>{
 
-/* baca API Apps Script */
-
 if(data.data_harian){
 masterData = data.data_harian;
 }else if(Array.isArray(data)){
@@ -312,7 +310,10 @@ let jagung=0;
 data.forEach(r=>{
 
 let luas = Number(r.luas) || 0;
-let jenis = (r.jenis || "").toLowerCase();
+
+let jenis = (r.jenis || "")
+.toLowerCase()
+.trim();
 
 total += luas;
 
@@ -330,6 +331,20 @@ document.getElementById("jagung").innerText = jagung;
 }
 
 /* ======================== */
+/* NORMALISASI JENIS */
+/* ======================== */
+
+function normalJenis(j){
+
+return (j || "lainnya")
+.toLowerCase()
+.trim()
+.replace(/\s+/g,"_")
+.replace(/[^\w]/g,"");
+
+}
+
+/* ======================== */
 /* PIVOT DATA */
 /* ======================== */
 
@@ -341,7 +356,7 @@ data.forEach(r=>{
 
 let kec = r.kecamatan || "-";
 let desa = r.desa || "-";
-let jenis = (r.jenis || "lainnya").toLowerCase().replace(/ /g,"_");
+let jenis = normalJenis(r.jenis);
 let luas = Number(r.luas) || 0;
 
 let key="";
@@ -360,7 +375,7 @@ if(group==="desa") hasil[key]["Desa"]=desa;
 
 }
 
-/* otomatis buat kolom jenis */
+/* buat kolom jenis otomatis */
 
 if(!hasil[key][jenis]){
 hasil[key][jenis]=0;
