@@ -298,6 +298,162 @@ function loadData(mode){
 
 let data = [];
 
+if(mode === "harian_kabupaten"){
+for(let kec in masterData.jenis_per_kecamatan){
+let j = masterData.jenis_per_kecamatan[kec];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+data.push({
+Tanggal: today(),
+Kecamatan:kec,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+}
+
+if(mode === "harian_kecamatan"){
+for(let desa in masterData.jenis_per_desa){
+let j = masterData.jenis_per_desa[desa];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+data.push({
+Tanggal: today(),
+Kecamatan:"-",
+Desa:desa,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+}
+
+if(mode === "harian_desa"){
+for(let desa in masterData.jenis_per_desa){
+let j = masterData.jenis_per_desa[desa];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+data.push({
+Tanggal: today(),
+Desa:desa,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+}
+
+if(mode === "jenis_kabupaten"){
+let reg = masterData.jenis_total.reguler || 0;
+let opl = masterData.jenis_total.oplah || 0;
+let jag = masterData.jenis_total.jagung || 0;
+data.push({
+Tanggal: today(),
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+
+if(mode === "jenis_kecamatan"){
+for(let kec in masterData.jenis_per_kecamatan){
+let j = masterData.jenis_per_kecamatan[kec];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+data.push({
+Tanggal: today(),
+Kecamatan:kec,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+}
+
+if(mode === "jenis_desa"){
+for(let desa in masterData.jenis_per_desa){
+let j = masterData.jenis_per_desa[desa];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+data.push({
+Tanggal: today(),
+Desa:desa,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+}
+
+if(mode === "bulanan_kabupaten"){
+let reg = masterData.jenis_total.reguler || 0;
+let opl = masterData.jenis_total.oplah || 0;
+let jag = masterData.jenis_total.jagung || 0;
+data.push({
+Bulan:"Bulan Ini",
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+
+if(mode === "bulanan_kecamatan"){
+for(let kec in masterData.jenis_per_kecamatan){
+let j = masterData.jenis_per_kecamatan[kec];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+data.push({
+Bulan:"Bulan Ini",
+Kecamatan:kec,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+}
+
+if(mode === "bulanan_desa"){
+for(let desa in masterData.jenis_per_desa){
+let j = masterData.jenis_per_desa[desa];
+let reg = j.reguler || 0;
+let opl = j.oplah || 0;
+let jag = j.jagung || 0;
+data.push({
+Bulan:"Bulan Ini",
+Desa:desa,
+Reguler:reg,
+Oplah:opl,
+Jagung:jag,
+Total_Padi: reg + opl,
+Total_LTT: reg + opl + jag
+});
+}
+}
+
+/* PERBAIKAN HANYA DI SINI */
 if(mode === "musiman"){
 for(let desa in masterData.jenis_per_desa){
 let j = masterData.jenis_per_desa[desa];
@@ -348,48 +504,6 @@ columns.forEach(c => tr += `<td>${row[c]}</td>`);
 tr += "</tr>";
 body.innerHTML += tr;
 });
-
-}
-
-function downloadExcel(){
-
-let csv = "";
-let columns = Object.keys(currentData[0] || {});
-csv += columns.join(",") + "\n";
-
-currentData.forEach(row=>{
-csv += columns.map(c=>row[c]).join(",") + "\n";
-});
-
-let blob = new Blob([csv], {type:"text/csv"});
-let a = document.createElement("a");
-a.href = URL.createObjectURL(blob);
-a.download = "rekap_ltt.xlsx";
-a.click();
-
-}
-
-function downloadPDF(){
-
-const { jsPDF } = window.jspdf;
-
-let doc = new jsPDF("landscape");
-
-let columns = Object.keys(currentData[0] || {});
-let rows = currentData.map(row => columns.map(c => row[c]));
-
-doc.setFontSize(14);
-doc.text("Rekap LTT Kabupaten Indragiri Hilir", 14, 15);
-
-doc.autoTable({
-head:[columns],
-body:rows,
-startY:20,
-styles:{fontSize:8},
-headStyles:{fillColor:[46,125,50]}
-});
-
-doc.save("rekap_ltt.pdf");
 
 }
 
