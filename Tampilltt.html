@@ -292,7 +292,7 @@ let todayStr=new Date().toLocaleDateString("sv-SE");
 
 data.forEach(d=>{
 
-let luas=parseFloat(d["LUAS TAMBAH TANAM"])||0;
+let luas=parseFloat(String(d["LUAS TAMBAH TANAM"]).replace(",", "."))||0;
 
 total+=luas;
 
