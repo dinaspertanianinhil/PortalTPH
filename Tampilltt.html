@@ -8,7 +8,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- AUTOTABLE (WAJIB untuk tabel PDF) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 
 <style>
 
@@ -225,11 +230,8 @@ let rawData=[];
 let chart;
 
 function formatDate(date){
-
 if(!date) return "";
-
 return date.toString().slice(0,10);
-
 }
 
 async function loadData(){
@@ -288,11 +290,11 @@ let kecMap={};
 let tbody=document.querySelector("#tableData tbody");
 tbody.innerHTML="";
 
-let todayStr=new Date().toLocaleDateString("sv-SE");
+let todayStr=new Date().toISOString().slice(0,10);
 
 data.forEach(d=>{
 
-let luas=parseFloat(String(d["LUAS TAMBAH TANAM"]).replace(",", "."))||0;
+let luas=parseFloat(d["LUAS TAMBAH TANAM"])||0;
 
 total+=luas;
 
@@ -329,9 +331,7 @@ function renderChart(data){
 if(chart) chart.destroy();
 
 chart=new Chart(document.getElementById("chartKecamatan"),{
-
 type:"bar",
-
 data:{
 labels:Object.keys(data),
 datasets:[{
@@ -339,7 +339,6 @@ label:"LTT per Kecamatan",
 data:Object.values(data)
 }]
 }
-
 });
 
 }
@@ -366,24 +365,39 @@ XLSX.writeFile(wb,"LTT.xlsx");
 
 }
 
+/* =======================
+   DOWNLOAD PDF (PERBAIKAN)
+   ======================= */
+
 function downloadPDF(){
 
-const {jsPDF}=window.jspdf;
+const { jsPDF } = window.jspdf;
 
-let doc=new jsPDF();
-
-doc.text("Laporan LTT",10,10);
-
-let rows=[...document.querySelectorAll("#tableData tr")];
-
-let y=20;
-
-rows.forEach(r=>{
-doc.text(r.innerText,10,y);
-y+=8;
+let doc = new jsPDF({
+orientation:"landscape",
+unit:"mm",
+format:"a4"
 });
 
-doc.save("LTT.pdf");
+doc.setFontSize(16);
+doc.text("Laporan Luas Tambah Tanam (LTT)",14,15);
+
+doc.setFontSize(10);
+doc.text("Kabupaten Indragiri Hilir",14,22);
+
+doc.autoTable({
+html:"#tableData",
+startY:28,
+theme:"grid",
+styles:{
+fontSize:8
+},
+headStyles:{
+fillColor:[46,125,50]
+}
+});
+
+doc.save("Laporan_LTT.pdf");
 
 }
 
