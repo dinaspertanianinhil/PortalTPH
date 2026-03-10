@@ -288,7 +288,7 @@ let kecMap={};
 let tbody=document.querySelector("#tableData tbody");
 tbody.innerHTML="";
 
-let todayStr=new Date().toISOString().slice(0,10);
+let todayStr=new Date().toLocaleDateString("sv-SE");
 
 data.forEach(d=>{
 
