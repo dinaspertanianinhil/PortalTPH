@@ -129,6 +129,11 @@ button:hover{
 background:#1b5e20;
 }
 
+button:disabled{
+background:#9e9e9e;
+cursor:not-allowed;
+}
+
 .status{
 margin-top:15px;
 font-size:14px;
@@ -298,7 +303,7 @@ margin-top:10px;
 <input id="petugas">
 </div>
 
-<button onclick="kirimData()">Simpan Laporan</button>
+<button id="btnKirim" onclick="kirimData()">Simpan Laporan</button>
 
 </div>
 
@@ -313,7 +318,10 @@ const scriptURL = "https://script.google.com/macros/s/AKfycbxd2EOl2PnQJ4jQcTMYrB
 
 function kirimData(){
 
-document.getElementById("status").innerHTML="Mengirim laporan...";
+const btn = document.getElementById("btnKirim");
+btn.disabled = true;
+
+document.getElementById("status").innerHTML="⏳ Mengirim laporan...";
 
 let data = {
 
@@ -344,10 +352,19 @@ body:JSON.stringify(data)
 })
 .then(res=>res.text())
 .then(res=>{
+
 document.getElementById("status").innerHTML="✅ Laporan berhasil dikirim";
+
+setTimeout(function(){
+location.reload();
+},1500);
+
 })
 .catch(err=>{
+
 document.getElementById("status").innerHTML="❌ Gagal mengirim laporan";
+btn.disabled=false;
+
 });
 
 }
