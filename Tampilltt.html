@@ -161,7 +161,15 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 
 </div>
 <div id="dashboardPage">
-<div class="cards">
+<div class="card">
+<h3>LTT Reguler</h3>
+<p id="totalReguler">0</p>
+</div>
+
+<div class="card">
+<h3>LTT Oplah</h3>
+<p id="totalOplah">0</p>
+</div>
 </div>
 <div class="card">
 <h3>Total LTT</h3>
@@ -323,6 +331,8 @@ return cocok;
 
 let total=0;
 let today=0;
+let totalReguler=0;
+let totalOplah=0;
 let kecMap={};
 
 let tbody=document.querySelector("#tableData tbody");
@@ -335,6 +345,10 @@ data.forEach(d=>{
 let luas=parseFloat(d["LUAS TAMBAH TANAM"])||0;
 
 total+=luas;
+let jenis = (d["JENIS LTT"] || "").toLowerCase();
+
+if(jenis.includes("reguler")) totalReguler += luas;
+if(jenis.includes("oplah")) totalOplah += luas;
 
 if(d.TANGGAL==todayStr) today+=luas;
 
@@ -358,7 +372,8 @@ document.getElementById("totalLtt").innerText=total+" Ha";
 document.getElementById("todayLtt").innerText=today+" Ha";
 document.getElementById("totalKec").innerText=Object.keys(kecMap).length;
 document.getElementById("totalData").innerText=data.length;
-
+document.getElementById("totalReguler").innerText=totalReguler+" Ha";
+document.getElementById("totalOplah").innerText=totalOplah+" Ha";
 renderChart(kecMap);
 renderRanking(kecMap);
 
@@ -387,8 +402,30 @@ let sorted=Object.entries(data).sort((a,b)=>b[1]-a[1]);
 
 let html="";
 
-sorted.forEach(r=>{
-html+=`<li>${r[0]} - ${r[1]} Ha</li>`;
+sorted.forEach((r,i)=>{
+
+let medal="";
+
+if(i==0) medal="🥇";
+else if(i==1) medal="🥈";
+else if(i==2) medal="🥉";
+else medal=`${i+1}.`;
+
+html+=`
+<li style="
+display:flex;
+justify-content:space-between;
+padding:6px 10px;
+margin:4px 0;
+border-radius:6px;
+background:${i<3 ? "#e8f5e9" : "#f5f5f5"};
+font-weight:${i<3 ? "bold":"normal"};
+">
+<span>${medal} ${r[0]}</span>
+<span>${r[1]} Ha</span>
+</li>
+`;
+
 });
 
 document.getElementById("ranking").innerHTML=html;
