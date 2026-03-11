@@ -154,9 +154,15 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 </header>
 
 <div class="container">
+<div style="margin-bottom:20px">
 
+<button onclick="showPage('dashboard')">Dashboard</button>
+<button onclick="showPage('tabel')">Rekap Data LTT</button>
+
+</div>
+<div id="dashboardPage">
 <div class="cards">
-
+</div>
 <div class="card">
 <h3>Total LTT</h3>
 <p id="totalLtt">0</p>
@@ -185,6 +191,10 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 <option value="">Semua Kecamatan</option>
 </select>
 
+<select id="filterJenis">
+<option value="">Semua Jenis LTT</option>
+</select>
+
 <input type="date" id="filterTanggal">
 
 <button onclick="downloadExcel()">Download Excel</button>
@@ -200,6 +210,10 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 <h3>Ranking Kecamatan</h3>
 <ol id="ranking"></ol>
 </div>
+
+<div id="tablePage" style="display:none">
+
+<h2>Rekap Data LTT</h2>
 
 <table id="tableData">
 
@@ -233,7 +247,20 @@ function formatDate(date){
 if(!date) return "";
 return date.toString().slice(0,10);
 }
+function showPage(page){
 
+document.getElementById("dashboardPage").style.display="none";
+document.getElementById("tablePage").style.display="none";
+
+if(page==="dashboard"){
+document.getElementById("dashboardPage").style.display="block";
+}
+
+if(page==="tabel"){
+document.getElementById("tablePage").style.display="block";
+}
+
+}
 async function loadData(){
 
 const res=await fetch(API_URL);
@@ -251,9 +278,11 @@ render();
 function initFilter(){
 
 let kecSet=new Set();
+let jenisSet=new Set();
 
 rawData.forEach(d=>{
 kecSet.add(d.KECAMATAN);
+jenisSet.add(d["JENIS LTT"]);
 });
 
 let select=document.getElementById("filterKecamatan");
@@ -262,8 +291,16 @@ kecSet.forEach(k=>{
 select.innerHTML+=`<option>${k}</option>`;
 });
 
+let selectJenis=document.getElementById("filterJenis");
+
+jenisSet.forEach(j=>{
+selectJenis.innerHTML+=`<option>${j}</option>`;
+});
+
 select.onchange=render;
 document.getElementById("filterTanggal").onchange=render;
+document.getElementById("filterJenis").onchange=render;
+
 
 }
 
@@ -271,6 +308,7 @@ function render(){
 
 let kecFilter=document.getElementById("filterKecamatan").value;
 let tglFilter=document.getElementById("filterTanggal").value;
+let jenisFilter=document.getElementById("filterJenis").value;
 
 let data=rawData.filter(d=>{
 
@@ -278,7 +316,7 @@ let cocok=true;
 
 if(kecFilter && d.KECAMATAN!=kecFilter) cocok=false;
 if(tglFilter && d.TANGGAL!=tglFilter) cocok=false;
-
+if(jenisFilter && d["JENIS LTT"]!=jenisFilter) cocok=false;
 return cocok;
 
 });
@@ -359,9 +397,46 @@ document.getElementById("ranking").innerHTML=html;
 
 function downloadExcel(){
 
-let table=document.getElementById("tableData");
-let wb=XLSX.utils.table_to_book(table);
-XLSX.writeFile(wb,"LTT.xlsx");
+let kecFilter=document.getElementById("filterKecamatan").value;
+let tglFilter=document.getElementById("filterTanggal").value;
+let jenisFilter=document.getElementById("filterJenis").value;
+
+let data=rawData.filter(d=>{
+
+let cocok=true;
+
+if(kecFilter && d.KECAMATAN!=kecFilter) cocok=false;
+if(tglFilter && d.TANGGAL!=tglFilter) cocok=false;
+if(jenisFilter && d["JENIS LTT"]!=jenisFilter) cocok=false;
+
+return cocok;
+
+});
+
+let excelData = data.map(d=>({
+Tanggal:d.TANGGAL,
+Kecamatan:d.KECAMATAN,
+Desa:d.DESA,
+Poktan:d["KELOMPOK TANI"],
+Jenis:d["JENIS LTT"],
+Luas:d["LUAS TAMBAH TANAM"],
+Pelapor:d["NAMA PELAPOR"]
+}));
+
+let ws = XLSX.utils.json_to_sheet(excelData);
+ws['!cols'] = [
+{wch:12},
+{wch:18},
+{wch:18},
+{wch:20},
+{wch:10},
+{wch:8},
+{wch:25}
+];
+let wb = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb, ws, "LTT");
+
+XLSX.writeFile(wb,"Laporan_LTT.xlsx");
 
 }
 
@@ -378,6 +453,33 @@ orientation:"landscape",
 unit:"mm",
 format:"a4"
 });
+
+let kecFilter=document.getElementById("filterKecamatan").value;
+let tglFilter=document.getElementById("filterTanggal").value;
+let jenisFilter=document.getElementById("filterJenis").value;
+
+let data=rawData.filter(d=>{
+
+let cocok=true;
+
+if(kecFilter && d.KECAMATAN!=kecFilter) cocok=false;
+if(tglFilter && d.TANGGAL!=tglFilter) cocok=false;
+if(jenisFilter && d["JENIS LTT"]!=jenisFilter) cocok=false;
+
+return cocok;
+
+});
+
+let rows=data.map(d=>[
+d.TANGGAL,
+d.KECAMATAN,
+d.DESA,
+d["KELOMPOK TANI"],
+d["JENIS LTT"],
+d["LUAS TAMBAH TANAM"],
+d["NAMA PELAPOR"]
+]);
+
 
 doc.setFontSize(16);
 doc.text("Laporan Luas Tambah Tanam (LTT)",14,15);
