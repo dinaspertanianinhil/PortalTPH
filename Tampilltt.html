@@ -16,7 +16,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 
 <style>
+.scoreCards{
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px; /* spasi dari tabel */
+}
 
+.scoreCards .card{
+  padding:10px 15px;
+  border-radius:8px;
+  background:white;
+  box-shadow:0 2px 6px rgba(0,0,0,0.15);
+}
 body{
 margin:0;
 font-family:Segoe UI,Arial;
@@ -217,7 +228,16 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 </div> <!-- TUTUP dashboardPage -->
 
 <div id="tablePage" style="display:none">
-
+<div class="scoreCards">
+  <div class="card">
+    <h3>Total Reguler</h3>
+    <p id="scoreReguler">0 Ha</p>
+  </div>
+  <div class="card">
+    <h3>Total Oplah</h3>
+    <p id="scoreOplah">0 Ha</p>
+  </div>
+</div>
 <h2>Rekap Data LTT</h2>
 <div class="filter">
 
@@ -419,6 +439,13 @@ document.getElementById("totalReguler").innerText=totalReguler+" Ha";
 document.getElementById("totalOplah").innerText=totalOplah+" Ha";
 document.getElementById("todayReguler").innerText=todayReguler+" Ha";
 document.getElementById("todayOplah").innerText=todayOplah+" Ha";
+// **update kartu skor di halaman tabel**
+    if(document.getElementById("scoreReguler")){
+    document.getElementById("scoreReguler").innerText = totalReguler + " Ha";
+}
+if(document.getElementById("scoreOplah")){
+    document.getElementById("scoreOplah").innerText = totalOplah + " Ha";
+}
 renderChart(kecMap);
 renderRanking(kecMap);
 
