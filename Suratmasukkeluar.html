@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Input Surat Masuk & Keluar - Advanced</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background: url('https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png') no-repeat center center fixed;
+    background-size: cover;
+    color: #333;
+  }
+
+  .container {
+    max-width: 950px;
+    margin: 40px auto;
+    background: rgba(255,255,255,0.95);
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  }
+
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+
+  .header-logo img {
+    width: 70px;
+    height: auto;
+  }
+
+  h1, h2 {
+    text-align: center;
+    margin: 0;
+    font-weight: 700;
+    color: #0f4c81;
+  }
+
+  h2 {
+    font-weight: 400;
+    font-size: 0.9rem;
+    text-transform: lowercase;
+    margin-bottom: 25px;
+  }
+
+  .tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 10px 30px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    font-weight: 500;
+    transition: all 0.3s;
+    color: #0f4c81;
+  }
+
+  .tab.active {
+    border-color: #0f4c81;
+    font-weight: 700;
+  }
+
+  form {
+    display: none;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  form.active {
+    display: flex;
+  }
+
+  label {
+    font-weight: 500;
+  }
+
+  input, select, textarea {
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    width: 100%;
+    transition: all 0.3s;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #0f4c81;
+    box-shadow: 0 0 5px rgba(15,76,129,0.3);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .btn, .btn-camera {
+    padding: 12px 25px;
+    background: #0f4c81;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    align-self: flex-start;
+  }
+
+  .btn:hover, .btn-camera:hover {
+    background: #0a365b;
+  }
+
+  .btn-camera {
+    margin-top: 5px;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .btn-camera::before {
+    content: "📸";
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 600px) {
+    .tabs {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header-logo">
+    <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png" alt="Logo Inhil">
+    <div>
+      <h1>Bidang Tanaman Pangan dan Hortikultura</h1>
+      <h3>Dinas Pertanian Kabupaten Indragiri Hilir</h3>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-target="masuk">Surat Masuk</div>
+    <div class="tab" data-target="keluar">Surat Keluar</div>
+  </div>
+
+  <!-- Form Surat Masuk -->
+  <form id="masuk" class="active" onsubmit="return validateMasuk()">
+    <label for="nama_input_masuk">Nama Penginput</label>
+    <input type="text" id="nama_input_masuk" placeholder="Siapa yang input" required>
+
+    <label for="no_surat_masuk">No. Surat</label>
+    <input type="text" id="no_surat_masuk" placeholder="Masukkan nomor surat" required>
+
+    <label for="tgl_masuk">Tanggal Masuk</label>
+    <input type="date" id="tgl_masuk" required>
+
+    <label for="pengirim">Pengirim</label>
+    <input type="text" id="pengirim" placeholder="Nama pengirim" required>
+
+    <label for="kategori_masuk">Kategori</label>
+    <select id="kategori_masuk" required>
+      <option value="">Pilih kategori</option>
+      <option value="Penting">Penting</option>
+      <option value="Rahasia">Rahasia</option>
+      <option value="Biasa">Biasa</option>
+      <option value="Internal">Internal</option>
+      <option value="Eksternal">Eksternal</option>
+    </select>
+
+    <label for="prioritas_masuk">Prioritas</label>
+    <select id="prioritas_masuk" required>
+      <option value="">Pilih prioritas</option>
+      <option value="Tinggi">Tinggi</option>
+      <option value="Normal">Normal</option>
+      <option value="Rendah">Rendah</option>
+    </select>
+
+    <label for="perihal_masuk">Perihal</label>
+    <textarea id="perihal_masuk" placeholder="Isi perihal surat" required></textarea>
+
+    <label>Lampiran / Foto Surat</label>
+    <input type="file" id="lampiran_masuk" accept=".pdf,.jpg,.jpeg,.png">
+    <button type="button" class="btn-camera" id="kameraBtnMasuk">Ambil Foto Surat</button>
+    <video id="videoMasuk" width="320" height="240" autoplay style="display:none;"></video>
+    <canvas id="canvasMasuk" width="320" height="240" style="display:none;"></canvas>
+    <img id="previewFotoMasuk" src="" alt="Preview Foto" style="display:block; margin-top:10px; max-width:100%;">
+
+    <button type="submit" class="btn">Simpan Surat Masuk</button>
+  </form>
+
+  <!-- Form Surat Keluar -->
+  <form id="keluar" onsubmit="return validateKeluar()">
+    <label for="nama_input_keluar">Nama Penginput</label>
+    <input type="text" id="nama_input_keluar" placeholder="Siapa yang input" required>
+
+    <label for="no_surat_keluar">No. Surat</label>
+    <input type="text" id="no_surat_keluar" placeholder="Masukkan nomor surat" required>
+
+    <label for="tgl_keluar">Tanggal Keluar</label>
+    <input type="date" id="tgl_keluar" required>
+
+    <label for="penerima">Penerima</label>
+    <input type="text" id="penerima" placeholder="Nama penerima" required>
+
+    <label for="kategori_keluar">Kategori</label>
+    <select id="kategori_keluar" required>
+      <option value="">Pilih kategori</option>
+      <option value="Penting">Penting</option>
+      <option value="Rahasia">Rahasia</option>
+      <option value="Biasa">Biasa</option>
+      <option value="Internal">Internal</option>
+      <option value="Eksternal">Eksternal</option>
+    </select>
+
+    <label for="prioritas_keluar">Prioritas</label>
+    <select id="prioritas_keluar" required>
+      <option value="">Pilih prioritas</option>
+      <option value="Tinggi">Tinggi</option>
+      <option value="Normal">Normal</option>
+      <option value="Rendah">Rendah</option>
+    </select>
+
+    <label for="perihal_keluar">Perihal</label>
+    <textarea id="perihal_keluar" placeholder="Isi perihal surat" required></textarea>
+
+    <label>Lampiran / Foto Surat</label>
+    <input type="file" id="lampiran_keluar" accept=".pdf,.jpg,.jpeg,.png">
+    <button type="button" class="btn-camera" id="kameraBtnKeluar">Ambil Foto Surat</button>
+    <video id="videoKeluar" width="320" height="240" autoplay style="display:none;"></video>
+    <canvas id="canvasKeluar" width="320" height="240" style="display:none;"></canvas>
+    <img id="previewFotoKeluar" src="" alt="Preview Foto" style="display:block; margin-top:10px; max-width:100%;">
+
+    <button type="submit" class="btn">Simpan Surat Keluar</button>
+  </form>
+</div>
+
+<script>
+  // Tab switch
+  const tabs = document.querySelectorAll('.tab');
+  const forms = document.querySelectorAll('form');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      forms.forEach(f => f.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.target).classList.add('active');
+    });
+  });
+
+  // Validation example
+  function validateMasuk() {
+    const tglMasuk = document.getElementById('tgl_masuk').value;
+    if (!tglMasuk) { alert("Tanggal masuk harus diisi!"); return false; }
+    return true;
+  }
+
+  function validateKeluar() {
+    const tglKeluar = document.getElementById('tgl_keluar').value;
+    const tglMasuk = document.getElementById('tgl_masuk').value;
+    if (!tglKeluar) { alert("Tanggal keluar harus diisi!"); return false; }
+    if (tglMasuk && tglKeluar < tglMasuk) {
+      alert("Tanggal keluar tidak boleh sebelum tanggal masuk!");
+      return false;
+    }
+    return true;
+  }
+
+  // Kamera Surat Masuk
+  const kameraBtnMasuk = document.getElementById('kameraBtnMasuk');
+  const videoMasuk = document.getElementById('videoMasuk');
+  const canvasMasuk = document.getElementById('canvasMasuk');
+  const previewFotoMasuk = document.getElementById('previewFotoMasuk');
+
+  kameraBtnMasuk.addEventListener('click', () => {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        videoMasuk.style.display = 'block';
+        videoMasuk.srcObject = stream;
+        kameraBtnMasuk.textContent = 'Ambil Foto';
+        kameraBtnMasuk.onclick = () => {
+          canvasMasuk.getContext('2d').drawImage(videoMasuk, 0, 0, canvasMasuk.width, canvasMasuk.height);
+          previewFotoMasuk.src = canvasMasuk.toDataURL('image/png');
+          previewFotoMasuk.style.display = 'block';
+          videoMasuk.srcObject.getTracks().forEach(track => track.stop());
+          videoMasuk.style.display = 'none';
+          kameraBtnMasuk.textContent = 'Ambil Ulang Foto';
+        };
+      })
+      .catch(err => alert('Gagal akses kamera: ' + err));
+  });
+
+  // Kamera Surat Keluar
+  const kameraBtnKeluar = document.getElementById('kameraBtnKeluar');
+  const videoKeluar = document.getElementById('videoKeluar');
+  const canvasKeluar = document.getElementById('canvasKeluar');
+  const previewFotoKeluar = document.getElementById('previewFotoKeluar');
+
+  kameraBtnKeluar.addEventListener('click', () => {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        videoKeluar.style.display = 'block';
+        videoKeluar.srcObject = stream;
+        kameraBtnKeluar.textContent = 'Ambil Foto';
+        kameraBtnKeluar.onclick = () => {
+          canvasKeluar.getContext('2d').drawImage(videoKeluar, 0, 0, canvasKeluar.width, canvasKeluar.height);
+          previewFotoKeluar.src = canvasKeluar.toDataURL('image/png');
+          previewFotoKeluar.style.display = 'block';
+          videoKeluar.srcObject.getTracks().forEach(track => track.stop());
+          videoKeluar.style.display = 'none';
+          kameraBtnKeluar.textContent = 'Ambil Ulang Foto';
+        };
+      })
+      .catch(err => alert('Gagal akses kamera: ' + err));
+  });
+</script>
+<script>
+async function submitForm(jenis) {
+  const namaInput = document.getElementById('nama_input_' + jenis).value;
+  const noSurat = document.getElementById('no_surat_' + jenis).value;
+  const tanggal = document.getElementById('tgl_' + jenis).value;
+  const pengirimPenerima = jenis === 'masuk' ? document.getElementById('pengirim').value : document.getElementById('penerima').value;
+  const kategori = document.getElementById('kategori_' + jenis).value;
+  const prioritas = document.getElementById('prioritas_' + jenis).value;
+  const perihal = document.getElementById('perihal_' + jenis).value;
+
+  const fileInput = document.getElementById('lampiran_' + jenis);
+  let lampiran = null;
+  let lampiranType = "";
+  let lampiranName = "";
+  if(fileInput.files.length > 0){
+    const file = fileInput.files[0];
+    const base64 = await fileToBase64(file);
+    lampiran = base64.split(',')[1]; // ambil content tanpa header
+    lampiranType = file.type;
+    lampiranName = file.name;
+  }
+
+  const payload = {
+    jenis, namaInput, noSurat, tanggal, pengirimPenerima, kategori, prioritas, perihal, lampiran, lampiranType, lampiranName
+  };
+
+  const response = await fetch("https://script.google.com/macros/s/AKfycbx1ziL3Fdl8krnTRQMj4n_WWbPJjrboVDYOJ5FWvlceFKGdlK4mC1lq0dsDfv5SlM-5/exec", {  // ganti LINK_WEB_APP_GAS dengan URL Apps Script-mu
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+
+  const result = await response.json();
+  if(result.status === "success") alert("Data berhasil disimpan!");
+  else alert("Error: " + result.message);
+}
+
+function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
+
+// attach ke submit
+document.getElementById('masuk').addEventListener('submit', e=>{
+  e.preventDefault();
+  submitForm('masuk');
+});
+document.getElementById('keluar').addEventListener('submit', e=>{
+  e.preventDefault();
+  submitForm('keluar');
+});
+</script>
+
+</body>
+</html>
