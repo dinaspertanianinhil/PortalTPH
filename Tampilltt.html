@@ -146,8 +146,7 @@ border-radius:10px;
 <div class="overlay">
 
 <header>
-<img src="logo PNG
-https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png">
+<img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
 <h1>
 Bidang Tanaman Pangan dan Hortikultura<br>
 Dinas Pertanian Kabupaten Indragiri Hilir
@@ -162,13 +161,6 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 
 </div>
 <div id="dashboardPage">
-<div class="cards">
-
-<div class="card">
-<h3>Total LTT</h3>
-<p id="totalLtt">0</p>
-</div>
-
 <div class="card">
 <h3>LTT Reguler</h3>
 <p id="totalReguler">0</p>
@@ -178,20 +170,15 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 <h3>LTT Oplah</h3>
 <p id="totalOplah">0</p>
 </div>
+</div>
+<div class="card">
+<h3>Total LTT</h3>
+<p id="totalLtt">0</p>
+</div>
 
 <div class="card">
 <h3>LTT Hari Ini</h3>
 <p id="todayLtt">0</p>
-</div>
-
-<div class="card">
-<h3>Reguler Hari Ini</h3>
-<p id="todayReguler">0</p>
-</div>
-
-<div class="card">
-<h3>Oplah Hari Ini</h3>
-<p id="todayOplah">0</p>
 </div>
 
 <div class="card">
@@ -344,13 +331,8 @@ return cocok;
 
 let total=0;
 let today=0;
-
 let totalReguler=0;
 let totalOplah=0;
-
-let todayReguler=0;
-let todayOplah=0;
-
 let kecMap={};
 
 let tbody=document.querySelector("#tableData tbody");
@@ -360,43 +342,17 @@ let todayStr=new Date().toISOString().slice(0,10);
 
 data.forEach(d=>{
 
-let luas = parseFloat(d["LUAS TAMBAH TANAM"]) || 0;
+let luas=parseFloat(d["LUAS TAMBAH TANAM"])||0;
 
-total += luas;
-
+total+=luas;
 let jenis = (d["JENIS LTT"] || "").toLowerCase();
 
-/* REGULER */
+if(jenis.includes("reguler")) totalReguler += luas;
+if(jenis.includes("oplah")) totalOplah += luas;
 
-if(jenis.includes("reguler")){
-totalReguler += luas;
+if(d.TANGGAL==todayStr) today+=luas;
 
-if(d.TANGGAL == todayStr){
-todayReguler += luas;
-}
-}
-
-/* OPLAH */
-
-if(jenis.includes("oplah")){
-totalOplah += luas;
-
-if(d.TANGGAL == todayStr){
-todayOplah += luas;
-}
-}
-
-/* TOTAL HARI INI */
-
-if(d.TANGGAL == todayStr){
-today += luas;
-}
-
-/* REKAP KECAMATAN */
-
-kecMap[d.KECAMATAN] = (kecMap[d.KECAMATAN] || 0) + luas;
-
-/* TAMBAH BARIS TABEL */
+kecMap[d.KECAMATAN]=(kecMap[d.KECAMATAN]||0)+luas;
 
 tbody.innerHTML+=`
 <tr>
@@ -418,8 +374,6 @@ document.getElementById("totalKec").innerText=Object.keys(kecMap).length;
 document.getElementById("totalData").innerText=data.length;
 document.getElementById("totalReguler").innerText=totalReguler+" Ha";
 document.getElementById("totalOplah").innerText=totalOplah+" Ha";
-document.getElementById("todayReguler").innerText=todayReguler+" Ha";
-document.getElementById("todayOplah").innerText=todayOplah+" Ha";
 renderChart(kecMap);
 renderRanking(kecMap);
 
