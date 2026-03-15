@@ -9,25 +9,59 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-<!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<!-- AUTOTABLE (WAJIB untuk tabel PDF) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 
 <style>
+
+/* =========================
+   NOTIFIKASI INFO
+   ========================= */
+
+.infoNotif{
+background:#fff3cd;
+border-left:6px solid #ff9800;
+padding:12px 40px 12px 15px;
+margin-bottom:30px;
+border-radius:6px;
+position:relative;
+font-size:14px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+animation:slideDown .4s ease;
+}
+
+.infoNotif b{ color:#b26a00; }
+
+.closeNotif{
+position:absolute;
+right:12px;
+top:8px;
+cursor:pointer;
+font-size:18px;
+font-weight:bold;
+color:#666;
+}
+
+.closeNotif:hover{ color:black; }
+
+@keyframes slideDown{
+from{ transform:translateY(-10px); opacity:0; }
+to{ transform:translateY(0); opacity:1; }
+}
+
 .scoreCards{
-  display: flex;
-  gap: 15px;
-  margin-bottom: 20px; /* spasi dari tabel */
+display:flex;
+gap:15px;
+margin-bottom:20px;
 }
 
 .scoreCards .card{
-  padding:10px 15px;
-  border-radius:8px;
-  background:white;
-  box-shadow:0 2px 6px rgba(0,0,0,0.15);
+padding:10px 15px;
+border-radius:8px;
+background:white;
+box-shadow:0 2px 6px rgba(0,0,0,0.15);
 }
+
 body{
 margin:0;
 font-family:Segoe UI,Arial;
@@ -50,9 +84,7 @@ background:#1b5e20;
 color:white;
 }
 
-header img{
-width:55px;
-}
+header img{ width:55px; }
 
 header h1{
 font-size:18px;
@@ -107,9 +139,7 @@ border-radius:5px;
 cursor:pointer;
 }
 
-button:hover{
-background:#1b5e20;
-}
+button:hover{ background:#1b5e20; }
 
 table{
 width:100%;
@@ -131,9 +161,7 @@ border-bottom:1px solid #eee;
 font-size:13px;
 }
 
-tr:hover{
-background:#f1f8e9;
-}
+tr:hover{ background:#f1f8e9; }
 
 .chartbox{
 background:white;
@@ -165,54 +193,31 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 </header>
 
 <div class="container">
-<div style="margin-bottom:20px">
 
+<div id="notifInfo" class="infoNotif">
+<span class="closeNotif" onclick="tutupNotif()">✕</span>
+⚠ <b>Informasi:</b>  
+Data <b>Final Luas Tambah Tanam (LTT)</b> biasanya dapat dipastikan setelah pukul <b>15.00 WIB</b>.  
+Sebelum jam tersebut data masih dapat mengalami perubahan.
+</div>
+
+<div style="margin-bottom:20px">
 <button onclick="showPage('dashboard')">Dashboard</button>
 <button onclick="showPage('tabel')">Rekap Data LTT</button>
-
 </div>
+
 <div id="dashboardPage">
+
 <div class="cards">
 
-<div class="card">
-<h3>Total LTT</h3>
-<p id="totalLtt">0</p>
-</div>
-
-<div class="card">
-<h3>LTT Reguler</h3>
-<p id="totalReguler">0</p>
-</div>
-
-<div class="card">
-<h3>LTT Oplah</h3>
-<p id="totalOplah">0</p>
-</div>
-
-<div class="card">
-<h3>LTT Hari Ini</h3>
-<p id="todayLtt">0</p>
-</div>
-
-<div class="card">
-<h3>Reguler Hari Ini</h3>
-<p id="todayReguler">0</p>
-</div>
-
-<div class="card">
-<h3>Oplah Hari Ini</h3>
-<p id="todayOplah">0</p>
-</div>
-
-<div class="card">
-<h3>Jumlah Kecamatan</h3>
-<p id="totalKec">0</p>
-</div>
-
-<div class="card">
-<h3>Jumlah Laporan</h3>
-<p id="totalData">0</p>
-</div>
+<div class="card"><h3>Total LTT</h3><p id="totalLtt">0</p></div>
+<div class="card"><h3>LTT Reguler</h3><p id="totalReguler">0</p></div>
+<div class="card"><h3>LTT Oplah</h3><p id="totalOplah">0</p></div>
+<div class="card"><h3>LTT Hari Ini</h3><p id="todayLtt">0</p></div>
+<div class="card"><h3>Reguler Hari Ini</h3><p id="todayReguler">0</p></div>
+<div class="card"><h3>Oplah Hari Ini</h3><p id="todayOplah">0</p></div>
+<div class="card"><h3>Jumlah Kecamatan</h3><p id="totalKec">0</p></div>
+<div class="card"><h3>Jumlah Laporan</h3><p id="totalData">0</p></div>
 
 </div>
 
@@ -225,20 +230,17 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 <ol id="ranking"></ol>
 </div>
 
-</div> <!-- TUTUP dashboardPage -->
+</div>
 
 <div id="tablePage" style="display:none">
+
 <div class="scoreCards">
-  <div class="card">
-    <h3>Total Reguler</h3>
-    <p id="scoreReguler">0 Ha</p>
-  </div>
-  <div class="card">
-    <h3>Total Oplah</h3>
-    <p id="scoreOplah">0 Ha</p>
-  </div>
+<div class="card"><h3>Total Reguler</h3><p id="scoreReguler">0 Ha</p></div>
+<div class="card"><h3>Total Oplah</h3><p id="scoreOplah">0 Ha</p></div>
 </div>
+
 <h2>Rekap Data LTT</h2>
+
 <div class="filter">
 
 <select id="filterKecamatan">
@@ -255,6 +257,7 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 <button onclick="downloadPDF()">Download PDF</button>
 
 </div>
+
 <table id="tableData">
 
 <thead>
@@ -278,6 +281,10 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 
 <script>
 
+function tutupNotif(){
+document.getElementById("notifInfo").style.display="none";
+}
+
 const API_URL="https://script.google.com/macros/s/AKfycbzN3Ak0JmBowwPePkwIIzIonYgGOEM9muR2V8ic5Z92LaqV1LriWdWlIBhNn5DA8ffT/exec";
 
 let rawData=[];
@@ -287,20 +294,17 @@ function formatDate(date){
 if(!date) return "";
 return date.toString().slice(0,10);
 }
+
 function showPage(page){
 
 document.getElementById("dashboardPage").style.display="none";
 document.getElementById("tablePage").style.display="none";
 
-if(page==="dashboard"){
-document.getElementById("dashboardPage").style.display="block";
-}
-
-if(page==="tabel"){
-document.getElementById("tablePage").style.display="block";
-}
+if(page==="dashboard") document.getElementById("dashboardPage").style.display="block";
+if(page==="tabel") document.getElementById("tablePage").style.display="block";
 
 }
+
 async function loadData(){
 
 const res=await fetch(API_URL);
@@ -341,7 +345,6 @@ select.onchange=render;
 document.getElementById("filterTanggal").onchange=render;
 document.getElementById("filterJenis").onchange=render;
 
-
 }
 
 function render(){
@@ -357,19 +360,17 @@ let cocok=true;
 if(kecFilter && d.KECAMATAN!=kecFilter) cocok=false;
 if(tglFilter && d.TANGGAL!=tglFilter) cocok=false;
 if(jenisFilter && d["JENIS LTT"]!=jenisFilter) cocok=false;
+
 return cocok;
 
 });
 
 let total=0;
 let today=0;
-
 let totalReguler=0;
 let totalOplah=0;
-
 let todayReguler=0;
 let todayOplah=0;
-
 let kecMap={};
 
 let tbody=document.querySelector("#tableData tbody");
@@ -385,37 +386,19 @@ total += luas;
 
 let jenis = (d["JENIS LTT"] || "").toLowerCase();
 
-/* REGULER */
-
 if(jenis.includes("reguler")){
 totalReguler += luas;
-
-if(d.TANGGAL == todayStr){
-todayReguler += luas;
+if(d.TANGGAL == todayStr) todayReguler += luas;
 }
-}
-
-/* OPLAH */
 
 if(jenis.includes("oplah")){
 totalOplah += luas;
-
-if(d.TANGGAL == todayStr){
-todayOplah += luas;
-}
+if(d.TANGGAL == todayStr) todayOplah += luas;
 }
 
-/* TOTAL HARI INI */
-
-if(d.TANGGAL == todayStr){
-today += luas;
-}
-
-/* REKAP KECAMATAN */
+if(d.TANGGAL == todayStr) today += luas;
 
 kecMap[d.KECAMATAN] = (kecMap[d.KECAMATAN] || 0) + luas;
-
-/* TAMBAH BARIS TABEL */
 
 tbody.innerHTML+=`
 <tr>
@@ -439,13 +422,15 @@ document.getElementById("totalReguler").innerText=totalReguler+" Ha";
 document.getElementById("totalOplah").innerText=totalOplah+" Ha";
 document.getElementById("todayReguler").innerText=todayReguler+" Ha";
 document.getElementById("todayOplah").innerText=todayOplah+" Ha";
-// **update kartu skor di halaman tabel**
-    if(document.getElementById("scoreReguler")){
-    document.getElementById("scoreReguler").innerText = totalReguler + " Ha";
+
+if(document.getElementById("scoreReguler")){
+document.getElementById("scoreReguler").innerText = totalReguler + " Ha";
 }
+
 if(document.getElementById("scoreOplah")){
-    document.getElementById("scoreOplah").innerText = totalOplah + " Ha";
+document.getElementById("scoreOplah").innerText = totalOplah + " Ha";
 }
+
 renderChart(kecMap);
 renderRanking(kecMap);
 
@@ -504,44 +489,14 @@ document.getElementById("ranking").innerHTML=html;
 
 }
 
+/* =========================
+   DOWNLOAD EXCEL
+   ========================= */
+
 function downloadExcel(){
 
-let kecFilter=document.getElementById("filterKecamatan").value;
-let tglFilter=document.getElementById("filterTanggal").value;
-let jenisFilter=document.getElementById("filterJenis").value;
+let ws = XLSX.utils.table_to_sheet(document.getElementById("tableData"));
 
-let data=rawData.filter(d=>{
-
-let cocok=true;
-
-if(kecFilter && d.KECAMATAN!=kecFilter) cocok=false;
-if(tglFilter && d.TANGGAL!=tglFilter) cocok=false;
-if(jenisFilter && d["JENIS LTT"]!=jenisFilter) cocok=false;
-
-return cocok;
-
-});
-
-let excelData = data.map(d=>({
-Tanggal:d.TANGGAL,
-Kecamatan:d.KECAMATAN,
-Desa:d.DESA,
-Poktan:d["KELOMPOK TANI"],
-Jenis:d["JENIS LTT"],
-Luas:d["LUAS TAMBAH TANAM"],
-Pelapor:d["NAMA PELAPOR"]
-}));
-
-let ws = XLSX.utils.json_to_sheet(excelData);
-ws['!cols'] = [
-{wch:12},
-{wch:18},
-{wch:18},
-{wch:20},
-{wch:10},
-{wch:8},
-{wch:25}
-];
 let wb = XLSX.utils.book_new();
 XLSX.utils.book_append_sheet(wb, ws, "LTT");
 
@@ -549,9 +504,9 @@ XLSX.writeFile(wb,"Laporan_LTT.xlsx");
 
 }
 
-/* =======================
-   DOWNLOAD PDF (PERBAIKAN)
-   ======================= */
+/* =========================
+   DOWNLOAD PDF
+   ========================= */
 
 function downloadPDF(){
 
@@ -563,33 +518,6 @@ unit:"mm",
 format:"a4"
 });
 
-let kecFilter=document.getElementById("filterKecamatan").value;
-let tglFilter=document.getElementById("filterTanggal").value;
-let jenisFilter=document.getElementById("filterJenis").value;
-
-let data=rawData.filter(d=>{
-
-let cocok=true;
-
-if(kecFilter && d.KECAMATAN!=kecFilter) cocok=false;
-if(tglFilter && d.TANGGAL!=tglFilter) cocok=false;
-if(jenisFilter && d["JENIS LTT"]!=jenisFilter) cocok=false;
-
-return cocok;
-
-});
-
-let rows=data.map(d=>[
-d.TANGGAL,
-d.KECAMATAN,
-d.DESA,
-d["KELOMPOK TANI"],
-d["JENIS LTT"],
-d["LUAS TAMBAH TANAM"],
-d["NAMA PELAPOR"]
-]);
-
-
 doc.setFontSize(16);
 doc.text("Laporan Luas Tambah Tanam (LTT)",14,15);
 
@@ -600,12 +528,8 @@ doc.autoTable({
 html:"#tableData",
 startY:28,
 theme:"grid",
-styles:{
-fontSize:8
-},
-headStyles:{
-fillColor:[46,125,50]
-}
+styles:{ fontSize:8 },
+headStyles:{ fillColor:[46,125,50] }
 });
 
 doc.save("Laporan_LTT.pdf");
