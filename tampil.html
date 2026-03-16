@@ -14,12 +14,6 @@ background:url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/
 background-size:cover;
 margin:0;
 padding:20px;
-animation:fadeBody 1s ease;
-}
-
-@keyframes fadeBody{
-from{opacity:0}
-to{opacity:1}
 }
 
 header{
@@ -32,11 +26,7 @@ margin-bottom:20px;
 box-shadow:0 6px 12px rgba(0,0,0,0.25);
 }
 
-header h2{
-margin:0;
-font-weight:600;
-letter-spacing:.5px;
-}
+header h2{margin:0;}
 
 .dashboard-info{
 margin-top:8px;
@@ -49,7 +39,6 @@ background:rgba(255,255,255,0.93);
 padding:20px;
 border-radius:12px;
 box-shadow:0 6px 15px rgba(0,0,0,0.2);
-backdrop-filter:blur(4px);
 }
 
 .filter-container{
@@ -60,13 +49,12 @@ flex-wrap:wrap;
 margin-bottom:15px;
 }
 
-select,input[type="text"]{
+select,input{
 padding:8px 10px;
 border-radius:6px;
 border:1px solid #ccc;
 font-size:14px;
 background:white;
-transition:.2s;
 }
 
 input[type="text"]{width:200px;}
@@ -79,7 +67,7 @@ margin-bottom:10px;
 flex-wrap:wrap;
 }
 
-button,.btn-action{
+button{
 background:#2d6a4f;
 color:white;
 border:none;
@@ -88,15 +76,15 @@ border-radius:6px;
 cursor:pointer;
 font-size:13px;
 font-weight:600;
-transition:.25s;
 }
 
-button:hover,.btn-action:hover{
-background:#1b4332;
-}
+button:hover{background:#1b4332;}
 
-.btn-danger{
-background:#d9534f;
+.btn-danger{background:#d9534f;}
+
+.table-frame{
+width:100%;
+overflow-x:auto;
 }
 
 table{
@@ -111,7 +99,6 @@ padding:8px;
 font-size:13px;
 text-align:left;
 max-width:150px;
-word-wrap:break-word;
 }
 
 th{
@@ -120,22 +107,7 @@ color:white;
 text-align:center;
 }
 
-tr:nth-child(even){
-background:#f3f6f4;
-}
-
-tr:hover{
-background:#e6f4ec;
-}
-
-/* FRAME SCROLL TABEL */
-
-.table-frame{
-width:100%;
-overflow-x:auto;
-border-radius:8px;
-box-shadow:0 3px 6px rgba(0,0,0,0.1);
-}
+tr:nth-child(even){background:#f3f6f4;}
 
 .total-box{
 margin-top:15px;
@@ -159,49 +131,10 @@ color:#555;
 text-align:center;
 padding:30px;
 font-size:15px;
-color:#666;
-}
-
-.spinner{
-border:4px solid #eee;
-border-top:4px solid #2d6a4f;
-border-radius:50%;
-width:35px;
-height:35px;
-animation:spin 1s linear infinite;
-margin:auto;
-}
-
-@keyframes spin{
-0%{transform:rotate(0)}
-100%{transform:rotate(360deg)}
 }
 
 @media print{
-
-@page{
-size:legal landscape;
-margin:10mm;
-}
-
-.filter-container,
-.action-bar,
-button{
-display:none;
-}
-
-body{
-background:none;
-}
-
-.content{
-box-shadow:none;
-}
-
-table{
-font-size:11px;
-}
-
+.filter-container,.action-bar{display:none;}
 }
 
 </style>
@@ -219,6 +152,7 @@ Sistem Monitoring Produksi dan Stok Penggilingan
 <div class="content">
 
 <div class="filter-container">
+
 <select id="filterBulan">
 <option value="">🗓️ Semua Bulan</option>
 </select>
@@ -227,7 +161,10 @@ Sistem Monitoring Produksi dan Stok Penggilingan
 <option value="">🏭 Semua Penggilingan</option>
 </select>
 
+<input type="date" id="filterTanggal">
+
 <input type="text" id="search" placeholder="🔍 Cari data...">
+
 </div>
 
 <div class="action-bar">
@@ -236,10 +173,7 @@ Sistem Monitoring Produksi dan Stok Penggilingan
 <button onclick="downloadPDF()">📄 PDF</button>
 </div>
 
-<div id="data-container" class="loading">
-<div class="spinner"></div>
-<p>Memuat data...</p>
-</div>
+<div id="data-container" class="loading">Memuat data...</div>
 
 <div id="data-count" class="data-count"></div>
 
@@ -249,7 +183,6 @@ Sistem Monitoring Produksi dan Stok Penggilingan
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-<!-- PDF LIBRARY -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 
@@ -261,8 +194,6 @@ let allData=[];
 
 async function loadData(){
 
-try{
-
 const res=await fetch(url);
 const data=await res.json();
 
@@ -270,13 +201,6 @@ allData=data;
 
 populateFilters(data);
 renderTable();
-
-}catch(err){
-
-document.getElementById("data-container").innerHTML=
-"<p style='color:red'>❌ Gagal memuat data</p>";
-
-}
 
 }
 
@@ -304,16 +228,12 @@ bulanSet.add(getNamaBulan(r[0]));
 penggilinganSet.add(r[1]);
 });
 
-const bulanSelect=document.getElementById("filterBulan");
-
 bulanSet.forEach(b=>{
-bulanSelect.innerHTML+=`<option value="${b}">${b}</option>`;
+document.getElementById("filterBulan").innerHTML+=`<option value="${b}">${b}</option>`;
 });
 
-const penggSelect=document.getElementById("filterPenggilingan");
-
 penggilinganSet.forEach(p=>{
-penggSelect.innerHTML+=`<option value="${p}">${p}</option>`;
+document.getElementById("filterPenggilingan").innerHTML+=`<option value="${p}">${p}</option>`;
 });
 
 }
@@ -323,19 +243,21 @@ function getFilteredRows(){
 const rows=allData.slice(1);
 
 const searchValue=document.getElementById("search").value.toLowerCase();
-
 const selectedBulan=document.getElementById("filterBulan").value;
 const selectedPenggilingan=document.getElementById("filterPenggilingan").value;
+const selectedTanggal=document.getElementById("filterTanggal").value;
 
 return rows.filter(row=>{
 
 const bulan=getNamaBulan(row[0]);
+const tanggal=row[0]?.split("T")[0];
 
 const cocokBulan=!selectedBulan||bulan===selectedBulan;
 const cocokPenggilingan=!selectedPenggilingan||row[1]===selectedPenggilingan;
+const cocokTanggal=!selectedTanggal||tanggal===selectedTanggal;
 const cocokSearch=row.join(" ").toLowerCase().includes(searchValue);
 
-return cocokBulan&&cocokPenggilingan&&cocokSearch;
+return cocokBulan&&cocokPenggilingan&&cocokTanggal&&cocokSearch;
 
 });
 
@@ -376,42 +298,23 @@ html+="</table></div>";
 
 document.getElementById("data-container").innerHTML=html;
 
-document.getElementById("data-count").innerHTML=
-"Jumlah Data Ditampilkan : "+rows.length;
+document.getElementById("data-count").innerHTML="Jumlah Data Ditampilkan : "+rows.length;
 
-const totalGKP=sumUnique(rows,4);
-const totalGKG=sumUnique(rows,8);
-const totalBeras=sumUnique(rows,12);
 const totalProduksi=sumUnique(rows,17);
 
-const ton=n=>(n/1000).toFixed(2);
-
 document.getElementById("total-container").innerHTML=
-
-rows.length>0?
-
-`Total Produksi Beras: ${ton(totalProduksi)} Ton | 
-Total Stok GKP: ${ton(totalGKP)} Ton | 
-Total Stok GKG: ${ton(totalGKG)} Ton | 
-Total Stok Beras: ${ton(totalBeras)} Ton`
-
-:"";
+`Total Produksi Beras : ${(totalProduksi/1000).toFixed(2)} Ton`;
 
 }
 
-function printTable(){
-window.print();
-}
+function printTable(){window.print();}
 
 function downloadExcel(){
 
 const rows=getFilteredRows();
 const header=allData[0];
 
-const data=[header,...rows];
-
-const ws=XLSX.utils.aoa_to_sheet(data);
-
+const ws=XLSX.utils.aoa_to_sheet([header,...rows]);
 const wb=XLSX.utils.book_new();
 
 XLSX.utils.book_append_sheet(wb,ws,"Laporan");
@@ -420,23 +323,35 @@ XLSX.writeFile(wb,"Laporan_Stok_Harga.xlsx");
 
 }
 
-/* DOWNLOAD PDF */
-
 function downloadPDF(){
 
-const { jsPDF } = window.jspdf;
+const {jsPDF}=window.jspdf;
 
-const doc = new jsPDF('l','mm','legal');
+const doc=new jsPDF('l','mm','legal');
 
-const header = allData[0];
-const rows = getFilteredRows();
+const header=allData[0];
+const rows=getFilteredRows();
 
-doc.text("Laporan Stok & Harga Gabah Beras",14,15);
+const tanggalCetak=new Date().toLocaleDateString("id-ID");
+
+doc.setFontSize(16);
+doc.text("LAPORAN STOK DAN HARGA GABAH BERAS",14,15);
+
+doc.setFontSize(10);
+doc.text("Tanggal Cetak : "+tanggalCetak,14,22);
+
+const filterBulan=document.getElementById("filterBulan").value||"Semua";
+const filterPenggilingan=document.getElementById("filterPenggilingan").value||"Semua";
+const filterTanggal=document.getElementById("filterTanggal").value||"Semua";
+
+doc.text("Filter Bulan : "+filterBulan,14,28);
+doc.text("Filter Penggilingan : "+filterPenggilingan,14,34);
+doc.text("Filter Tanggal : "+filterTanggal,14,40);
 
 doc.autoTable({
 head:[header],
 body:rows,
-startY:20,
+startY:45,
 styles:{fontSize:8},
 theme:'grid'
 });
@@ -447,6 +362,7 @@ doc.save("Laporan_Stok_Harga.pdf");
 
 document.getElementById("filterBulan").addEventListener("change",renderTable);
 document.getElementById("filterPenggilingan").addEventListener("change",renderTable);
+document.getElementById("filterTanggal").addEventListener("change",renderTable);
 document.getElementById("search").addEventListener("input",renderTable);
 
 loadData();
