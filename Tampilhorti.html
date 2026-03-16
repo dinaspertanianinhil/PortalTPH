@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard Harga Hortikultura</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+font-family:Segoe UI,system-ui,sans-serif;
+margin:0;
+padding:20px;
+background:
+linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)),
+url("https://voxntt.com/wp-content/uploads/2018/07/sayur-dan-buah-sehat.jpg") center/cover fixed;
+}
+
+.container{
+max-width:1300px;
+margin:auto;
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:20px;
+margin-bottom:20px;
+}
+
+.header img{height:70px}
+
+.title{color:white}
+
+.title h1{margin:0;font-size:26px}
+
+.title small{font-size:15px;opacity:.9}
+
+.card{
+background:white;
+border-radius:14px;
+padding:20px;
+margin-bottom:20px;
+box-shadow:0 10px 25px rgba(0,0,0,.2);
+}
+
+.flex{
+display:flex;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.stat{
+flex:1;
+min-width:220px;
+background:#f7f7f7;
+border-radius:12px;
+padding:15px;
+}
+
+.stat h3{
+margin:0;
+font-size:15px;
+color:#555;
+}
+
+.stat span{
+font-size:20px;
+font-weight:600;
+}
+
+.green{color:#27ae60}
+.red{color:#e74c3c}
+.gold{color:#f39c12}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #eee;
+text-align:left;
+}
+
+th{background:#f2f2f2}
+
+.controls{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:15px;
+flex-wrap:wrap;
+gap:10px;
+}
+
+button{
+padding:10px 16px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:#27ae60;
+color:white;
+font-weight:600;
+}
+
+.menu{
+margin-bottom:20px;
+display:flex;
+gap:10px;
+}
+
+canvas{max-height:350px}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png">
+<div class="title">
+<h1>Bidang Tanaman Pangan dan Hortikultura</h1>
+<small>Dinas Pertanian Kabupaten Indragiri Hilir</small>
+</div>
+</div>
+
+<div class="menu">
+<button onclick="showPage('dashboard')">Dashboard</button>
+<button onclick="showPage('rekap')">Rekap Harga</button>
+</div>
+
+<!-- DASHBOARD -->
+
+<div id="dashboardPage">
+
+<div class="card">
+<div class="flex">
+<div class="stat">
+<h3>🔺 Harga Naik</h3>
+<span class="green" id="naik">-</span>
+</div>
+<div class="stat">
+<h3>🔻 Harga Turun</h3>
+<span class="red" id="turun">-</span>
+</div>
+<div class="stat">
+<h3>⭐ Komoditi Termahal</h3>
+<span class="gold" id="mahal">-</span>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>Grafik Harga</h3>
+<canvas id="chartHarga"></canvas>
+</div>
+
+</div>
+
+<!-- REKAP -->
+
+<div id="rekapPage" style="display:none">
+
+<div class="card">
+
+<div class="controls">
+<div>
+Filter Tanggal :
+<input type="date" id="filterTanggal">
+<button onclick="loadData('rekap')">Tampilkan</button>
+</div>
+<div>
+<button onclick="downloadExcel()">Download Excel</button>
+<button onclick="downloadPDF()">Download PDF</button>
+</div>
+</div>
+
+</div>
+
+<div class="card">
+<h3>Tabel Harga</h3>
+
+<table id="tabelHarga">
+<thead>
+<tr>
+<th>Komoditi</th>
+<th>Harga Grosir</th>
+<th>Harga Eceran</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+const API_URL="https://script.google.com/macros/s/AKfycbyYQgrvHuFSXP8fCY8U_bQ9ZROkjYFlwU9jfH4W2vc6wYC7pi6MZf2Sw2hH88igBkcE/exec"
+
+let chart
+let allData=[]
+
+function showPage(page){
+    document.getElementById("dashboardPage").style.display="none"
+    document.getElementById("rekapPage").style.display="none"
+    if(page==="dashboard") document.getElementById("dashboardPage").style.display="block"
+    if(page==="rekap") document.getElementById("rekapPage").style.display="block"
+}
+
+// loadData tunggal untuk dashboard & rekap
+async function loadData(targetPage = "dashboard"){
+    const tanggal=document.getElementById("filterTanggal").value
+    let url=API_URL
+    if(tanggal) url+="?tanggal="+tanggal
+
+    const res=await fetch(url)
+    const data=await res.json()
+    allData=data
+
+    if(targetPage === "rekap"){
+        renderTable(data) // hanya tabel
+    } else {
+        renderTable(data)
+        renderChart(data)
+        hitungStat(data)
+    }
+}
+
+function renderTable(data){
+    const tbody=document.querySelector("#tabelHarga tbody")
+    tbody.innerHTML=""
+    data.forEach(d=>{
+        const tr=document.createElement("tr")
+        tr.innerHTML=`
+            <td>${d.komoditi}</td>
+            <td>${d.grosir}</td>
+            <td>${d.eceran}</td>
+        `
+        tbody.appendChild(tr)
+    })
+}
+
+function hitungStat(data){
+    if(data.length==0) return
+    let max=data.reduce((a,b)=>a.eceran>b.eceran?a:b)
+    document.getElementById("mahal").innerText=max.komoditi+" (Rp "+max.eceran+")"
+    let naik=0
+    let turun=0
+    data.forEach(d=>{
+        if(d.eceran>0 && d.grosir>0){
+            if(d.eceran>d.grosir) naik++
+            if(d.eceran<d.grosir) turun++
+        }
+    })
+    document.getElementById("naik").innerText=naik+" Komoditi"
+    document.getElementById("turun").innerText=turun+" Komoditi"
+}
+
+function renderChart(data){
+    const labels=data.map(d=>d.komoditi)
+    const grosir=data.map(d=>d.grosir)
+    const eceran=data.map(d=>d.eceran)
+    if(chart) chart.destroy()
+    chart=new Chart(
+        document.getElementById("chartHarga"),
+        {
+            type:"bar",
+            data:{
+                labels:labels,
+                datasets:[
+                    {label:"Harga Grosir",data:grosir},
+                    {label:"Harga Eceran",data:eceran}
+                ]
+            },
+            options:{responsive:true}
+        }
+    )
+}
+
+function downloadExcel(){
+    const table=document.getElementById("tabelHarga")
+    const wb=XLSX.utils.table_to_book(table)
+    XLSX.writeFile(wb,"Harga_Hortikultura.xlsx")
+}
+
+async function downloadPDF(){
+    const { jsPDF } = window.jspdf
+    const doc = new jsPDF()
+    doc.setFontSize(16)
+    doc.text("Rekap Harga Hortikultura",20,20)
+    const tanggal=document.getElementById("filterTanggal").value
+    if(tanggal) doc.text("Tanggal : "+tanggal,20,30)
+    let y=40
+    doc.setFontSize(11)
+    document.querySelectorAll("#tabelHarga tbody tr").forEach(r=>{
+        const col=r.children
+        doc.text(col[0].innerText,20,y)
+        doc.text("Grosir : "+col[1].innerText,90,y)
+        doc.text("Eceran : "+col[2].innerText,150,y)
+        y+=10
+        if(y>280){ doc.addPage(); y=20 }
+    })
+    doc.save("Rekap_Harga_Hortikultura.pdf")
+}
+
+// load dashboard awal
+loadData("dashboard")
+</script>
+
+</body>
+</html>
