@@ -170,6 +170,23 @@ button:disabled {
 </div>
 
 <script>
+  function formatAngka(el){
+  let val = el.value;
+
+  // ubah titik jadi koma
+  val = val.replace(/\./g, ',');
+
+  // hanya angka & koma
+  val = val.replace(/[^0-9,]/g, '');
+
+  // hanya 1 koma
+  const parts = val.split(',');
+  if(parts.length > 2){
+    val = parts[0] + ',' + parts.slice(1).join('');
+  }
+
+  el.value = val;
+}
 /* FORMAT OTOMATIS KAPITAL AWAL KATA */
 function formatKapital(el) {
   let text = el.value;
@@ -204,7 +221,7 @@ function tambahPoktan(btn) {
   p.className = "poktan";
   p.innerHTML = `
     <input type="text" placeholder="Nama Poktan" oninput="formatKapital(this)">
-    <input type="number" step="0.01" placeholder="Luas (Ha)" oninput="hitung()">
+    <input type="text" placeholder="Luas (Ha)" oninput="formatAngka(this); hitung()">
     <select onchange="hitung()">
       <option value="reguler">Reguler</option>
       <option value="oplah">OPLAH</option>
@@ -237,32 +254,34 @@ function hitung() {
   };
 
   document.querySelectorAll(".poktan").forEach(p => {
-    const luas = parseFloat(p.children[1].value) || 0;
-    const jenis = p.children[2].value;
+  const luas = parseFloat(
+  (p.children[1].value || "0").replace(/,/g, ".")
+) || 0;
+  const jenis = p.children[2].value;
 
-    if (total.hasOwnProperty(jenis)) {
-      total[jenis] += luas;
-    }
-  });
+  if (total.hasOwnProperty(jenis)) {
+    total[jenis] += luas;
+  }
+});
 
-  reguler.innerText = total.reguler.toFixed(2);
-  oplah.innerText   = total.oplah.toFixed(2);
-  csr.innerText     = total.csr.toFixed(2);
-  pompa.innerText   = total.pompa.toFixed(2);
-  das.innerText     = total.das.toFixed(2);
-  padi.innerText    = total.tusip.toFixed(2);
-  gogo.innerText    = total.gogo.toFixed(2);
-  jagung.innerText  = total.jagung.toFixed(2);
-  jagung_polri.innerText = total.jagung_polri.toFixed(2);
-  kedelai.innerText = total.kedelai.toFixed(2);
+  reguler.innerText = total.reguler.toFixed(2).replace(".", ",");
+oplah.innerText   = total.oplah.toFixed(2).replace(".", ",");
+csr.innerText     = total.csr.toFixed(2).replace(".", ",");
+pompa.innerText   = total.pompa.toFixed(2).replace(".", ",");
+das.innerText     = total.das.toFixed(2).replace(".", ",");
+padi.innerText    = total.tusip.toFixed(2).replace(".", ",");
+gogo.innerText    = total.gogo.toFixed(2).replace(".", ",");
+jagung.innerText  = total.jagung.toFixed(2).replace(".", ",");
+jagung_polri.innerText = total.jagung_polri.toFixed(2).replace(".", ",");
+kedelai.innerText = total.kedelai.toFixed(2).replace(".", ",");
 }
 </script>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzb05XYKJGjg6ksbzsJMEbhTjgeVhA4LvuJ904jJo4DCm3UDwiAL9ttPc_gD7Qej3oI/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyEsqdUGIser0k4WkCn66CMxsHGZbY5gM1dDzMW4QaRBzjZxkuQLZD-ZT4nAIIQjqYC/exec";
 
 function simpan() {
-  const btn = document.getElementById("btnSimpan");
+    const btn = document.getElementById("btnSimpan");
 
   if (btn.disabled) return;
 
@@ -282,11 +301,11 @@ function simpan() {
 
     desaBox.querySelectorAll(".poktan").forEach(p => {
       rows.push({
-        desa,
-        poktan: p.children[0].value,
-        luas: p.children[1].value,
-        jenis: p.children[2].value
-      });
+  desa,
+  poktan: p.children[0].value,
+  luas: (p.children[1].value || "0").replace(/\./g, ","), // 🔥 paksa koma
+  jenis: p.children[2].value
+});
     });
   });
 
