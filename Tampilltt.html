@@ -4,162 +4,48 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Maintenance Dashboard LTT</title>
+<title>Dashboard LTT</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 
 <style>
-
-body{
-margin:0;
-font-family:Segoe UI,Arial;
-background:linear-gradient(rgba(255,255,255,0.9),rgba(255,255,255,0.9)),
-url('https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-rice-fields-with-green-rice-with-dew-and-mountains-image_15860694.jpg');
-background-size:cover;
-background-attachment:fixed;
-overflow:hidden;
-}
-
-/* HEADER */
-header{
-display:flex;
-align-items:center;
-gap:15px;
-padding:15px 25px;
-background:#1b5e20;
-color:white;
-z-index:2;
-position:relative;
-}
-
+/* CSS ASLI - TIDAK DIUBAH */
+.infoNotif{background:#fff3cd;border-left:6px solid #ff9800;padding:12px 40px 12px 15px;margin-bottom:30px;border-radius:6px;position:relative;font-size:14px;box-shadow:0 2px 6px rgba(0,0,0,0.1);animation:slideDown .4s ease;}
+.infoNotif b{ color:#b26a00; }
+.closeNotif{position:absolute;right:12px;top:8px;cursor:pointer;font-size:18px;font-weight:bold;color:#666;}
+.closeNotif:hover{ color:black; }
+@keyframes slideDown{from{ transform:translateY(-10px); opacity:0; }to{ transform:translateY(0); opacity:1; }}
+.scoreCards{display:flex;gap:15px;margin-bottom:20px;}
+.scoreCards .card{padding:10px 15px;border-radius:8px;background:white;box-shadow:0 2px 6px rgba(0,0,0,0.15);}
+body{margin:0;font-family:Segoe UI,Arial;background-image:url('https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-rice-fields-with-green-rice-with-dew-and-mountains-image_15860694.jpg');background-size:cover;background-attachment:fixed;}
+.overlay{background:rgba(255,255,255,0.92);min-height:100vh;}
+header{display:flex;align-items:center;gap:15px;padding:15px 25px;background:#1b5e20;color:white;}
 header img{ width:55px; }
-
-header h1{
-font-size:18px;
-margin:0;
-}
-
-/* CONTAINER */
-.container{
-height:calc(100vh - 80px);
-display:flex;
-justify-content:center;
-align-items:center;
-text-align:center;
-padding:20px;
-}
-
-/* CARD */
-.card{
-background:white;
-padding:50px 35px;
-border-radius:16px;
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
-max-width:520px;
-width:100%;
-position:relative;
-overflow:hidden;
-}
-
-/* Glow effect */
-.card::before{
-content:"";
-position:absolute;
-width:200%;
-height:200%;
-background:radial-gradient(circle,#66bb6a33,transparent 70%);
-top:-50%;
-left:-50%;
-animation:rotateGlow 6s linear infinite;
-}
-
-@keyframes rotateGlow{
-from{transform:rotate(0deg);}
-to{transform:rotate(360deg);}
-}
-
-/* ICON ANIMASI */
-.icon{
-font-size:65px;
-margin-bottom:15px;
-animation:bounce 1.5s infinite;
-}
-
-@keyframes bounce{
-0%,100%{transform:translateY(0);}
-50%{transform:translateY(-8px);}
-}
-
-/* TEXT */
-h2{
-margin:10px 0;
-color:#1b5e20;
-}
-
-p{
-font-size:14px;
-color:#555;
-}
-
-/* PROGRESS BAR */
-.progress{
-height:10px;
-background:#eee;
-border-radius:10px;
-overflow:hidden;
-margin-top:20px;
-}
-
-.progress-bar{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,#43a047,#66bb6a);
-animation:loading 5s infinite;
-}
-
-@keyframes loading{
-0%{width:10%;}
-50%{width:70%;}
-100%{width:100%;}
-}
-
-/* DOT LOADING */
-.loading{
-margin-top:15px;
-font-size:14px;
-color:#777;
-}
-
-.loading span{
-animation:blink 1.4s infinite;
-}
-
-.loading span:nth-child(2){ animation-delay:0.2s; }
-.loading span:nth-child(3){ animation-delay:0.4s; }
-
-@keyframes blink{
-0%,80%,100%{opacity:0;}
-40%{opacity:1;}
-}
-
-/* FLOATING ICON BACKGROUND */
-.bg-icon{
-position:absolute;
-font-size:100px;
-color:#2e7d3210;
-animation:float 6s ease-in-out infinite;
-}
-
-.bg1{ top:10%; left:5%; }
-.bg2{ bottom:10%; right:5%; animation-delay:2s; }
-
-@keyframes float{
-0%,100%{transform:translateY(0);}
-50%{transform:translateY(-20px);}
-}
-
+header h1{font-size:18px;margin:0;}
+.container{padding:20px;max-width:1200px;margin:auto;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px;}
+.card{background:white;padding:15px;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.15);}
+.card h3{margin:0;font-size:13px;color:#666;}
+.card p{font-size:26px;margin:5px 0;font-weight:bold;}
+.filter{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+button{padding:8px 12px;border:none;background:#2e7d32;color:white;border-radius:5px;cursor:pointer;}
+button:hover{ background:#1b5e20; }
+table{width:100%;border-collapse:collapse;background:white;margin-top:20px;}
+th{background:#2e7d32;color:white;padding:8px;font-size:13px;}
+td{padding:8px;border-bottom:1px solid #eee;font-size:13px;}
+tr:hover{ background:#f1f8e9; }
+.chartbox{background:white;padding:20px;margin-top:20px;border-radius:10px;}
+.rankbox{background:white;padding:15px;margin-top:20px;border-radius:10px;}
 </style>
 </head>
 
 <body>
+
+<div class="overlay">
 
 <header>
 <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png">
@@ -171,34 +57,152 @@ Dinas Pertanian Kabupaten Indragiri Hilir
 
 <div class="container">
 
-<div class="card">
-
-<div class="bg-icon bg1">🌾</div>
-<div class="bg-icon bg2">⚙️</div>
-
-<div class="icon">🛠️</div>
-
-<h2>Sistem Sedang Dalam Perbaikan</h2>
-
-<p>
-Dashboard <b>Luas Tambah Tanam (LTT)</b> sedang menjalani peningkatan sistem.
-</p>
-
-<p>
-Kami sedang memastikan performa lebih stabil, cepat, dan akurat untuk mendukung pelaporan yang lebih optimal.
-</p>
-
-<div class="progress">
-<div class="progress-bar"></div>
+<div id="notifInfo" class="infoNotif">
+<span class="closeNotif" onclick="tutupNotif()">✕</span>
+⚠ <b>Informasi:</b>  
+Data <b>Final Luas Tambah Tanam (LTT)</b> bisa dapat dipastikan setelah pukul <b>15.00 WIB</b>.
 </div>
 
-<div class="loading">
-Kembali Lagi Nanti... Terima Kasih<span>.</span><span>.</span><span>.</span>
+<div style="margin-bottom:20px">
+<button onclick="showPage('dashboard')">Dashboard</button>
+<button onclick="showPage('tabel')">Rekap Data LTT</button>
+</div>
+
+<div id="dashboardPage">
+<div class="cards">
+<div class="card"><h3>Total LTT</h3><p id="totalLtt">0</p></div>
+<div class="card"><h3>LTT Reguler</h3><p id="totalReguler">0</p></div>
+<div class="card"><h3>LTT Oplah</h3><p id="totalOplah">0</p></div>
+<div class="card"><h3>LTT Hari Ini</h3><p id="todayLtt">0</p></div>
+<div class="card"><h3>Reguler Hari Ini</h3><p id="todayReguler">0</p></div>
+<div class="card"><h3>Oplah Hari Ini</h3><p id="todayOplah">0</p></div>
+<div class="card"><h3>Jumlah Kecamatan</h3><p id="totalKec">0</p></div>
+<div class="card"><h3>Jumlah Laporan</h3><p id="totalData">0</p></div>
+</div>
+
+<div class="chartbox">
+<canvas id="chartKecamatan"></canvas>
+</div>
+
+<div class="rankbox">
+<h3>Ranking Kecamatan</h3>
+<ol id="ranking"></ol>
+</div>
+</div>
+
+<div id="tablePage" style="display:none">
+<div class="scoreCards">
+<div class="card"><h3>Total Reguler</h3><p id="scoreReguler">0 Ha</p></div>
+<div class="card"><h3>Total Oplah</h3><p id="scoreOplah">0 Ha</p></div>
+</div>
+
+<h2>Rekap Data LTT</h2>
+
+<div class="filter">
+<select id="filterKecamatan"><option value="">Semua Kecamatan</option></select>
+<select id="filterJenis"><option value="">Semua Jenis LTT</option></select>
+<input type="date" id="filterTanggal">
+<button onclick="downloadExcel()">Download Excel</button>
+<button onclick="downloadPDF()">Download PDF</button>
+</div>
+
+<table id="tableData">
+<thead>
+<tr>
+<th>Tanggal</th>
+<th>Kecamatan</th>
+<th>Desa</th>
+<th>Poktan</th>
+<th>Jenis</th>
+<th>Luas</th>
+<th>Pelapor</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
 </div>
 
 </div>
 
-</div>
+<script>
+
+function tutupNotif(){document.getElementById("notifInfo").style.display="none";}
+
+const API_URL="https://script.google.com/macros/s/AKfycbzN3Ak0JmBowwPePkwIIzIonYgGOEM9muR2V8ic5Z92LaqV1LriWdWlIBhNn5DA8ffT/exec";
+
+let rawData=[], chart;
+
+function safeNumber(val){
+return parseFloat((val+"").replace(",", ".")) || 0;
+}
+
+function fix(n){
+return Math.round(n * 100) / 100;
+}
+
+function render(){
+
+let total=0,today=0,totalReguler=0,totalOplah=0,todayReguler=0,todayOplah=0,kecMap={};
+
+let tbody=document.querySelector("#tableData tbody");
+tbody.innerHTML="";
+
+let todayStr=new Date().toISOString().slice(0,10);
+
+rawData.forEach(d=>{
+
+let luas = safeNumber(d["LUAS TAMBAH TANAM"]);
+
+total = fix(total + luas);
+
+let jenis = (d["JENIS LTT"]||"").toLowerCase();
+
+if(jenis.includes("reguler")){
+totalReguler = fix(totalReguler + luas);
+if(d.TANGGAL==todayStr) todayReguler = fix(todayReguler + luas);
+}
+
+if(jenis.includes("oplah")){
+totalOplah = fix(totalOplah + luas);
+if(d.TANGGAL==todayStr) todayOplah = fix(todayOplah + luas);
+}
+
+if(d.TANGGAL==todayStr) today = fix(today + luas);
+
+kecMap[d.KECAMATAN] = fix((kecMap[d.KECAMATAN]||0)+luas);
+
+tbody.innerHTML+=`<tr>
+<td>${d.TANGGAL}</td>
+<td>${d.KECAMATAN}</td>
+<td>${d.DESA}</td>
+<td>${d["KELOMPOK TANI"]}</td>
+<td>${d["JENIS LTT"]}</td>
+<td>${luas.toFixed(2)}</td>
+<td>${d["NAMA PELAPOR"]}</td>
+</tr>`;
+});
+
+document.getElementById("totalLtt").innerText=total.toFixed(2)+" Ha";
+document.getElementById("todayLtt").innerText=today.toFixed(2)+" Ha";
+document.getElementById("totalReguler").innerText=totalReguler.toFixed(2)+" Ha";
+document.getElementById("totalOplah").innerText=totalOplah.toFixed(2)+" Ha";
+document.getElementById("todayReguler").innerText=todayReguler.toFixed(2)+" Ha";
+document.getElementById("todayOplah").innerText=todayOplah.toFixed(2)+" Ha";
+document.getElementById("scoreReguler").innerText=totalReguler.toFixed(2)+" Ha";
+document.getElementById("scoreOplah").innerText=totalOplah.toFixed(2)+" Ha";
+
+}
+
+async function loadData(){
+const res=await fetch(API_URL);
+rawData=await res.json();
+rawData.forEach(d=>d.TANGGAL=(d.TANGGAL||"").toString().slice(0,10));
+render();
+}
+
+loadData();
+
+</script>
 
 </body>
 </html>
