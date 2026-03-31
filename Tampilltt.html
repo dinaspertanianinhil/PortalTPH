@@ -84,7 +84,12 @@ Data <b>Final Luas Tambah Tanam (LTT)</b> bisa dapat dipastikan setelah pukul <b
 <canvas id="chartKecamatan"></canvas>
 </div>
 
+<h3>Grafik Jagung per Kecamatan</h3>
+<canvas id="chartJagung"></canvas>
+
 <div class="rankbox">
+<h3>Ranking Jagung</h3>
+<ol id="rankingJagung"></ol>
 <h3>Ranking Kecamatan</h3>
 <ol id="ranking"></ol>
 </div>
@@ -94,6 +99,7 @@ Data <b>Final Luas Tambah Tanam (LTT)</b> bisa dapat dipastikan setelah pukul <b
 <div class="scoreCards">
 <div class="card"><h3>Total Reguler</h3><p id="scoreReguler">0 Ha</p></div>
 <div class="card"><h3>Total Oplah</h3><p id="scoreOplah">0 Ha</p></div>
+<div class="card"><h3>Total Jagung</h3><p id="scoreJagung">0 Ha</p></div>
 </div>
 
 <h2>Rekap Data LTT</h2>
@@ -134,6 +140,7 @@ const API_URL="https://script.google.com/macros/s/AKfycbzN3Ak0JmBowwPePkwIIzIonY
 
 let rawData=[];
 let chart;
+let chartJagung;
 
 // fungsi aman angka
 function safeNumber(val){
@@ -226,7 +233,10 @@ let totalReguler=0;
 let totalOplah=0;
 let todayReguler=0;
 let todayOplah=0;
+let totalJagung=0;
+let todayJagung=0;
 let kecMap={};
+let kecMapJagung={};
 
 let tbody=document.querySelector("#tableData tbody");
 tbody.innerHTML="";
@@ -241,20 +251,32 @@ total = fix(total + luas);
 
 let jenis = (d["JENIS LTT"] || "").toLowerCase();
 
+// JAGUNG
+if(jenis.includes("jagung")){
+kecMapJagung[d.KECAMATAN] = fix((kecMapJagung[d.KECAMATAN] || 0) + luas);
+totalJagung = fix(totalJagung + luas);
+if(d.TANGGAL == todayStr) todayJagung = fix(todayJagung + luas);
+}
+
+// REGULER
 if(jenis.includes("reguler")){
 totalReguler = fix(totalReguler + luas);
 if(d.TANGGAL == todayStr) todayReguler = fix(todayReguler + luas);
 }
 
+// OPLAH
 if(jenis.includes("oplah")){
 totalOplah = fix(totalOplah + luas);
 if(d.TANGGAL == todayStr) todayOplah = fix(todayOplah + luas);
 }
 
+// TOTAL HARI INI
 if(d.TANGGAL == todayStr) today = fix(today + luas);
 
+// TOTAL PER KEC
 kecMap[d.KECAMATAN] = fix((kecMap[d.KECAMATAN] || 0) + luas);
 
+// TABLE
 tbody.innerHTML+=`
 <tr>
 <td>${d.TANGGAL}</td>
@@ -269,7 +291,7 @@ tbody.innerHTML+=`
 
 });
 
-// OUTPUT FIX
+// OUTPUT
 document.getElementById("totalLtt").innerText = total.toFixed(2)+" Ha";
 document.getElementById("todayLtt").innerText = today.toFixed(2)+" Ha";
 document.getElementById("totalKec").innerText = Object.keys(kecMap).length;
@@ -279,14 +301,19 @@ document.getElementById("totalOplah").innerText = totalOplah.toFixed(2)+" Ha";
 document.getElementById("todayReguler").innerText = todayReguler.toFixed(2)+" Ha";
 document.getElementById("todayOplah").innerText = todayOplah.toFixed(2)+" Ha";
 
+document.getElementById("scoreJagung").innerText = totalJagung.toFixed(2)+" Ha";
 document.getElementById("scoreReguler").innerText = totalReguler.toFixed(2)+" Ha";
 document.getElementById("scoreOplah").innerText = totalOplah.toFixed(2)+" Ha";
 
+// RENDER
 renderChart(kecMap);
 renderRanking(kecMap);
+renderChartJagung(kecMapJagung);
+renderRankingJagung(kecMapJagung);
 
 }
 
+// CHART UTAMA
 function renderChart(data){
 
 if(chart) chart.destroy();
@@ -304,6 +331,25 @@ data:Object.values(data)
 
 }
 
+// CHART JAGUNG
+function renderChartJagung(data){
+
+if(chartJagung) chartJagung.destroy();
+
+chartJagung = new Chart(document.getElementById("chartJagung"),{
+type:"bar",
+data:{
+labels:Object.keys(data),
+datasets:[{
+label:"Jagung per Kecamatan",
+data:Object.values(data)
+}]
+}
+});
+
+}
+
+// RANKING UTAMA
 function renderRanking(data){
 
 let sorted=Object.entries(data).sort((a,b)=>b[1]-a[1]);
@@ -339,6 +385,43 @@ document.getElementById("ranking").innerHTML=html;
 
 }
 
+// RANKING JAGUNG
+function renderRankingJagung(data){
+
+let sorted = Object.entries(data).sort((a,b)=>b[1]-a[1]);
+
+let html = "";
+
+sorted.forEach((r,i)=>{
+
+let medal="";
+if(i==0) medal="🥇";
+else if(i==1) medal="🥈";
+else if(i==2) medal="🥉";
+else medal=`${i+1}.`;
+
+html+=`
+<li style="
+display:flex;
+justify-content:space-between;
+padding:6px 10px;
+margin:4px 0;
+border-radius:6px;
+background:${i<3 ? "#fff3e0" : "#f5f5f5"};
+font-weight:${i<3 ? "bold":"normal"};
+">
+<span>${medal} ${r[0]}</span>
+<span>${r[1].toFixed(2)} Ha</span>
+</li>
+`;
+
+});
+
+document.getElementById("rankingJagung").innerHTML = html;
+
+}
+
+// DOWNLOAD
 function downloadExcel(){
 
 let ws = XLSX.utils.table_to_sheet(document.getElementById("tableData"));
