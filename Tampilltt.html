@@ -126,52 +126,137 @@ Data <b>Final Luas Tambah Tanam (LTT)</b> bisa dapat dipastikan setelah pukul <b
 
 <script>
 
-function tutupNotif(){document.getElementById("notifInfo").style.display="none";}
+function tutupNotif(){
+document.getElementById("notifInfo").style.display="none";
+}
 
 const API_URL="https://script.google.com/macros/s/AKfycbzN3Ak0JmBowwPePkwIIzIonYgGOEM9muR2V8ic5Z92LaqV1LriWdWlIBhNn5DA8ffT/exec";
 
-let rawData=[], chart;
+let rawData=[];
+let chart;
 
+// fungsi aman angka
 function safeNumber(val){
 return parseFloat((val+"").replace(",", ".")) || 0;
 }
 
+// pembulatan
 function fix(n){
 return Math.round(n * 100) / 100;
 }
 
+function formatDate(date){
+if(!date) return "";
+return date.toString().slice(0,10);
+}
+
+function showPage(page){
+document.getElementById("dashboardPage").style.display="none";
+document.getElementById("tablePage").style.display="none";
+
+if(page==="dashboard") document.getElementById("dashboardPage").style.display="block";
+if(page==="tabel") document.getElementById("tablePage").style.display="block";
+}
+
+async function loadData(){
+
+const res=await fetch(API_URL);
+rawData=await res.json();
+
+rawData.forEach(d=>{
+d.TANGGAL=formatDate(d.TANGGAL);
+});
+
+initFilter();
+render();
+
+}
+
+function initFilter(){
+
+let kecSet=new Set();
+let jenisSet=new Set();
+
+rawData.forEach(d=>{
+kecSet.add(d.KECAMATAN);
+jenisSet.add(d["JENIS LTT"]);
+});
+
+let select=document.getElementById("filterKecamatan");
+select.innerHTML='<option value="">Semua Kecamatan</option>';
+
+kecSet.forEach(k=>{
+select.innerHTML+=`<option>${k}</option>`;
+});
+
+let selectJenis=document.getElementById("filterJenis");
+selectJenis.innerHTML='<option value="">Semua Jenis LTT</option>';
+
+jenisSet.forEach(j=>{
+selectJenis.innerHTML+=`<option>${j}</option>`;
+});
+
+select.onchange=render;
+document.getElementById("filterTanggal").onchange=render;
+document.getElementById("filterJenis").onchange=render;
+
+}
+
 function render(){
 
-let total=0,today=0,totalReguler=0,totalOplah=0,todayReguler=0,todayOplah=0,kecMap={};
+let kecFilter=document.getElementById("filterKecamatan").value;
+let tglFilter=document.getElementById("filterTanggal").value;
+let jenisFilter=document.getElementById("filterJenis").value;
+
+let data=rawData.filter(d=>{
+
+let cocok=true;
+
+if(kecFilter && d.KECAMATAN!=kecFilter) cocok=false;
+if(tglFilter && d.TANGGAL!=tglFilter) cocok=false;
+if(jenisFilter && d["JENIS LTT"]!=jenisFilter) cocok=false;
+
+return cocok;
+
+});
+
+let total=0;
+let today=0;
+let totalReguler=0;
+let totalOplah=0;
+let todayReguler=0;
+let todayOplah=0;
+let kecMap={};
 
 let tbody=document.querySelector("#tableData tbody");
 tbody.innerHTML="";
 
 let todayStr=new Date().toISOString().slice(0,10);
 
-rawData.forEach(d=>{
+data.forEach(d=>{
 
 let luas = safeNumber(d["LUAS TAMBAH TANAM"]);
 
 total = fix(total + luas);
 
-let jenis = (d["JENIS LTT"]||"").toLowerCase();
+let jenis = (d["JENIS LTT"] || "").toLowerCase();
 
 if(jenis.includes("reguler")){
 totalReguler = fix(totalReguler + luas);
-if(d.TANGGAL==todayStr) todayReguler = fix(todayReguler + luas);
+if(d.TANGGAL == todayStr) todayReguler = fix(todayReguler + luas);
 }
 
 if(jenis.includes("oplah")){
 totalOplah = fix(totalOplah + luas);
-if(d.TANGGAL==todayStr) todayOplah = fix(todayOplah + luas);
+if(d.TANGGAL == todayStr) todayOplah = fix(todayOplah + luas);
 }
 
-if(d.TANGGAL==todayStr) today = fix(today + luas);
+if(d.TANGGAL == todayStr) today = fix(today + luas);
 
-kecMap[d.KECAMATAN] = fix((kecMap[d.KECAMATAN]||0)+luas);
+kecMap[d.KECAMATAN] = fix((kecMap[d.KECAMATAN] || 0) + luas);
 
-tbody.innerHTML+=`<tr>
+tbody.innerHTML+=`
+<tr>
 <td>${d.TANGGAL}</td>
 <td>${d.KECAMATAN}</td>
 <td>${d.DESA}</td>
@@ -179,25 +264,112 @@ tbody.innerHTML+=`<tr>
 <td>${d["JENIS LTT"]}</td>
 <td>${luas.toFixed(2)}</td>
 <td>${d["NAMA PELAPOR"]}</td>
-</tr>`;
+</tr>
+`;
+
 });
 
-document.getElementById("totalLtt").innerText=total.toFixed(2)+" Ha";
-document.getElementById("todayLtt").innerText=today.toFixed(2)+" Ha";
-document.getElementById("totalReguler").innerText=totalReguler.toFixed(2)+" Ha";
-document.getElementById("totalOplah").innerText=totalOplah.toFixed(2)+" Ha";
-document.getElementById("todayReguler").innerText=todayReguler.toFixed(2)+" Ha";
-document.getElementById("todayOplah").innerText=todayOplah.toFixed(2)+" Ha";
-document.getElementById("scoreReguler").innerText=totalReguler.toFixed(2)+" Ha";
-document.getElementById("scoreOplah").innerText=totalOplah.toFixed(2)+" Ha";
+// OUTPUT FIX
+document.getElementById("totalLtt").innerText = total.toFixed(2)+" Ha";
+document.getElementById("todayLtt").innerText = today.toFixed(2)+" Ha";
+document.getElementById("totalKec").innerText = Object.keys(kecMap).length;
+document.getElementById("totalData").innerText = data.length;
+document.getElementById("totalReguler").innerText = totalReguler.toFixed(2)+" Ha";
+document.getElementById("totalOplah").innerText = totalOplah.toFixed(2)+" Ha";
+document.getElementById("todayReguler").innerText = todayReguler.toFixed(2)+" Ha";
+document.getElementById("todayOplah").innerText = todayOplah.toFixed(2)+" Ha";
+
+document.getElementById("scoreReguler").innerText = totalReguler.toFixed(2)+" Ha";
+document.getElementById("scoreOplah").innerText = totalOplah.toFixed(2)+" Ha";
+
+renderChart(kecMap);
+renderRanking(kecMap);
 
 }
 
-async function loadData(){
-const res=await fetch(API_URL);
-rawData=await res.json();
-rawData.forEach(d=>d.TANGGAL=(d.TANGGAL||"").toString().slice(0,10));
-render();
+function renderChart(data){
+
+if(chart) chart.destroy();
+
+chart=new Chart(document.getElementById("chartKecamatan"),{
+type:"bar",
+data:{
+labels:Object.keys(data),
+datasets:[{
+label:"LTT per Kecamatan",
+data:Object.values(data)
+}]
+}
+});
+
+}
+
+function renderRanking(data){
+
+let sorted=Object.entries(data).sort((a,b)=>b[1]-a[1]);
+
+let html="";
+
+sorted.forEach((r,i)=>{
+
+let medal="";
+if(i==0) medal="🥇";
+else if(i==1) medal="🥈";
+else if(i==2) medal="🥉";
+else medal=`${i+1}.`;
+
+html+=`
+<li style="
+display:flex;
+justify-content:space-between;
+padding:6px 10px;
+margin:4px 0;
+border-radius:6px;
+background:${i<3 ? "#e8f5e9" : "#f5f5f5"};
+font-weight:${i<3 ? "bold":"normal"};
+">
+<span>${medal} ${r[0]}</span>
+<span>${r[1].toFixed(2)} Ha</span>
+</li>
+`;
+
+});
+
+document.getElementById("ranking").innerHTML=html;
+
+}
+
+function downloadExcel(){
+
+let ws = XLSX.utils.table_to_sheet(document.getElementById("tableData"));
+let wb = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb, ws, "LTT");
+XLSX.writeFile(wb,"Laporan_LTT.xlsx");
+
+}
+
+function downloadPDF(){
+
+const { jsPDF } = window.jspdf;
+
+let doc = new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
+
+doc.setFontSize(16);
+doc.text("Laporan Luas Tambah Tanam (LTT)",14,15);
+
+doc.setFontSize(10);
+doc.text("Kabupaten Indragiri Hilir",14,22);
+
+doc.autoTable({
+html:"#tableData",
+startY:28,
+theme:"grid",
+styles:{ fontSize:8 },
+headStyles:{ fillColor:[46,125,50] }
+});
+
+doc.save("Laporan_LTT.pdf");
+
 }
 
 loadData();
