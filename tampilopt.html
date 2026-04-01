@@ -17,8 +17,6 @@ body{
   background-size: cover;
   color:#fff;
 }
-
-/* HEADER */
 .header{
   display:flex;
   align-items:center;
@@ -27,24 +25,15 @@ body{
   backdrop-filter: blur(10px);
   background: rgba(0,0,0,0.4);
 }
+.header img{ width:60px; }
+.title{ font-size:18px; font-weight:600; }
 
-.header img{
-  width:60px;
-}
-
-.title{
-  font-size:18px;
-  font-weight:600;
-}
-
-/* MENU */
 .menu{
   display:flex;
   gap:20px;
   padding:10px 25px;
   background: rgba(0,0,0,0.5);
 }
-
 .menu button{
   background:none;
   border:none;
@@ -52,17 +41,10 @@ body{
   cursor:pointer;
   font-size:14px;
 }
+.menu button:hover{ color:#00ffd5; }
 
-.menu button:hover{
-  color:#00ffd5;
-}
+.container{ padding:20px; }
 
-/* CONTENT */
-.container{
-  padding:20px;
-}
-
-/* CARD */
 .card{
   background: rgba(255,255,255,0.08);
   backdrop-filter: blur(10px);
@@ -72,32 +54,20 @@ body{
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
-/* TABLE */
 table{
   width:100%;
   border-collapse: collapse;
   font-size:13px;
 }
-
 th, td{
   padding:8px;
   border-bottom:1px solid rgba(255,255,255,0.2);
 }
+th{ background: rgba(255,255,255,0.1); }
 
-th{
-  background: rgba(255,255,255,0.1);
-}
+.red{ background: rgba(255,0,0,0.3); }
 
-/* WARNING */
-.red{
-  background: rgba(255,0,0,0.3);
-}
-
-/* FILTER */
-.filter{
-  margin-bottom:15px;
-}
-
+.filter{ margin-bottom:15px; }
 input{
   padding:6px;
   border-radius:8px;
@@ -123,9 +93,7 @@ input{
 
 <div class="container">
 
-  <!-- DASHBOARD -->
   <div id="dashboard">
-
     <div class="card">
       <h3>Total Laporan</h3>
       <h1 id="totalData">0</h1>
@@ -150,15 +118,13 @@ input{
       <h3>Ranking Kecamatan Rawan</h3>
       <div id="ranking"></div>
     </div>
-
   </div>
 
-  <!-- REKAP -->
   <div id="rekap" style="display:none;">
     <div class="card">
       <div class="filter">
         Filter Tanggal :
-        <input type="date" id="tglFilter" onchange="filterData()">
+        <input type="date" id="tglFilter">
       </div>
 
       <table>
@@ -227,7 +193,6 @@ function renderDashboard(){
     let kec = d["Kecamatan"];
 
     luasTotal += luas;
-
     countOPT[opt] = (countOPT[opt] || 0) + 1;
     kecamatanRank[kec] = (kecamatanRank[kec] || 0) + luas;
   });
@@ -272,6 +237,17 @@ function renderRanking(data){
 }
 
 function renderTable(data){
+  if(data.length === 0){
+    document.getElementById('tableData').innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align:center; padding:20px;">
+          Tidak ada laporan pada tanggal ini
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
   let html = "";
   data.forEach(d=>{
     let intensitas = parseFloat(d["Intensitas"]) || 0;
@@ -293,8 +269,9 @@ function renderTable(data){
   document.getElementById('tableData').innerHTML = html;
 }
 
-function filterData(){
-  let tgl = document.getElementById('tglFilter').value;
+/* 🔥 FILTER FIX TOTAL */
+document.getElementById('tglFilter').addEventListener('change', function(){
+  let tgl = this.value;
 
   if(!tgl){
     renderTable(dataGlobal);
@@ -302,23 +279,27 @@ function filterData(){
   }
 
   let filtered = dataGlobal.filter(d=>{
-    let t = formatTanggalInput(d["Tanggal Pengamatan"]);
-    return t === tgl;
+    let raw = d["Tanggal Pengamatan"];
+    if(!raw) return false;
+
+    let dSheet = new Date(raw);
+
+    let yyyy = dSheet.getFullYear();
+    let mm = String(dSheet.getMonth()+1).padStart(2,'0');
+    let dd = String(dSheet.getDate()).padStart(2,'0');
+
+    let fix = `${yyyy}-${mm}-${dd}`;
+
+    return fix === tgl;
   });
 
   renderTable(filtered);
-}
+});
 
 function formatTanggal(t){
   if(!t) return "";
   let d = new Date(t);
   return d.toLocaleDateString('id-ID');
-}
-
-function formatTanggalInput(t){
-  if(!t) return "";
-  let d = new Date(t);
-  return d.toISOString().split('T')[0];
 }
 
 loadData();
