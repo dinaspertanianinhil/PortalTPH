@@ -7,7 +7,9 @@
 <title>Dashboard OPT</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 <style>
 body{
   margin:0;
@@ -73,6 +75,16 @@ input{
   border-radius:8px;
   border:none;
 }
+
+.btn-download{
+  padding:6px 10px;
+  border:none;
+  border-radius:6px;
+  margin-left:5px;
+  cursor:pointer;
+  background:#00ffd5;
+  color:#000;
+}
 </style>
 </head>
 
@@ -122,12 +134,17 @@ input{
 
   <div id="rekap" style="display:none;">
     <div class="card">
+
       <div class="filter">
         Filter Tanggal :
         <input type="date" id="tglFilter">
+
+        <!-- 🔥 tombol baru -->
+        <button class="btn-download" onclick="downloadExcel()">Excel</button>
+        <button class="btn-download" onclick="downloadPDF()">PDF</button>
       </div>
 
-      <table>
+      <table id="dataTable">
         <thead>
           <tr>
             <th>Tanggal</th>
@@ -151,6 +168,7 @@ input{
 const API_URL = "https://script.google.com/macros/s/AKfycbwAVVigXcjQe06R4v4H9v8AcOnwUX_dBDjAwcbaA8E9OwPTOOIbiUcJAaMlPlSaLRM_vg/exec";
 
 let dataGlobal = [];
+let dataFilter = [];
 let chart;
 
 function showPage(page){
@@ -169,11 +187,11 @@ function loadData(){
 
       dataGlobal = rows.map(row => {
         let obj = {};
-        header.forEach((h,i)=>{
-          obj[h] = row[i];
-        });
+        header.forEach((h,i)=> obj[h]=row[i]);
         return obj;
       });
+
+      dataFilter = dataGlobal;
 
       renderDashboard();
       renderTable(dataGlobal);
@@ -183,21 +201,17 @@ function loadData(){
 function renderDashboard(){
   document.getElementById('totalData').innerText = dataGlobal.length;
 
-  let countOPT = {};
-  let luasTotal = 0;
-  let kecamatanRank = {};
+  let countOPT={}, luasTotal=0, kecamatanRank={};
 
   dataGlobal.forEach(d=>{
-    let opt = d["Jenis OPT"];
-    let luas = parseFloat(d["Luas Terserang"]) || 0;
-    let kec = d["Kecamatan"];
+    let luas=parseFloat(d["Luas Terserang"])||0;
+    luasTotal+=luas;
 
-    luasTotal += luas;
-    countOPT[opt] = (countOPT[opt] || 0) + 1;
-    kecamatanRank[kec] = (kecamatanRank[kec] || 0) + luas;
+    countOPT[d["Jenis OPT"]] = (countOPT[d["Jenis OPT"]]||0)+1;
+    kecamatanRank[d["Kecamatan"]] = (kecamatanRank[d["Kecamatan"]]||0)+luas;
   });
 
-  document.getElementById('totalLuas').innerText = luasTotal.toFixed(2) + " Ha";
+  document.getElementById('totalLuas').innerText = luasTotal.toFixed(2)+" Ha";
 
   let top = Object.entries(countOPT).sort((a,b)=>b[1]-a[1])[0];
   document.getElementById('topOPT').innerText = top ? top[0] : "-";
@@ -207,99 +221,139 @@ function renderDashboard(){
 }
 
 function renderChart(data){
-  let labels = Object.keys(data);
-  let values = Object.values(data);
-
+  let labels=Object.keys(data), values=Object.values(data);
   if(chart) chart.destroy();
-
-  chart = new Chart(document.getElementById('chartOPT'), {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Jumlah Kasus',
-        data: values
-      }]
-    }
+  chart=new Chart(document.getElementById('chartOPT'),{
+    type:'bar',
+    data:{labels,datasets:[{label:'Jumlah Kasus',data:values}]}
   });
 }
 
 function renderRanking(data){
-  let sorted = Object.entries(data).sort((a,b)=>b[1]-a[1]);
-
-  let html = "<ol>";
-  sorted.forEach(r=>{
-    html += `<li>${r[0]} - ${r[1].toFixed(2)} Ha</li>`;
-  });
-  html += "</ol>";
-
-  document.getElementById('ranking').innerHTML = html;
+  let sorted=Object.entries(data).sort((a,b)=>b[1]-a[1]);
+  let html="<ol>";
+  sorted.forEach(r=> html+=`<li>${r[0]} - ${r[1].toFixed(2)} Ha</li>`);
+  html+="</ol>";
+  document.getElementById('ranking').innerHTML=html;
 }
 
 function renderTable(data){
-  if(data.length === 0){
-    document.getElementById('tableData').innerHTML = `
-      <tr>
-        <td colspan="7" style="text-align:center; padding:20px;">
-          Tidak ada laporan pada tanggal ini
-        </td>
-      </tr>
-    `;
+  dataFilter = data;
+
+  if(data.length===0){
+    document.getElementById('tableData').innerHTML =
+    `<tr><td colspan="7" style="text-align:center">Tidak ada laporan</td></tr>`;
     return;
   }
 
-  let html = "";
+  let html="";
   data.forEach(d=>{
-    let intensitas = parseFloat(d["Intensitas"]) || 0;
-    let warning = intensitas > 50 ? "class='red'" : "";
-
-    html += `
-      <tr ${warning}>
-        <td>${formatTanggal(d["Tanggal Pengamatan"])}</td>
-        <td>${d["Kecamatan"]}</td>
-        <td>${d["Desa"]}</td>
-        <td>${d["Jenis Tanaman"]}</td>
-        <td>${d["Jenis OPT"]}</td>
-        <td>${d["Luas Terserang"]}</td>
-        <td>${d["Intensitas"]}%</td>
-      </tr>
-    `;
+    let intensitas=parseFloat(d["Intensitas"])||0;
+    let warn=intensitas>50?"class='red'":"";
+    html+=`
+    <tr ${warn}>
+      <td>${formatTanggal(d["Tanggal Pengamatan"])}</td>
+      <td>${d["Kecamatan"]}</td>
+      <td>${d["Desa"]}</td>
+      <td>${d["Jenis Tanaman"]}</td>
+      <td>${d["Jenis OPT"]}</td>
+      <td>${d["Luas Terserang"]}</td>
+      <td>${d["Intensitas"]}%</td>
+    </tr>`;
   });
-
-  document.getElementById('tableData').innerHTML = html;
+  document.getElementById('tableData').innerHTML=html;
 }
 
-/* 🔥 FILTER FIX TOTAL */
+/* FILTER */
 document.getElementById('tglFilter').addEventListener('change', function(){
-  let tgl = this.value;
+  let tgl=this.value;
+  if(!tgl){ renderTable(dataGlobal); return; }
 
-  if(!tgl){
-    renderTable(dataGlobal);
-    return;
-  }
-
-  let filtered = dataGlobal.filter(d=>{
-    let raw = d["Tanggal Pengamatan"];
-    if(!raw) return false;
-
-    let dSheet = new Date(raw);
-
-    let yyyy = dSheet.getFullYear();
-    let mm = String(dSheet.getMonth()+1).padStart(2,'0');
-    let dd = String(dSheet.getDate()).padStart(2,'0');
-
-    let fix = `${yyyy}-${mm}-${dd}`;
-
-    return fix === tgl;
+  let filtered=dataGlobal.filter(d=>{
+    let dt=new Date(d["Tanggal Pengamatan"]);
+    let fix=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+    return fix===tgl;
   });
 
   renderTable(filtered);
 });
 
+/* ===== DOWNLOAD EXCEL ===== */
+function downloadExcel(){
+  let ws = XLSX.utils.json_to_sheet(dataFilter);
+  let wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Laporan OPT");
+  XLSX.writeFile(wb, "Laporan_OPT.xlsx");
+}
+
+/* ===== DOWNLOAD PDF ===== */
+function downloadPDF(){
+  const { jsPDF } = window.jspdf;
+  let doc = new jsPDF('l', 'mm', 'a4'); // landscape biar lega
+
+  // Judul
+  doc.setFontSize(14);
+  doc.text("LAPORAN PERINGATAN OPT", 14, 15);
+
+  doc.setFontSize(10);
+  doc.text("Bidang Tanaman Pangan dan Hortikultura", 14, 22);
+  doc.text("Dinas Pertanian Kabupaten Indragiri Hilir", 14, 27);
+
+  // Header tabel
+  let head = [[
+    "Tanggal",
+    "Kecamatan",
+    "Desa",
+    "Tanaman",
+    "OPT",
+    "Luas (Ha)",
+    "Intensitas (%)"
+  ]];
+
+  // Body tabel
+  let body = dataFilter.map(d => [
+    formatTanggal(d["Tanggal Pengamatan"]),
+    d["Kecamatan"],
+    d["Desa"],
+    d["Jenis Tanaman"],
+    d["Jenis OPT"],
+    d["Luas Terserang"],
+    d["Intensitas"]
+  ]);
+
+  // Tabel
+  doc.autoTable({
+    startY: 32,
+    head: head,
+    body: body,
+    styles: {
+      fontSize: 8
+    },
+    headStyles: {
+      fillColor: [0, 0, 0]
+    },
+    alternateRowStyles: {
+      fillColor: [240, 240, 240]
+    },
+    didParseCell: function (data) {
+      // 🔥 WARNING merah kalau intensitas > 50
+      if (data.section === 'body' && data.column.index === 6) {
+        let val = parseFloat(data.cell.raw) || 0;
+        if (val > 50) {
+          data.cell.styles.fillColor = [255, 0, 0];
+          data.cell.styles.textColor = [255, 255, 255];
+        }
+      }
+    }
+  });
+
+  doc.save("Laporan_OPT.pdf");
+}
+
+
 function formatTanggal(t){
   if(!t) return "";
-  let d = new Date(t);
-  return d.toLocaleDateString('id-ID');
+  return new Date(t).toLocaleDateString('id-ID');
 }
 
 loadData();
