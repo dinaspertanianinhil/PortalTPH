@@ -129,6 +129,16 @@
       transform: translateY(-2px);
     }
 
+    .guestBtn {
+      background: #2873e1;
+      margin-top: 8px;
+    }
+
+    .guestBtn:hover {
+      background: #3b8cff;
+      transform: translateY(-2px);
+    }
+
     .error {
       color: #ffb9b9;
       margin-top: 12px;
@@ -167,6 +177,8 @@
       </div>
 
       <button onclick="login()">Masuk</button>
+      <button class="guestBtn" onclick="guestLogin()">Masuk sebagai Tamu</button>
+
       <div class="error" id="errorMsg"></div>
     </div>
   </main>
@@ -204,6 +216,11 @@
       } else {
         msg.textContent = "Username atau password salah.";
       }
+    }
+
+    function guestLogin() {
+      localStorage.setItem("loginUser", "guest");
+      window.location.href = "dashboard2.html";
     }
 
     document.addEventListener("keypress", e => {
