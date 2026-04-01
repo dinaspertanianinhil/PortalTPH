@@ -383,7 +383,7 @@ font-size:.9rem;
 
 </div>
 
-<a href="#" onclick="logout()">Logout</a>
+<a href="javascript:void(0)" onclick="logout()">Logout</a>
 
 </div>
 
@@ -402,37 +402,36 @@ Monitoring Harga • Produksi • Stok • Serangan Hama tanaman • Luas Tambah
 </div>
 
 </section>
-
 <script>
-
 function toggleMenu(){
-document.getElementById("menu").classList.toggle("show");
+  document.getElementById("menu").classList.toggle("show");
 }
 
 function toggleDrop(el){
-
-document.querySelectorAll(".dropdown").forEach(d=>{
-
-if(d.contains(el)){
-d.classList.toggle("active");
-}else{
-d.classList.remove("active");
+  document.querySelectorAll(".dropdown").forEach(d=>{
+    if(d.contains(el)){
+      d.classList.toggle("active");
+    }else{
+      d.classList.remove("active");
+    }
+  });
 }
 
+document.addEventListener("click", e=>{
+  if(!e.target.closest(".dropdown") && !e.target.closest(".mobile-btn")){
+    document.querySelectorAll(".dropdown").forEach(d=>d.classList.remove("active"));
+  }
 });
 
+// ===== LOGOUT FUNCTION =====
+function logout(){
+  // hapus session/localStorage kalau mau
+  // localStorage.removeItem("login"); // opsional
+
+  // redirect ke halaman login utama
+  window.location.href = "index.html";
 }
-
-document.addEventListener("click",e=>{
-
-if(!e.target.closest(".dropdown") && !e.target.closest(".mobile-btn")){
-
-document.querySelectorAll(".dropdown").forEach(d=>d.classList.remove("active"));
-
-}
-
-});
-
+</script>
 
 
 </script>
