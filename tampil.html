@@ -286,12 +286,12 @@ if(allData.length===0)return;
 const header=allData[0];
 const rows=getFilteredRows();
 
-let html=`<div class="table-frame"><table><tr>${header.map(h=>`<th>${h}</th>`).join("")}<th>Aksi</th></tr>`;
+let html = `<div class="table-frame"><table><tr>${header.map(h=>`<th>${h}</th>`).join("")}</tr>`;
 
-rows.forEach((row,i)=>{
-html+="<tr>";
-row.forEach(cell=>html+=`<td>${cell}</td>`);
-html+=`<td><button class="btn-danger" onclick="hapusData(${i+2})">Hapus</button></td></tr>`;
+rows.forEach((row, i) => {
+  html += "<tr>";
+  row.forEach(cell => html += `<td>${cell}</td>`);
+  html += "</tr>"; // tidak ada tombol Hapus
 });
 
 html+="</table></div>";
