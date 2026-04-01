@@ -2,392 +2,110 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Pelaporan LTT – Sekali Input Semua Jenis</title>
+<title>Maintenance Sistem</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
   font-family: "Segoe UI", Arial, sans-serif;
   background:#f4f6f8;
-  padding:16px;
   margin:0;
-}
-h2,h3 { margin:0 0 10px; }
-
-/* HEADER */
-.header {
-  background:#ffffff;
-  padding:16px;
-  border-radius:10px;
   display:flex;
   align-items:center;
-  gap:16px;
-  margin-bottom:16px;
-  box-shadow:0 4px 12px rgba(0,0,0,.06);
+  justify-content:center;
+  height:100vh;
 }
-.header img { width:60px; }
-.header .title { font-size:16px; font-weight:600; }
-.header .subtitle { font-size:13px; color:#6b7280; }
 
-/* BOX */
-.box {
-  background:#fff;
-  padding:16px;
+/* BOX UTAMA */
+.container {
+  background:#ffffff;
+  padding:30px 24px;
+  border-radius:12px;
+  text-align:center;
+  max-width:400px;
+  width:90%;
+  box-shadow:0 6px 20px rgba(0,0,0,.08);
+}
+
+/* LOGO */
+.logo {
+  width:70px;
   margin-bottom:16px;
-  border-radius:10px;
-  box-shadow:0 4px 12px rgba(0,0,0,.06);
 }
-label {
-  font-size:13px;
+
+/* TITLE */
+.title {
+  font-size:18px;
   font-weight:600;
-  display:block;
-  margin-top:12px;
+  margin-bottom:6px;
 }
-input, select {
-  width:100%;
-  padding:10px 1px;
-  margin-top:6px;
-  border-radius:8px;
-  border:1px solid #cfd6dd;
+
+/* SUBTITLE */
+.subtitle {
   font-size:14px;
+  color:#6b7280;
+  margin-bottom:20px;
 }
+
+/* ICON */
+.icon {
+  font-size:40px;
+  margin-bottom:10px;
+}
+
+/* TEXT */
+.text {
+  font-size:14px;
+  color:#374151;
+  margin-bottom:20px;
+}
+
+/* FOOTER */
+.footer {
+  font-size:12px;
+  color:#9ca3af;
+}
+
+/* BUTTON */
 button {
-  margin-top:12px;
   padding:10px 16px;
-  border-radius:8px;
   border:none;
+  border-radius:8px;
   background:#0f766e;
   color:#fff;
   font-weight:600;
   cursor:pointer;
 }
-button:hover { opacity:.9 }
-
-button:disabled {
-  background:#9ca3af;
-  cursor:not-allowed;
-}
-
-.btn-hapus {
-  background:#dc2626;
-}
-.btn-hapus:hover { opacity:.9; }
-
-/* DESA */
-.desa {
-  border:1px dashed #b6bec8;
-  padding:14px;
-  margin-top:14px;
-  border-radius:8px;
-  background:#fafafa;
-}
-
-/* POKTAN */
-.poktan {
-  display:grid;
-  grid-template-columns: 1fr 110px 170px 90px;
-  gap:10px;
-  margin-top:10px;
-}
-@media (max-width:600px){
-  .poktan { grid-template-columns: 1fr; }
-}
-
-/* REKAP */
-.rekap div {
-  font-size:14px;
-  margin-top:6px;
+button:hover {
+  opacity:.9;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
-  <div>
-    <div class="title">Form LTT Kecamatan - Kabupaten Indragiri Hilir</div>
-    <div class="subtitle">Dinas Pertanian Kabupaten Indragiri Hilir</div>
+<div class="container">
+  
+  <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
+
+  <div class="title">Sistem Pelaporan LTT</div>
+  <div class="subtitle">Dinas Pertanian Kabupaten Indragiri Hilir</div>
+
+  <div class="icon">🛠️</div>
+
+  <div class="text">
+    Halaman input sedang dalam proses <b>maintenance</b>.<br><br>
+    Kami sedang melakukan peningkatan sistem agar layanan lebih optimal, stabil, dan cepat.
   </div>
-</div>
 
-<div class="box">
-  <label>Nama Pelapor</label>
-  <input type="text" id="pelapor" placeholder="Nama petugas pelapor" oninput="formatKapital(this)">
+  <button onclick="location.reload()">login kembali jam 10.30</button>
 
-  <label>Kecamatan</label>
-  <select id="kecamatan">
-    <option>Batang Tuaka</option>
-    <option>Concong</option>
-    <option>Enok</option>
-    <option>Gaung</option>
-    <option>Gaung Anak Serka</option>
-    <option>Kateman</option>
-    <option>Kempas</option>
-    <option>Kemuning</option>
-    <option>Keritang</option>
-    <option>Kuala Indragiri</option>
-    <option>Mandah</option>
-    <option>Pelangiran</option>
-    <option>Pulau Burung</option>
-    <option>Reteh</option>
-    <option>Sungai Batang</option>
-    <option>Tanah Merah</option>
-    <option>Teluk Belengkong</option>
-    <option>Tembilahan</option>
-    <option>Tembilahan Hulu</option>
-    <option>Tempuling</option>
-  </select>
-
-  <label>Tanggal</label>
-  <input type="date" id="tanggal">
-</div>
-
-<div class="box">
-  <h3>Data Desa & Poktan</h3>
-  <div id="desaContainer"></div>
-  <button type="button" onclick="tambahDesa()">+ Tambah Desa/Kelurahan</button>
-</div>
-
-<div class="box">
-  <h3>Rekap Otomatis LTT (Preview)</h3>
-  <div class="rekap">
-    <div>LT Reguler : <b id="reguler">0</b> Ha</div>
-    <div>LT OPLAH : <b id="oplah">0</b> Ha</div>
-    <div>LT CSR : <b id="csr">0</b> Ha</div>
-    <div>LT Pompa : <b id="pompa">0</b> Ha</div>
-    <div>LT DAS/Bendungan : <b id="das">0</b> Ha</div>
-    <div>LT Padi Tusip Sawit/Kelapa : <b id="padi">0</b> Ha</div>
-    <div>LT GOGO : <b id="gogo">0</b> Ha</div>
-    <div>LT Jagung : <b id="jagung">0</b> Ha</div>
-    <div>LT Jagung Polri : <b id="jagung_polri">0</b> Ha</div>
-    <div>LT Kedelai : <b id="kedelai">0</b> Ha</div>    
+  <div class="footer" style="margin-top:16px;">
+    Mohon maaf atas ketidaknyamanan ini 🙏<br>
+    Silakan kembali beberapa saat lagi
   </div>
+
 </div>
-
-<div class="box">
-  <button id="btnSimpan" onclick="simpan()">Simpan Laporan</button>
-</div>
-
-<script>
-  function formatAngka(el){
-  let val = el.value;
-
-  // ubah titik jadi koma
-  val = val.replace(/\./g, ',');
-
-  // hanya angka & koma
-  val = val.replace(/[^0-9,]/g, '');
-
-  // hanya 1 koma
-  const parts = val.split(',');
-  if(parts.length > 2){
-    val = parts[0] + ',' + parts.slice(1).join('');
-  }
-
-  el.value = val;
-}
-/* FORMAT OTOMATIS KAPITAL AWAL KATA */
-function formatKapital(el) {
-  let text = el.value;
-
-  text = text
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trimStart()
-    .replace(/\b\w/g, function (char) {
-      return char.toUpperCase();
-    });
-
-  el.value = text;
-}
-
-function tambahDesa() {
-  const desa = document.createElement("div");
-  desa.className = "desa";
-  desa.innerHTML = `
-    <label>Desa/Kelurahan</label>
-    <input type="text" placeholder="Nama Desa / Kelurahan" oninput="formatKapital(this)">
-    <div class="poktanContainer"></div>
-    <button type="button" onclick="tambahPoktan(this)">+ Tambah Poktan</button>
-    <button type="button" class="btn-hapus" onclick="this.parentElement.remove()">Hapus Desa</button>
-  `;
-  document.getElementById("desaContainer").appendChild(desa);
-}
-
-function tambahPoktan(btn) {
-  const container = btn.parentElement.querySelector(".poktanContainer");
-  const p = document.createElement("div");
-  p.className = "poktan";
-  p.innerHTML = `
-    <input type="text" placeholder="Nama Poktan" oninput="formatKapital(this)">
-    <input type="text" placeholder="Luas (Ha)" oninput="formatAngka(this); hitung()">
-    <select onchange="hitung()">
-      <option value="reguler">Reguler</option>
-      <option value="oplah">OPLAH</option>
-      <option value="csr">CSR</option>
-      <option value="pompa">Pompa</option>
-      <option value="das">DAS/Bendungan</option>
-      <option value="tusip">Tusip Sawit/Kelapa</option>
-      <option value="gogo">GOGO</option>
-      <option value="jagung">Jagung</option>
-      <option value="jagung_polri">Jagung Polri</option>
-      <option value="kedelai">Kedelai</option>
-    </select>
-    <button type="button" class="btn-hapus" onclick="this.parentElement.remove();hitung();">Hapus</button>
-  `;
-  container.appendChild(p);
-}
-
-function hitung() {
-  let total = {
-    reguler: 0,
-    oplah: 0,
-    csr: 0,
-    pompa: 0,
-    das: 0,
-    tusip: 0,
-    gogo: 0,
-    jagung: 0,
-    jagung_polri: 0,
-    kedelai: 0
-  };
-
-  document.querySelectorAll(".poktan").forEach(p => {
-  const luas = parseFloat(
-  (p.children[1].value || "0").replace(/,/g, ".")
-) || 0;
-  const jenis = p.children[2].value;
-
-  if (total.hasOwnProperty(jenis)) {
-    total[jenis] += luas;
-  }
-});
-
-  reguler.innerText = total.reguler.toFixed(2).replace(".", ",");
-oplah.innerText   = total.oplah.toFixed(2).replace(".", ",");
-csr.innerText     = total.csr.toFixed(2).replace(".", ",");
-pompa.innerText   = total.pompa.toFixed(2).replace(".", ",");
-das.innerText     = total.das.toFixed(2).replace(".", ",");
-padi.innerText    = total.tusip.toFixed(2).replace(".", ",");
-gogo.innerText    = total.gogo.toFixed(2).replace(".", ",");
-jagung.innerText  = total.jagung.toFixed(2).replace(".", ",");
-jagung_polri.innerText = total.jagung_polri.toFixed(2).replace(".", ",");
-kedelai.innerText = total.kedelai.toFixed(2).replace(".", ",");
-}
-</script>
-
-<script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyEsqdUGIser0k4WkCn66CMxsHGZbY5gM1dDzMW4QaRBzjZxkuQLZD-ZT4nAIIQjqYC/exec";
-
-function simpan() {
-    const btn = document.getElementById("btnSimpan");
-
-  if (btn.disabled) return;
-
-  const pelapor   = document.getElementById("pelapor").value.trim();
-  const kecamatan = document.getElementById("kecamatan").value;
-  const tanggal   = document.getElementById("tanggal").value;
-
-  if (!pelapor || !tanggal) {
-    alert("⚠️ Nama pelapor & tanggal wajib diisi");
-    return;
-  }
-
-  let rows = [];
-
-  document.querySelectorAll(".desa").forEach(desaBox => {
-    const desa = desaBox.querySelector("input").value;
-
-    desaBox.querySelectorAll(".poktan").forEach(p => {
-      rows.push({
-  desa,
-  poktan: p.children[0].value,
-  luas: (p.children[1].value || "0").replace(/\./g, ","), // 🔥 paksa koma
-  jenis: p.children[2].value
-});
-    });
-  });
-
-  if (rows.length === 0) {
-    alert("⚠️ Data belum diisi");
-    return;
-  }
-
-  btn.disabled = true;
-  btn.innerText = "Menyimpan...";
-
-  const data = new URLSearchParams();
-  data.append("pelapor", pelapor);
-  data.append("kecamatan", kecamatan);
-  data.append("tanggal", tanggal);
-  data.append("rows", JSON.stringify(rows));
-
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    body: data
-  })
-  .then(r => r.text())
-  .then(r => {
-    if (r.startsWith("OK")) {
-      alert("✅ Data berhasil disimpan");
-      location.reload();
-    } else {
-      btn.disabled = false;
-      btn.innerText = "Simpan Laporan";
-      alert("❌ Server error:\n" + r);
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    btn.disabled = false;
-    btn.innerText = "Simpan Laporan";
-    alert("❌ Gagal mengirim data");
-  });
-}
-</script>
-
-<!-- TAMBAHAN FITUR YANG DIMINTA -->
-<script>
-/* Kunci tanggal hanya hari ini */
-(function(){
-  const t = document.getElementById("tanggal");
-  const now = new Date();
-
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth()+1).padStart(2,'0');
-  const dd = String(now.getDate()).padStart(2,'0');
-
-  const today = `${yyyy}-${mm}-${dd}`;
-
-  t.value = today;
-  t.min = today;
-  t.max = today;
-
-  t.addEventListener("change", function(){
-    this.value = today;
-  });
-})();
-
-/* Batas waktu laporan jam 15:00 */
-(function(){
-  const btn = document.getElementById("btnSimpan");
-
-  function cekBatasWaktu(){
-    const now = new Date();
-    const jam = now.getHours();
-    const menit = now.getMinutes();
-
-    if (jam > 15 || (jam === 15 && menit > 0)) {
-      btn.disabled = true;
-      btn.innerText = "Waktu Laporan Sudah Lewat";
-      alert("Waktu pelaporan hari ini sudah lewat. Silakan melaporkan besok hari.");
-    }
-  }
-
-  cekBatasWaktu();
-})();
-</script>
 
 </body>
 </html>
