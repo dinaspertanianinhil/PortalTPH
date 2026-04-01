@@ -193,171 +193,162 @@ const url="https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsf
 let allData=[];
 
 async function loadData(){
+  const res=await fetch(url);
+  const data=await res.json();
 
-const res=await fetch(url);
-const data=await res.json();
+  allData=data;
 
-allData=data;
-
-populateFilters(data);
-renderTable();
-
+  populateFilters(data);
+  renderTable();
 }
 
 function getNamaBulan(dateStr){
-
-const bulan=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-
-const d=new Date(dateStr);
-
-if(isNaN(d))return"Tidak diketahui";
-
-return bulan[d.getMonth()]+" "+d.getFullYear();
-
+  const bulan=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+  const d=new Date(dateStr);
+  if(isNaN(d))return"Tidak diketahui";
+  return bulan[d.getMonth()]+" "+d.getFullYear();
 }
 
 function populateFilters(data){
+  const rows=data.slice(1);
 
-const rows=data.slice(1);
+  const bulanSet=new Set();
+  const penggilinganSet=new Set();
 
-const bulanSet=new Set();
-const penggilinganSet=new Set();
+  rows.forEach(r=>{
+    bulanSet.add(getNamaBulan(r[0]));
+    penggilinganSet.add(r[1]);
+  });
 
-rows.forEach(r=>{
-bulanSet.add(getNamaBulan(r[0]));
-penggilinganSet.add(r[1]);
-});
+  bulanSet.forEach(b=>{
+    document.getElementById("filterBulan").innerHTML+=`<option value="${b}">${b}</option>`;
+  });
 
-bulanSet.forEach(b=>{
-document.getElementById("filterBulan").innerHTML+=`<option value="${b}">${b}</option>`;
-});
-
-penggilinganSet.forEach(p=>{
-document.getElementById("filterPenggilingan").innerHTML+=`<option value="${p}">${p}</option>`;
-});
-
+  penggilinganSet.forEach(p=>{
+    document.getElementById("filterPenggilingan").innerHTML+=`<option value="${p}">${p}</option>`;
+  });
 }
 
 function getFilteredRows(){
+  const rows=allData.slice(1);
 
-const rows=allData.slice(1);
+  const searchValue=document.getElementById("search").value.toLowerCase();
+  const selectedBulan=document.getElementById("filterBulan").value;
+  const selectedPenggilingan=document.getElementById("filterPenggilingan").value;
+  const selectedTanggal=document.getElementById("filterTanggal").value;
 
-const searchValue=document.getElementById("search").value.toLowerCase();
-const selectedBulan=document.getElementById("filterBulan").value;
-const selectedPenggilingan=document.getElementById("filterPenggilingan").value;
-const selectedTanggal=document.getElementById("filterTanggal").value;
+  return rows.filter(row=>{
 
-return rows.filter(row=>{
+    const bulan=getNamaBulan(row[0]);
+    const tanggal=row[0]?.split("T")[0];
 
-const bulan=getNamaBulan(row[0]);
-const tanggal=row[0]?.split("T")[0];
+    const cocokBulan=!selectedBulan||bulan===selectedBulan;
+    const cocokPenggilingan=!selectedPenggilingan||row[1]===selectedPenggilingan;
+    const cocokTanggal=!selectedTanggal||tanggal===selectedTanggal;
+    const cocokSearch=row.join(" ").toLowerCase().includes(searchValue);
 
-const cocokBulan=!selectedBulan||bulan===selectedBulan;
-const cocokPenggilingan=!selectedPenggilingan||row[1]===selectedPenggilingan;
-const cocokTanggal=!selectedTanggal||tanggal===selectedTanggal;
-const cocokSearch=row.join(" ").toLowerCase().includes(searchValue);
-
-return cocokBulan&&cocokPenggilingan&&cocokTanggal&&cocokSearch;
-
-});
-
+    return cocokBulan&&cocokPenggilingan&&cocokTanggal&&cocokSearch;
+  });
 }
 
 function sumUnique(rows,index){
+  const seen=new Set();
+  let total=0;
 
-const seen=new Set();
-let total=0;
+  rows.forEach(r=>{
+    const val=Number(r[index])||0;
+    if(seen.has(val))return;
+    seen.add(val);
+    total+=val;
+  });
 
-rows.forEach(r=>{
-const val=Number(r[index])||0;
-if(seen.has(val))return;
-seen.add(val);
-total+=val;
-});
-
-return total;
-
+  return total;
 }
 
 function renderTable(){
 
-if(allData.length===0)return;
+  if(allData.length===0)return;
 
-const header=allData[0];
-const rows=getFilteredRows();
+  const header=allData[0];
+  const rows=getFilteredRows();
 
-let html = `<div class="table-frame"><table><tr>${header.map(h=>`<th>${h}</th>`).join("")}</tr>`;
+  let html = `<div class="table-frame"><table><tr>${header.map(h=>`<th>${h}</th>`).join("")}</tr>`;
 
-rows.forEach((row, i) => {
-  html += "<tr>";
-  row.forEach(cell => html += `<td>${cell}</td>`);
-  html += "</tr>"; // tidak ada tombol Hapus
-});
+  rows.forEach(row=>{
+    html += "<tr>";
+    row.forEach(cell => html += `<td>${cell}</td>`);
+    html += "</tr>";
+  });
 
-html+="</table></div>";
+  html+="</table></div>";
 
-document.getElementById("data-container").innerHTML=html;
+  document.getElementById("data-container").innerHTML=html;
 
-document.getElementById("data-count").innerHTML="Jumlah Data Ditampilkan : "+rows.length;
+  document.getElementById("data-count").innerHTML="Jumlah Data Ditampilkan : "+rows.length;
 
-const totalProduksi=sumUnique(rows,17);
+  // ===== TOTAL SESUAI DATA =====
+  const totalProduksi=sumUnique(rows,17); // Hasil Beras
+  const totalGKP=sumUnique(rows,4);
+  const totalGKG=sumUnique(rows,8);
+  const totalBeras=sumUnique(rows,12);
 
-document.getElementById("total-container").innerHTML=
-`Total Produksi Beras : ${(totalProduksi/1000).toFixed(2)} Ton`;
-
+  document.getElementById("total-container").innerHTML=
+  `
+  Total Produksi Beras : ${(totalProduksi/1000).toFixed(2)} Ton<br>
+  Total Stok GKP : ${(totalGKP/1000).toFixed(2)} Ton<br>
+  Total Stok GKG : ${(totalGKG/1000).toFixed(2)} Ton<br>
+  Total Stok Beras : ${(totalBeras/1000).toFixed(2)} Ton
+  `;
 }
 
 function printTable(){window.print();}
 
 function downloadExcel(){
 
-const rows=getFilteredRows();
-const header=allData[0];
+  const rows=getFilteredRows();
+  const header=allData[0];
 
-const ws=XLSX.utils.aoa_to_sheet([header,...rows]);
-const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet([header,...rows]);
+  const wb=XLSX.utils.book_new();
 
-XLSX.utils.book_append_sheet(wb,ws,"Laporan");
+  XLSX.utils.book_append_sheet(wb,ws,"Laporan");
 
-XLSX.writeFile(wb,"Laporan_Stok_Harga.xlsx");
-
+  XLSX.writeFile(wb,"Laporan_Stok_Harga.xlsx");
 }
 
 function downloadPDF(){
 
-const {jsPDF}=window.jspdf;
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF('l','mm','legal');
 
-const doc=new jsPDF('l','mm','legal');
+  const header=allData[0];
+  const rows=getFilteredRows();
 
-const header=allData[0];
-const rows=getFilteredRows();
+  const tanggalCetak=new Date().toLocaleDateString("id-ID");
 
-const tanggalCetak=new Date().toLocaleDateString("id-ID");
+  doc.setFontSize(16);
+  doc.text("LAPORAN STOK DAN HARGA GABAH BERAS",14,15);
 
-doc.setFontSize(16);
-doc.text("LAPORAN STOK DAN HARGA GABAH BERAS",14,15);
+  doc.setFontSize(10);
+  doc.text("Tanggal Cetak : "+tanggalCetak,14,22);
 
-doc.setFontSize(10);
-doc.text("Tanggal Cetak : "+tanggalCetak,14,22);
+  const filterBulan=document.getElementById("filterBulan").value||"Semua";
+  const filterPenggilingan=document.getElementById("filterPenggilingan").value||"Semua";
+  const filterTanggal=document.getElementById("filterTanggal").value||"Semua";
 
-const filterBulan=document.getElementById("filterBulan").value||"Semua";
-const filterPenggilingan=document.getElementById("filterPenggilingan").value||"Semua";
-const filterTanggal=document.getElementById("filterTanggal").value||"Semua";
+  doc.text("Filter Bulan : "+filterBulan,14,28);
+  doc.text("Filter Penggilingan : "+filterPenggilingan,14,34);
+  doc.text("Filter Tanggal : "+filterTanggal,14,40);
 
-doc.text("Filter Bulan : "+filterBulan,14,28);
-doc.text("Filter Penggilingan : "+filterPenggilingan,14,34);
-doc.text("Filter Tanggal : "+filterTanggal,14,40);
+  doc.autoTable({
+    head:[header],
+    body:rows,
+    startY:45,
+    styles:{fontSize:8},
+    theme:'grid'
+  });
 
-doc.autoTable({
-head:[header],
-body:rows,
-startY:45,
-styles:{fontSize:8},
-theme:'grid'
-});
-
-doc.save("Laporan_Stok_Harga.pdf");
-
+  doc.save("Laporan_Stok_Harga.pdf");
 }
 
 document.getElementById("filterBulan").addEventListener("change",renderTable);
