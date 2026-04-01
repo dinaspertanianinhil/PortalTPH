@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -404,7 +404,28 @@ Monitoring Harga • Produksi • Stok • Serangan Hama tanaman • Luas Tambah
 </div>
 
 </section>
+
+<!-- AUDIO (WAJIB DI SINI) -->
+<audio id="welcomeAudio">
+  <source src="https://raw.githubusercontent.com/dinaspertanianinhil/PortalTPH/refs/heads/main/ElevenLabs_2026-04-01T06_31_34_Putri%20Maharani%20-%20Neutral%20and%20WItty_pvc_sp100_s30_sb40_se50_b_m2.mp3" type="audio/mpeg">
+</audio>
+
 <script>
+const audio = document.getElementById("welcomeAudio");
+
+// klik pertama baru bunyi (100% pasti jalan)
+document.addEventListener("click", function(){
+  if(!localStorage.getItem("welcomePlayed")){
+    audio.volume = 0.6;
+    audio.play();
+    localStorage.setItem("welcomePlayed","yes");
+  }
+}, { once:true });
+</script>
+
+<script>
+
+// ===== MENU =====
 function toggleMenu(){
   document.getElementById("menu").classList.toggle("show");
 }
@@ -425,16 +446,30 @@ document.addEventListener("click", e=>{
   }
 });
 
-// ===== LOGOUT FUNCTION =====
-function logout(){
-  // hapus session/localStorage kalau mau
-  // localStorage.removeItem("login"); // opsional
+// ===== AUDIO (SUDAH FIX) =====
+window.addEventListener("load", function(){
 
-  // redirect ke halaman login utama
+  const audio = document.getElementById("welcomeAudio");
+
+  if(!localStorage.getItem("welcomePlayed")){
+    setTimeout(()=>{
+      audio.volume = 0.6;
+      audio.play().catch(()=>{});
+      localStorage.setItem("welcomePlayed","yes");
+    }, 1200);
+  }
+
+  // fallback klik
+  document.addEventListener("click", function(){
+    audio.play();
+  }, { once:true });
+
+});
+
+// ===== LOGOUT =====
+function logout(){
   window.location.href = "index.html";
 }
-</script>
-
 
 </script>
 
