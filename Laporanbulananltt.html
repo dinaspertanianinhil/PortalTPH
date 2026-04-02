@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Laporan LTT Bulanan</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+<style>
+body{margin:0;font-family:Segoe UI,Arial;background-image:url('https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-rice-fields-with-green-rice-with-dew-and-mountains-image_15860694.jpg');background-size:cover;background-attachment:fixed;}
+.overlay{background:rgba(255,255,255,0.92);min-height:100vh;}
+header{display:flex;align-items:center;gap:15px;padding:15px 25px;background:#1b5e20;color:white;}
+header img{ width:55px; }
+.container{padding:20px;max-width:1200px;margin:auto;}
+.filter{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+button{padding:8px 12px;border:none;background:#2e7d32;color:white;border-radius:5px;cursor:pointer;}
+table{width:100%;border-collapse:collapse;background:white;margin-top:10px;}
+th{background:#2e7d32;color:white;padding:8px;}
+td{padding:8px;border-bottom:1px solid #eee;}
+</style>
+</head>
+
+<body>
+<div class="overlay">
+
+<header>
+<img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png">
+<h3>Dinas Pertanian Indragiri Hilir</h3>
+</header>
+
+<div class="container">
+
+<div class="filter">
+<input type="month" id="bulan">
+<select id="kecamatan"><option value="">Semua Kecamatan</option></select>
+<select id="desa"><option value="">Semua Desa</option></select>
+<button onclick="render()">Terapkan</button>
+</div>
+
+<h3>Rekap Kecamatan</h3>
+<button onclick="downloadExcel('kecamatan')">Download Excel</button>
+<button onclick="downloadPDF('kecamatan')">Download PDF</button>
+<table id="tabelKecamatan">
+<thead>
+<tr><th>Kecamatan</th><th>Oplah</th><th>Reguler</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<h3>Rekap Desa</h3>
+<button onclick="downloadExcel('desa')">Download Excel</button>
+<button onclick="downloadPDF('desa')">Download PDF</button>
+<table id="tabelDesa">
+<thead>
+<tr><th>Desa</th><th>Oplah</th><th>Reguler</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+
+</div>
+
+<script>
+
+const API="https://script.google.com/macros/s/AKfycbzN3Ak0JmBowwPePkwIIzIonYgGOEM9muR2V8ic5Z92LaqV1LriWdWlIBhNn5DA8ffT/exec";
+let raw=[];
+
+function num(x){return parseFloat((x+"").replace(",", "."))||0;}
+
+async function load(){
+let r=await fetch(API);
+raw=await r.json();
+
+let kecSet=new Set(), desaSet=new Set();
+raw.forEach(d=>{
+kecSet.add(d.KECAMATAN);
+desaSet.add(d.DESA);
+});
+
+kecSet.forEach(k=>kecamatan.innerHTML+=`<option>${k}</option>`);
+desaSet.forEach(d=>desa.innerHTML+=`<option>${d}</option>`);
+
+render();
+}
+
+function render(){
+
+let b=bulan.value;
+let k=kecamatan.value;
+let d=desa.value;
+
+// FILTER
+let data=raw.filter(x=>{
+if(b && !x.TANGGAL.startsWith(b)) return false;
+if(k && x.KECAMATAN!=k) return false;
+if(d && x.DESA!=d) return false;
+return true;
+});
+
+// ========================
+// DETEKSI SEMUA JENIS
+// ========================
+let jenisSet=new Set();
+data.forEach(x=>{
+jenisSet.add(x["JENIS LTT"]);
+});
+let jenisList=[...jenisSet];
+
+// ========================
+// REKAP KECAMATAN
+// ========================
+let kecMap={};
+
+data.forEach(x=>{
+let kc=x.KECAMATAN;
+let jenis=x["JENIS LTT"];
+let luas=num(x["LUAS TAMBAH TANAM"]);
+
+if(!kecMap[kc]) kecMap[kc]={};
+
+kecMap[kc][jenis]=(kecMap[kc][jenis]||0)+luas;
+});
+
+// HEADER
+let head="<tr><th>Kecamatan</th>";
+jenisList.forEach(j=> head+=`<th>${j}</th>`);
+head+="</tr>";
+tabelKecamatan.querySelector("thead").innerHTML=head;
+
+// BODY
+let body="";
+let totalKolom={};
+
+Object.keys(kecMap).forEach(kc=>{
+let row=`<tr><td>${kc}</td>`;
+
+jenisList.forEach(j=>{
+let val=kecMap[kc][j]||0;
+
+totalKolom[j]=(totalKolom[j]||0)+val;
+
+row+=`<td>${val.toFixed(2)}</td>`;
+});
+
+row+="</tr>";
+body+=row;
+});
+
+// TOTAL ROW
+let totalRow="<tr style='font-weight:bold;background:#e8f5e9'><td>TOTAL</td>";
+
+jenisList.forEach(j=>{
+totalRow+=`<td>${(totalKolom[j]||0).toFixed(2)}</td>`;
+});
+
+totalRow+="</tr>";
+
+tabelKecamatan.querySelector("tbody").innerHTML=body+totalRow;
+
+
+// ========================
+// REKAP DESA
+// ========================
+let desaMap={};
+
+data.forEach(x=>{
+let ds=x.DESA;
+let jenis=x["JENIS LTT"];
+let luas=num(x["LUAS TAMBAH TANAM"]);
+
+if(!desaMap[ds]) desaMap[ds]={};
+
+desaMap[ds][jenis]=(desaMap[ds][jenis]||0)+luas;
+});
+
+// HEADER
+let head2="<tr><th>Desa</th>";
+jenisList.forEach(j=> head2+=`<th>${j}</th>`);
+head2+="</tr>";
+tabelDesa.querySelector("thead").innerHTML=head2;
+
+// BODY
+let body2="";
+let totalKolom2={};
+
+Object.keys(desaMap).forEach(ds=>{
+let row=`<tr><td>${ds}</td>`;
+
+jenisList.forEach(j=>{
+let val=desaMap[ds][j]||0;
+
+totalKolom2[j]=(totalKolom2[j]||0)+val;
+
+row+=`<td>${val.toFixed(2)}</td>`;
+});
+
+row+="</tr>";
+body2+=row;
+});
+
+// TOTAL
+let totalRow2="<tr style='font-weight:bold;background:#e8f5e9'><td>TOTAL</td>";
+
+jenisList.forEach(j=>{
+totalRow2+=`<td>${(totalKolom2[j]||0).toFixed(2)}</td>`;
+});
+
+totalRow2+="</tr>";
+
+tabelDesa.querySelector("tbody").innerHTML=body2+totalRow2;
+
+}
+
+function downloadExcel(type){
+
+let table = type==='kecamatan'?tabelKecamatan:tabelDesa;
+
+let wb=XLSX.utils.table_to_book(table);
+XLSX.writeFile(wb,`LTT_${type}.xlsx`);
+}
+
+function downloadPDF(type){
+
+const { jsPDF } = window.jspdf;
+let doc=new jsPDF();
+
+let table = type==='kecamatan'?tabelKecamatan:tabelDesa;
+
+doc.text("Laporan LTT Bulanan",14,10);
+
+doc.autoTable({
+html:table,
+startY:15,
+styles:{fontSize:8},
+headStyles:{fillColor:[46,125,50]}
+});
+
+doc.save(`LTT_${type}.pdf`);
+}
+
+load();
+
+</script>
+
+</body>
+</html>
