@@ -14,7 +14,6 @@ body {
 }
 h2,h3 { margin:0 0 10px; }
 
-/* HEADER */
 .header {
   background:#ffffff;
   padding:16px;
@@ -29,7 +28,6 @@ h2,h3 { margin:0 0 10px; }
 .header .title { font-size:16px; font-weight:600; }
 .header .subtitle { font-size:13px; color:#6b7280; }
 
-/* BOX */
 .box {
   background:#fff;
   padding:16px;
@@ -62,18 +60,8 @@ button {
   cursor:pointer;
 }
 button:hover { opacity:.9 }
+.btn-hapus { background:#dc2626; }
 
-button:disabled {
-  background:#9ca3af;
-  cursor:not-allowed;
-}
-
-.btn-hapus {
-  background:#dc2626;
-}
-.btn-hapus:hover { opacity:.9; }
-
-/* DESA */
 .desa {
   border:1px dashed #b6bec8;
   padding:14px;
@@ -82,7 +70,6 @@ button:disabled {
   background:#fafafa;
 }
 
-/* POKTAN */
 .poktan {
   display:grid;
   grid-template-columns: 1fr 110px 170px 90px;
@@ -93,7 +80,6 @@ button:disabled {
   .poktan { grid-template-columns: 1fr; }
 }
 
-/* REKAP */
 .rekap div {
   font-size:14px;
   margin-top:6px;
@@ -113,7 +99,7 @@ button:disabled {
 
 <div class="box">
   <label>Nama Pelapor</label>
-  <input type="text" id="pelapor" placeholder="Nama petugas pelapor" oninput="formatKapital(this)">
+  <input type="text" id="pelapor" oninput="formatKapital(this)">
 
   <label>Kecamatan</label>
   <select id="kecamatan">
@@ -170,118 +156,147 @@ button:disabled {
 </div>
 
 <script>
-  function formatAngka(el){
-  let val = el.value;
-
-  // ubah titik jadi koma
-  val = val.replace(/\./g, ',');
-
-  // hanya angka & koma
-  val = val.replace(/[^0-9,]/g, '');
-
-  // hanya 1 koma
-  const parts = val.split(',');
-  if(parts.length > 2){
-    val = parts[0] + ',' + parts.slice(1).join('');
-  }
-
-  el.value = val;
-}
-/* FORMAT OTOMATIS KAPITAL AWAL KATA */
+// =============================
+// FORMAT
+// =============================
 function formatKapital(el) {
   let text = el.value;
-
-  text = text
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trimStart()
-    .replace(/\b\w/g, function (char) {
-      return char.toUpperCase();
-    });
-
+  text = text.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
   el.value = text;
 }
 
+// =============================
+// DATA WILAYAH (PAKAI PUNYA KAMU)
+// =============================
+const dataWilayah = { "Batang Tuaka": { kelurahan: ["Sungai Piring"], desa: [ "Gemilang Jaya", "Kuala Sebatu", "Pasir Emas", "Sialang Jaya", "Simpang Jaya", "Sungai Dusun", "Sungai Junjangan", "Sungai Luar", "Sungai Rawa", "Sungai Raya", "Tanjung Siantar", "Tasik Raya" ] }, "Concong": { kelurahan: ["Concong Luar"], desa: [ "Concong Dalam", "Concong Tengah", "Kampung Baru", "Panglima Raja", "Sungai Berapit" ] }, "Enok": { kelurahan: ["Enok", "Pusaran", "Pantai Seberang Makmur", "Simpang Tiga"], desa: [ "Bagan Jaya", "Jaya Bhakti", "Pengalihan", "Rantau Panjang", "Simpang Tiga Daratan", "Suhada", "Sungai Ambat", "Sungai Lokan", "Sungai Rukam", "Teluk Medan" ] }, "Gaung": { kelurahan: ["Kuala Lahang"], desa: [ "Belantaraya", "Gembira", "Jerambang", "Lahang Baru", "Lahang Hulu", "Lahang Tengah", "Pintasan", "Pungkat", "Semambu Kuning", "Simpang Gaung", "Soren", "Sungai Baru", "Teluk Kabung", "Teluk Merbau", "Teluk Nibung", "Terusan Kempas" ] }, "Gaung Anak Serka": { kelurahan: ["Teluk Pinang", "Tanjung Harapan", "Sungai Empat"], desa: [ "Harapan Makmur", "Idaman", "Kelumpang", "Kuala Gaung", "Rambaian", "Sungai Iliran", "Teluk Pantaian", "Teluk Sungka", "Teluk Tuasan" ] }, "Kateman": { kelurahan: ["Tagaraja", "Bandar Sri Gemilang", "Amal Bhakti"], desa: [ "Air Tawar", "Kuala Selat", "Penjuru", "Sari Mulya", "Sungai Simbar", "Sungai Teritip", "Tanjung Raja", "Makmur Jaya" ] }, "Kempas": { kelurahan: ["Kempas Jaya", "Harapan Tani"], desa: [ "Bayas Jaya", "Danau Pulai Indah", "Karya Tani", "Kerta Jaya", "Kulim Jaya", "Pekan Tua", "Rumbai Jaya", "Sungai Ara", "Sungai Gantang", "Sungai Rabit" ] }, "Kemuning": { kelurahan: ["Selensen"], desa: [ "Air Balui", "Batu Ampar", "Tuk Jimun", "Kemuning Muda", "Kemuning Tua", "Keritang", "Limau Manis", "Lubuk Besar", "Sekara", "Sekayan", "Talang Jangkang" ] }, "Keritang": { kelurahan: ["Kota Baru Reteh"], desa: [ "Kayu Raja", "Kembang Mekar Sari", "Kota Baru Seberida", "Kuala Keritang", "Kuala Lemang", "Lintas Utara", "Nusantara Jaya", "Nyiur Permai", "Pancur", "Pasar Kembang", "Pebenaan", "Pengalihan", "Petalongan", "Seberang Pebenaan", "Sencalang", "Teluk Kelasa" ] }, "Kuala Indragiri": { kelurahan: ["Sapat"], desa: [ "Perigi Raja", "Sungai Bela", "Sungai Buluh", "Sungai Piyai", "Tanjung Lajau", "Tanjung Melayu", "Teluk Dalam" ] }, "Mandah": { kelurahan: ["Khairiah Mandah"], desa: [ "Bakau Aceh", "Bantaian", "Batang Sari", "Batang Tumu", "Bekawan", "Belaras", "Belaras Barat", "Bente", "Bidari Tanjung Datuk", "Bolak Raya", "Cahaya Baru", "Igal", "Pelanduk", "Pulau Cawan", "Sepakat Jaya", "Surayya Mandiri" ] }, "Pelangiran": { kelurahan: ["Pelangiran"], desa: [ "Bagan Jaya", "Baung Rejo Jaya", "Catur Karya", "Hidayah", "Intan Mulya Jaya", "Pinang Jaya", "Rotan Semelur", "Saka Palas Jaya", "Simpang Kateman", "Tagagiri Raja", "Tagagiri Tama Jaya", "Tanjung Simpang", "Tegal Rejo Jaya", "Teluk Bunian", "Terusan Beringin Jaya", "Wonosari" ] }, "Pulau Burung": { kelurahan: [], desa: [ "Bangun Harjo Jaya", "Beringin Jaya", "Binangun Jaya", "Bukit Sari Intan Jaya", "Keramat Jaya", "Manunggal Jaya", "Mayang Sari Jaya", "Pulau Burung", "Ringin Jaya", "Sapta Jaya", "Sempadan Jaya", "Sri Danai", "Suka Jaya", "Suko Harjo Jaya", "Sungai Danai", "Teluk Nibung" ] }, "Reteh": { kelurahan: ["Pulau Kijang", "Madani", "Metro"], desa: [ "Seberang Pulau Kijang", "Pulau Kecil", "Pulau Ruku", "Sanglar", "Seberang Sanglar", "Sungai Asam", "Sungai Mahang", "Sungai Terab", "Sungai Undan", "Tanjung Labuh" ] }, "Sungai Batang": { kelurahan: ["Benteng"], desa: [ "Benteng Barat", "Benteng Utara", "Kuala Patah Parang", "Kuala Sungai Batang", "Mugo Mulyo", "Pandan Sari", "Pasenggarahan" ] }, "Tanah Merah": { kelurahan: ["Kuala Enok"], desa: [ "Selat Nama", "Sungai Laut", "Sungai Nyiur", "Tanah Merah", "Tanjung Baru", "Tanjung Pasir", "Tekulai Bugis", "Tekulai Hilir", "Tekulai Hulu" ] }, "Teluk Belengkong": { kelurahan: [], desa: [ "Beringin Mulya", "Gembaran", "Griya Mukti Jaya", "Hibrida Jaya", "Hibrida Mulya", "Indra Sari Jaya", "Kelapa Patih Jaya", "Saka Rotan", "Sapta Mulya Jaya", "Sumber Jaya", "Sumber Makmur Jaya", "Sumber Sari Jaya", "Tunggal Rahayu Jaya" ] }, "Tembilahan": { kelurahan: ["Tembilahan Hilir", "Pekan Arba", "Seberang Tembilahan", "Seberang Tembilahan Barat", "Seberang Tembilahan Selatan"], desa: [ "Sungai Beringin", "Sungai Perak", "Tembilahan Kota" ] }, "Tembilahan Hulu": { kelurahan: ["Pekan Kamis", "Pulau Palas", "Sialang Panjang", "Tembilahan Hulu"], desa: [ "Sungai Intan", "Tembilahan Barāt" ] }, "Tempuling": { kelurahan: ["Harapan Jaya", "Karya Tunas Jaya", "Mumpa"], desa: [ "Pangkalan Tujuh", "Sungai Salak", "Teluk Jira", "Tempuling Jaya" ] } };
+
+// =============================
+// TANGGAL OTOMATIS & DIKUNCI
+// =============================
+(function(){
+  const t = document.getElementById("tanggal");
+  const now = new Date();
+
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const dd = String(now.getDate()).padStart(2,'0');
+
+  const today = `${yyyy}-${mm}-${dd}`;
+
+  t.value = today;
+  t.min = today;
+  t.max = today;
+
+  t.addEventListener("change", function(){
+    this.value = today;
+  });
+})();
+
+// =============================
+// DROPDOWN DESA
+// =============================
 function tambahDesa() {
   const desa = document.createElement("div");
   desa.className = "desa";
   desa.innerHTML = `
     <label>Desa/Kelurahan</label>
-    <input type="text" placeholder="Nama Desa / Kelurahan" oninput="formatKapital(this)">
+    <select class="desaSelect"></select>
     <div class="poktanContainer"></div>
     <button type="button" onclick="tambahPoktan(this)">+ Tambah Poktan</button>
     <button type="button" class="btn-hapus" onclick="this.parentElement.remove()">Hapus Desa</button>
   `;
   document.getElementById("desaContainer").appendChild(desa);
+  isiDropdownDesa(desa.querySelector(".desaSelect"));
 }
 
-function tambahPoktan(btn) {
-  const container = btn.parentElement.querySelector(".poktanContainer");
+function isiDropdownDesa(selectEl) {
+  const kec = document.getElementById("kecamatan").value;
+  selectEl.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
+
+  if (dataWilayah[kec]) {
+    dataWilayah[kec].kelurahan.forEach(k=>{
+      let o=document.createElement("option");
+      o.value=k; o.textContent=k+" (Kelurahan)";
+      selectEl.appendChild(o);
+    });
+    dataWilayah[kec].desa.forEach(d=>{
+      let o=document.createElement("option");
+      o.value=d; o.textContent=d+" (Desa)";
+      selectEl.appendChild(o);
+    });
+  }
+}
+
+document.getElementById("kecamatan").addEventListener("change", ()=>{
+  document.querySelectorAll(".desaSelect").forEach(s=>isiDropdownDesa(s));
+});
+
+// =============================
+function tambahPoktan(btn){
+  const c = btn.parentElement.querySelector(".poktanContainer");
   const p = document.createElement("div");
-  p.className = "poktan";
-  p.innerHTML = `
-    <input type="text" placeholder="Nama Poktan" oninput="formatKapital(this)">
-    <input type="text" placeholder="Luas (Ha)" oninput="formatAngka(this); hitung()">
-    <select onchange="hitung()">
+  p.className="poktan";
+
+  p.innerHTML=`
+    <input placeholder="Nama Poktan" oninput="hitungRekap()">
+    <input placeholder="Luas (Ha)" oninput="hitungRekap()">
+    <select onchange="hitungRekap()">
       <option value="reguler">Reguler</option>
       <option value="oplah">OPLAH</option>
       <option value="csr">CSR</option>
       <option value="pompa">Pompa</option>
-      <option value="das">DAS/Bendungan</option>
-      <option value="tusip">Tusip Sawit/Kelapa</option>
+      <option value="das/bendungan">DAS/Bendungan</option>
+      <option value="padi tusip sawit/kelapa">Padi Tusip Sawit/Kelapa</option>
       <option value="gogo">GOGO</option>
       <option value="jagung">Jagung</option>
       <option value="jagung_polri">Jagung Polri</option>
       <option value="kedelai">Kedelai</option>
     </select>
-    <button type="button" class="btn-hapus" onclick="this.parentElement.remove();hitung();">Hapus</button>
+    <button class="btn-hapus" onclick="this.parentElement.remove(); hitungRekap()">Hapus</button>
   `;
-  container.appendChild(p);
-}
 
-function hitung() {
+  c.appendChild(p);
+}
+function hitungRekap(){
   let total = {
-    reguler: 0,
-    oplah: 0,
-    csr: 0,
-    pompa: 0,
-    das: 0,
-    tusip: 0,
-    gogo: 0,
-    jagung: 0,
-    jagung_polri: 0,
-    kedelai: 0
+    reguler:0, oplah:0, csr:0, pompa:0,
+    das:0, padi:0, gogo:0,
+    jagung:0, jagung_polri:0, kedelai:0
   };
 
-  document.querySelectorAll(".poktan").forEach(p => {
-  const luas = parseFloat(
-  (p.children[1].value || "0").replace(/,/g, ".")
-) || 0;
-  const jenis = p.children[2].value;
+  document.querySelectorAll(".poktan").forEach(p=>{
+    let luas = parseFloat((p.children[1].value || "0").replace(",", ".")) || 0;
+    let jenis = p.children[2].value.toLowerCase();
 
-  if (total.hasOwnProperty(jenis)) {
-    total[jenis] += luas;
-  }
-});
+    if(jenis === "reguler") total.reguler += luas;
+    else if(jenis === "oplah") total.oplah += luas;
+    else if(jenis === "csr") total.csr += luas;
+    else if(jenis === "pompa") total.pompa += luas;
+    else if(jenis === "das/bendungan") total.das += luas;
+    else if(jenis.includes("padi")) total.padi += luas;
+    else if(jenis === "gogo") total.gogo += luas;
+    else if(jenis === "jagung") total.jagung += luas;
+    else if(jenis.includes("polri")) total.jagung_polri += luas;
+    else if(jenis === "kedelai") total.kedelai += luas;
+  });
 
-  reguler.innerText = total.reguler.toFixed(2).replace(".", ",");
-oplah.innerText   = total.oplah.toFixed(2).replace(".", ",");
-csr.innerText     = total.csr.toFixed(2).replace(".", ",");
-pompa.innerText   = total.pompa.toFixed(2).replace(".", ",");
-das.innerText     = total.das.toFixed(2).replace(".", ",");
-padi.innerText    = total.tusip.toFixed(2).replace(".", ",");
-gogo.innerText    = total.gogo.toFixed(2).replace(".", ",");
-jagung.innerText  = total.jagung.toFixed(2).replace(".", ",");
-jagung_polri.innerText = total.jagung_polri.toFixed(2).replace(".", ",");
-kedelai.innerText = total.kedelai.toFixed(2).replace(".", ",");
+  document.getElementById("reguler").innerText = total.reguler;
+  document.getElementById("oplah").innerText = total.oplah;
+  document.getElementById("csr").innerText = total.csr;
+  document.getElementById("pompa").innerText = total.pompa;
+  document.getElementById("das").innerText = total.das;
+  document.getElementById("padi").innerText = total.padi;
+  document.getElementById("gogo").innerText = total.gogo;
+  document.getElementById("jagung").innerText = total.jagung;
+  document.getElementById("jagung_polri").innerText = total.jagung_polri;
+  document.getElementById("kedelai").innerText = total.kedelai;
 }
-</script>
 
-<script>
+// =============================
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLt1OpDD7hEKTcVmATs-bxG5LgyQ2pKYzBSk6UO7YUzcx-vNFZM24SOjrcZh0RFI91/exec";
 
 function simpan() {
-    const btn = document.getElementById("btnSimpan");
+  const btn = document.getElementById("btnSimpan");
 
   if (btn.disabled) return;
 
@@ -297,15 +312,17 @@ function simpan() {
   let rows = [];
 
   document.querySelectorAll(".desa").forEach(desaBox => {
-    const desa = desaBox.querySelector("input").value;
+
+    // 🔥 INI YANG DIREVISI
+    const desa = desaBox.querySelector("select").value;
 
     desaBox.querySelectorAll(".poktan").forEach(p => {
       rows.push({
-  desa,
-  poktan: p.children[0].value,
-  luas: (p.children[1].value || "0").replace(/\./g, ","), // 🔥 paksa koma
-  jenis: p.children[2].value
-});
+        desa,
+        poktan: p.children[0].value,
+        luas: (p.children[1].value || "0").replace(/\./g, ","),
+        jenis: p.children[2].value
+      });
     });
   });
 
@@ -345,48 +362,6 @@ function simpan() {
     alert("❌ Gagal mengirim data");
   });
 }
-</script>
-
-<!-- TAMBAHAN FITUR YANG DIMINTA -->
-<script>
-/* Kunci tanggal hanya hari ini */
-(function(){
-  const t = document.getElementById("tanggal");
-  const now = new Date();
-
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth()+1).padStart(2,'0');
-  const dd = String(now.getDate()).padStart(2,'0');
-
-  const today = `${yyyy}-${mm}-${dd}`;
-
-  t.value = today;
-  t.min = today;
-  t.max = today;
-
-  t.addEventListener("change", function(){
-    this.value = today;
-  });
-})();
-
-/* Batas waktu laporan jam 15:00 */
-(function(){
-  const btn = document.getElementById("btnSimpan");
-
-  function cekBatasWaktu(){
-    const now = new Date();
-    const jam = now.getHours();
-    const menit = now.getMinutes();
-
-    if (jam > 15 || (jam === 15 && menit > 0)) {
-      btn.disabled = true;
-      btn.innerText = "Waktu Laporan Sudah Lewat";
-      alert("Waktu pelaporan hari ini sudah lewat. Silakan melaporkan besok hari.");
-    }
-  }
-
-  cekBatasWaktu();
-})();
 </script>
 
 </body>
