@@ -215,13 +215,15 @@ function isiDropdownDesa(selectEl) {
 
   if (dataWilayah[kec]) {
     dataWilayah[kec].kelurahan.forEach(k=>{
-      let o=document.createElement("option");
-      o.value=k; o.textContent=k+" (Kelurahan)";
+      let o = document.createElement("option");
+      o.value = "Kelurahan " + k;   // 🔥 INI DIUBAH
+      o.textContent = k + " (Kelurahan)";
       selectEl.appendChild(o);
     });
     dataWilayah[kec].desa.forEach(d=>{
-      let o=document.createElement("option");
-      o.value=d; o.textContent=d+" (Desa)";
+      let o = document.createElement("option");
+      o.value = "Desa " + d;        // 🔥 INI DIUBAH
+      o.textContent = d + " (Desa)";
       selectEl.appendChild(o);
     });
   }
