@@ -121,7 +121,7 @@ Sebelum waktu tersebut, data masih bersifat sementara dan berpotensi mengalami p
 <tr>
 <th>Tanggal</th>
 <th>Kecamatan</th>
-<th>Desa</th>
+<th>Desa/Kelurahan</th>
 <th>Poktan</th>
 <th>Jenis</th>
 <th>Luas</th>
@@ -285,7 +285,7 @@ tbody.innerHTML+=`
 <tr>
 <td>${d.TANGGAL}</td>
 <td>${d.KECAMATAN}</td>
-<td>${d.DESA}</td>
+<td>${d["DESA/KELURAHAN"]}</td>
 <td>${d["KELOMPOK TANI"]}</td>
 <td>${d["JENIS LTT"]}</td>
 <td>${luas.toFixed(2)}</td>
