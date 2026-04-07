@@ -693,6 +693,46 @@ function simpan() {
   });
 }
 </script>
+  <script>
+/* Kunci tanggal hanya hari ini */
+(function(){
+  const t = document.getElementById("tanggal");
+  const now = new Date();
+
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const dd = String(now.getDate()).padStart(2,'0');
+
+  const today = `${yyyy}-${mm}-${dd}`;
+
+  t.value = today;
+  t.min = today;
+  t.max = today;
+
+  t.addEventListener("change", function(){
+    this.value = today;
+  });
+})();
+
+/* Batas waktu laporan jam 15:00 */
+(function(){
+  const btn = document.getElementById("btnSimpan");
+
+  function cekBatasWaktu(){
+    const now = new Date();
+    const jam = now.getHours();
+    const menit = now.getMinutes();
+
+    if (jam > 15 || (jam === 15 && menit > 0)) {
+      btn.disabled = true;
+      btn.innerText = "Waktu Laporan Sudah Lewat";
+      alert("Waktu pelaporan hari ini sudah lewat. Silakan melaporkan besok hari.");
+    }
+  }
+
+  cekBatasWaktu();
+})();
+</script>
 
 </body>
 </html>
