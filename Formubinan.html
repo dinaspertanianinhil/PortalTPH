@@ -190,7 +190,7 @@ button:hover{background:#0f9d4a}
 </div>
 </div>
 
-<button type="submit">Simpan Data</button>
+<button type="button" onclick="kirimData()">Simpan Data</button>
 
 </form>
 
@@ -198,39 +198,38 @@ button:hover{background:#0f9d4a}
 </div>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbwEYb41a103Ai2G1HUmbJzqFfrsZOhkF0vJ5NUnoxumYAneDi8yGbQNqnyinRkJCdt1/exec";
+function kirimData(){
 
-const form = document.getElementById('formUbinan');
+  const scriptURL = "https://script.google.com/macros/s/AKfycbxm2XTO289xrY1njB6doplRQubStWisr-Fx1PR7CqI3IamH9oPFY4VRJETMY_xQ07-w/exec";
 
-form.addEventListener('submit', e => {
-  e.preventDefault();
+  const formData = new FormData();
 
-  const data = {
-    kecamatan: document.getElementById('kecamatan').value,
-    desa: document.getElementById('desa').value,
-    poktan: document.getElementById('poktan').value,
-    jenis: document.getElementById('jenis').value,
-    varietas: document.getElementById('varietas').value,
-    luas: document.getElementById('luas').value,
-    rumpun: document.getElementById('rumpun').value,
-    bulir: document.getElementById('bulir').value,
-    timbang: document.getElementById('timbang').value
-  };
+  formData.append("kecamatan", document.getElementById('kecamatan').value);
+  formData.append("desa", document.getElementById('desa').value);
+  formData.append("poktan", document.getElementById('poktan').value);
+  formData.append("jenis", document.getElementById('jenis').value);
+  formData.append("varietas", document.getElementById('varietas').value);
+  formData.append("luas", document.getElementById('luas').value);
+  formData.append("rumpun", document.getElementById('rumpun').value);
+  formData.append("bulir", document.getElementById('bulir').value);
+  formData.append("timbang", document.getElementById('timbang').value);
 
   fetch(scriptURL, {
-  method: 'POST',
-  body: formData
-})
-.then(res => res.text())
-.then(res => {
-  console.log(res);
-  alert("Data berhasil disimpan");
-  form.reset();
-})
-.catch(err => {
-  console.error(err);
-  alert("Gagal kirim");
-});
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.text())
+  .then(res => {
+    console.log(res);
+    alert("Data berhasil disimpan");
+    document.getElementById("formUbinan").reset();
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Gagal kirim");
+  });
+
+}
 </script>
 
 </body>
