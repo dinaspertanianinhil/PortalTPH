@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Ubinan</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+  font-family:'Segoe UI',sans-serif;
+  margin:0;
+  background:url('https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-rice-fields-with-green-rice-with-dew-and-mountains-image_15860694.jpg') no-repeat center center fixed;
+  background-size:cover;
+}
+
+.overlay{
+  background:rgba(0,0,0,0.45);
+  min-height:100vh;
+  padding:20px;
+}
+
+.container{
+  max-width:1000px;
+  margin:auto;
+}
+
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+  margin-bottom:20px;
+}
+
+.header{
+  text-align:center;
+  margin-bottom:20px;
+}
+.header img{width:70px}
+.header h2{margin:10px 0;color:#0a7d3b}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:15px;
+}
+
+.stat{
+  background:#f5f5f5;
+  padding:15px;
+  border-radius:12px;
+  text-align:center;
+}
+.stat h3{margin:0;font-size:14px;color:#555}
+.stat p{font-size:20px;font-weight:bold;color:#0a7d3b}
+
+.table-container{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+table th, table td{
+  padding:8px;
+  border-bottom:1px solid #ddd;
+  font-size:13px;
+  text-align:left;
+}
+
+table th{
+  background:#0a7d3b;
+  color:#fff;
+}
+</style>
+</head>
+
+<body>
+<div class="overlay">
+<div class="container">
+
+<div class="card header">
+<img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png">
+<h2>Dashboard Ubinan</h2>
+</div>
+
+<div class="card">
+<div class="grid">
+<div class="stat">
+<h3>Total Data</h3>
+<p id="totalData">0</p>
+</div>
+<div class="stat">
+<h3>Total Luas (m²)</h3>
+<p id="totalLuas">0</p>
+</div>
+<div class="stat">
+<h3>Total Timbangan (kg)</h3>
+<p id="totalTimbang">0</p>
+</div>
+<div class="stat">
+<h3>Rata-rata Bulir</h3>
+<p id="avgBulir">0</p>
+</div>
+</div>
+</div>
+
+<div class="card">
+<canvas id="chart"></canvas>
+</div>
+
+<div class="card table-container">
+<table id="table">
+<thead>
+<tr>
+<th>Tanggal</th>
+<th>Kecamatan</th>
+<th>Desa</th>
+<th>Poktan</th>
+<th>Varietas</th>
+<th>Luas</th>
+<th>Timbang</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+</div>
+</div>
+
+<script>
+const url = "https://script.google.com/macros/s/AKfycbzpvtL5CtN6WEJZU9eKwH04L8oAdpLF3v5vLTPNjPi9wfD6rXGIwk86zhyKRTCTPPJx/exec";
+
+function loadData(data){
+
+let totalLuas=0,totalTimbang=0,totalBulir=0;
+
+const tbody = document.querySelector("#table tbody");
+
+data.forEach(d=>{
+  totalLuas+=Number(d.luas);
+  totalTimbang+=Number(d.timbang);
+  totalBulir+=Number(d.bulir);
+
+  tbody.innerHTML+=`<tr>
+  <td>${d.tanggal}</td>
+  <td>${d.kecamatan}</td>
+  <td>${d.desa}</td>
+  <td>${d.poktan}</td>
+  <td>${d.varietas}</td>
+  <td>${d.luas}</td>
+  <td>${d.timbang}</td>
+  </tr>`;
+});
+
+document.getElementById("totalData").innerText=data.length;
+document.getElementById("totalLuas").innerText=totalLuas;
+document.getElementById("totalTimbang").innerText=totalTimbang;
+document.getElementById("avgBulir").innerText=(totalBulir/data.length).toFixed(1);
+
+const ctx=document.getElementById('chart');
+new Chart(ctx,{
+type:'bar',
+data:{
+labels:data.map(d=>d.kecamatan),
+datasets:[{
+label:'Timbangan',
+data:data.map(d=>d.timbang)
+}]
+}
+});
+
+}
+// 🔥 panggil data dari Apps Script (JSONP anti CORS)
+const script = document.createElement("script");
+script.src = url + "?callback=loadData";
+document.body.appendChild(script);
+</script>
+
+</body>
+</html>
