@@ -79,7 +79,7 @@ raw=await r.json();
 let kecSet=new Set(), desaSet=new Set();
 raw.forEach(d=>{
 kecSet.add(d.KECAMATAN);
-desaSet.add(d.DESA);
+desaSet.add(d["DESA/KELURAHAN"]);
 });
 
 kecSet.forEach(k=>kecamatan.innerHTML+=`<option>${k}</option>`);
@@ -98,7 +98,7 @@ let d=desa.value;
 let data=raw.filter(x=>{
 if(b && !x.TANGGAL.startsWith(b)) return false;
 if(k && x.KECAMATAN!=k) return false;
-if(d && x.DESA!=d) return false;
+if(d && x["DESA/KELURAHAN"] != d) return false;
 return true;
 });
 
@@ -169,7 +169,7 @@ tabelKecamatan.querySelector("tbody").innerHTML=body+totalRow;
 let desaMap={};
 
 data.forEach(x=>{
-let ds=x.DESA;
+let ds = x["DESA/KELURAHAN"];
 let jenis=x["JENIS LTT"];
 let luas=num(x["LUAS TAMBAH TANAM"]);
 
