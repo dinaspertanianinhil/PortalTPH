@@ -12,11 +12,11 @@
 
 <style>
 :root {
-    --accent: #4ade80;
-    --accent-glow: rgba(74, 222, 128, 0.2);
-    --glass-bg: rgba(255, 255, 255, 0.03);
+    --accent: #22c55e;
+    --accent-light: #4ade80;
+    --glass: rgba(255, 255, 255, 0.04);
     --glass-border: rgba(255, 255, 255, 0.1);
-    --nav-height: 80px;
+    --nav-height: 72px;
 }
 
 * {
@@ -29,7 +29,7 @@
 
 body {
     background: 
-        linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.8) 100%),
+        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85)),
         url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png");
     background-size: cover;
     background-position: center;
@@ -39,7 +39,7 @@ body {
     overflow-x: hidden;
 }
 
-/* Subtle Animated Overlay */
+/* Subtle Animated Glow */
 body::before {
     content: '';
     position: fixed;
@@ -47,15 +47,15 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at 50% 50%, var(--accent-glow) 0%, transparent 50%);
+    background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.12) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
-    animation: pulse 8s infinite alternate;
+    animation: glowMove 10s infinite alternate ease-in-out;
 }
 
-@keyframes pulse {
-    0% { transform: scale(1) translate(0, 0); opacity: 0.3; }
-    100% { transform: scale(1.2) translate(5%, 5%); opacity: 0.5; }
+@keyframes glowMove {
+    0% { transform: translateY(0); opacity: 0.5; }
+    100% { transform: translateY(10%); opacity: 0.8; }
 }
 
 /* ===== NAVBAR ===== */
@@ -64,22 +64,22 @@ nav {
     top: 0;
     width: 100%;
     height: var(--nav-height);
-    background: rgba(10, 10, 10, 0.3);
+    background: rgba(10, 10, 10, 0.25);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 60px;
+    padding: 0 6%;
     z-index: 1000;
     border-bottom: 1px solid var(--glass-border);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .brand {
     font-weight: 800;
-    font-size: 1.15rem;
-    letter-spacing: -0.03em;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
     display: flex;
     flex-direction: column;
     line-height: 1.1;
@@ -87,29 +87,29 @@ nav {
 }
 
 .brand span.sub {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--accent);
+    letter-spacing: 0.12em;
+    color: var(--accent-light);
     margin-top: 4px;
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 /* ===== MENU ===== */
 .menu {
     display: flex;
-    gap: 40px;
+    gap: 36px;
     align-items: center;
 }
 
 .menu a,
 .dropbtn {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.75);
     text-decoration: none;
     font-weight: 600;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     transition: all 0.3s ease;
     padding: 10px 0;
     position: relative;
@@ -127,7 +127,7 @@ nav {
     left: 0;
     width: 0;
     height: 2px;
-    background: var(--accent);
+    background: var(--accent-light);
     transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     border-radius: 10px;
 }
@@ -143,36 +143,36 @@ nav {
 
 .dropdown-content {
     position: absolute;
-    top: calc(100% + 15px);
+    top: calc(100% + 12px);
     left: 50%;
-    transform: translateX(-50%) translateY(15px);
-    background: rgba(15, 15, 15, 0.8);
+    transform: translateX(-50%) translateY(12px);
+    background: rgba(15, 15, 15, 0.82);
     backdrop-filter: blur(32px);
     -webkit-backdrop-filter: blur(32px);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
-    min-width: 260px;
+    min-width: 250px;
     overflow: hidden;
-    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
     visibility: hidden;
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    padding: 10px;
+    padding: 8px;
 }
 
 .dropdown-content a {
     display: block;
-    padding: 14px 18px;
+    padding: 12px 18px;
     color: rgba(255, 255, 255, 0.7);
     font-weight: 500;
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     border-radius: 12px;
     transition: all 0.2s ease;
 }
 
 .dropdown-content a:hover {
     background: rgba(255, 255, 255, 0.08);
-    color: var(--accent);
+    color: var(--accent-light);
     padding-left: 24px;
 }
 
@@ -197,12 +197,12 @@ nav {
 
 .hero-card {
     background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
     border: 1px solid var(--glass-border);
-    padding: 80px 60px;
+    padding: 72px 48px;
     border-radius: 40px;
-    max-width: 800px;
+    max-width: 780px;
     width: 100%;
     text-align: center;
     box-shadow: 
@@ -212,7 +212,7 @@ nav {
 }
 
 @keyframes heroEntrance {
-    0% { opacity: 0; transform: translateY(60px) scale(0.96); }
+    0% { opacity: 0; transform: translateY(50px) scale(0.96); }
     100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
@@ -231,36 +231,37 @@ nav {
 }
 
 .hero p {
-    font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.65);
     font-weight: 500;
-    max-width: 620px;
+    max-width: 600px;
     margin: 0 auto;
 }
 
 /* ===== MOBILE BUTTON ===== */
 .mobile-btn {
     display: none;
-    font-size: 28px;
+    font-size: 26px;
     cursor: pointer;
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
     align-items: center;
     justify-content: center;
-    border-radius: 15px;
+    border-radius: 14px;
     background: rgba(255,255,255,0.05);
     transition: all 0.3s ease;
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
-    nav { padding: 0 30px; }
-    .menu { gap: 25px; }
+    nav { padding: 0 4%; }
+    .menu { gap: 24px; }
 }
 
 @media (max-width: 820px) {
     .mobile-btn { display: flex; }
+    
     .menu {
         display: none;
         position: absolute;
@@ -268,10 +269,10 @@ nav {
         left: 0;
         width: 100%;
         background: rgba(10, 10, 10, 0.98);
-        backdrop-filter: blur(30px);
+        backdrop-filter: blur(32px);
         flex-direction: column;
-        padding: 30px;
-        gap: 10px;
+        padding: 32px;
+        gap: 12px;
         border-bottom: 1px solid var(--glass-border);
         animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -282,14 +283,17 @@ nav {
     }
 
     .menu.show { display: flex; }
+    
     .menu a, .dropbtn {
         width: 100%;
         padding: 16px 24px;
-        border-radius: 15px;
+        border-radius: 16px;
         text-align: left;
         font-size: 1.05rem;
+        background: rgba(255,255,255,0.03);
     }
-    .menu a:hover, .dropbtn:hover { background: rgba(255,255,255,0.05); }
+    
+    .menu a:hover, .dropbtn:hover { background: rgba(255,255,255,0.08); }
     
     .dropdown { width: 100%; }
     .dropdown-content {
@@ -307,9 +311,11 @@ nav {
     }
     .dropdown.active .dropdown-content {
         max-height: 800px;
-        padding: 10px 0 10px 20px;
+        padding: 12px 0 12px 20px;
     }
-    .hero-card { padding: 50px 30px; border-radius: 30px; }
+    
+    .hero-card { padding: 56px 28px; border-radius: 32px; }
+    .brand { font-size: 0.9rem; }
 }
 </style>
 </head>
@@ -356,7 +362,7 @@ nav {
 <section class="hero">
     <div class="hero-card">
         <h1>Pusat Monitoring Pertanian Digital</h1>
-        <br>
+        <p>
             Monitoring Harga • Produksi • Stok • Serangan Hama Tanaman • Luas Tambah Tanam Kabupaten Indragiri Hilir
         </p>
     </div>
@@ -364,7 +370,7 @@ nav {
 
 <!-- AUDIO (WAJIB DI SINI) -->
 <audio id="welcomeAudio">
-  <source src="https://raw.githubusercontent.com/dinaspertanianinhil/PortalTPH/refs/heads/main/ElevenLabs_2026-04-08T04_59_39_Arunika%20-%20National%20TV%20Voice%20Over_pvc_sp100_s50_sb75_se0_b_m2.mp3" type="audio/mpeg">
+  <source src="https://raw.githubusercontent.com/dinaspertanianinhil/PortalTPH/refs/heads/main/ElevenLabs_2026-04-09T08_28_50_Kanna%20-%20Warm%2C%20Calm%20and%20Clear_pvc_sp100_s50_sb75_se0_b_m2.mp3" type="audio/mpeg">
 </audio>
 
 <script>
