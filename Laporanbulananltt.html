@@ -1,250 +1,618 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan LTT Bulanan - Dinas Pertanian</title>
 
-<title>Laporan LTT Bulanan</title>
+    <!-- Library untuk Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root {
+            --primary-green: #1b5e20;
+            --medium-green: #2e7d32;
+            --light-green: #4caf50;
+            --soft-green: #e8f5e9;
+            --white: #ffffff;
+            --gray-text: #4a5568;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
 
-<style>
-body{margin:0;font-family:Segoe UI,Arial;background-image:url('https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-rice-fields-with-green-rice-with-dew-and-mountains-image_15860694.jpg');background-size:cover;background-attachment:fixed;}
-.overlay{background:rgba(255,255,255,0.92);min-height:100vh;}
-header{display:flex;align-items:center;gap:15px;padding:15px 25px;background:#1b5e20;color:white;}
-header img{ width:55px; }
-.container{padding:20px;max-width:1200px;margin:auto;}
-.filter{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
-button{padding:8px 12px;border:none;background:#2e7d32;color:white;border-radius:5px;cursor:pointer;}
-table{width:100%;border-collapse:collapse;background:white;margin-top:10px;}
-th{background:#2e7d32;color:white;padding:8px;}
-td{padding:8px;border-bottom:1px solid #eee;}
-</style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #2d3748;
+            line-height: 1.5;
+            background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-rice-fields-with-green-rice-with-dew-and-mountains-image_15860694.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+
+        .overlay {
+            background: rgba(255, 255, 255, 0.94);
+            min-height: 100vh;
+            padding-bottom: 50px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--primary-green);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        header img {
+            width: 50px;
+            height: auto;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .header-title h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+        }
+
+        .header-title p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Filter Section */
+        .filter-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.2rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-text);
+            text-transform: uppercase;
+        }
+
+        .filter-group select, .filter-group input {
+            padding: 0.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .filter-group select:focus, .filter-group input:focus {
+            border-color: var(--medium-green);
+        }
+
+        .btn-apply {
+            background: var(--medium-green);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-apply:hover {
+            background: var(--primary-green);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-left: 5px solid var(--medium-green);
+        }
+
+        .stat-icon {
+            background: var(--soft-green);
+            color: var(--medium-green);
+            padding: 0.8rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-info p {
+            font-size: 0.85rem;
+            color: var(--gray-text);
+            margin-bottom: 2px;
+        }
+
+        .stat-info h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        /* Table Section */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-header h3 {
+            font-size: 1.25rem;
+            color: var(--primary-green);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .btn-export {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid var(--border-color);
+            background: white;
+        }
+
+        .btn-excel { color: #1d6f42; border-color: #1d6f42; }
+        .btn-excel:hover { background: #1d6f42; color: white; }
+        .btn-pdf { color: #d32f2f; border-color: #d32f2f; }
+        .btn-pdf:hover { background: #d32f2f; color: white; }
+
+        .table-container {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 3rem;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        thead th {
+            background: #f8fafc;
+            color: var(--primary-green);
+            text-align: left;
+            padding: 1rem;
+            font-weight: 700;
+            border-bottom: 2px solid var(--soft-green);
+            position: sticky;
+            top: 0;
+        }
+
+        tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--soft-green);
+            color: #4a5568;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f8f1;
+        }
+
+        .total-row {
+            background: var(--soft-green) !important;
+            font-weight: 800;
+            color: var(--primary-green);
+        }
+
+        .total-row td {
+            border-top: 2px solid var(--medium-green);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header { flex-direction: column; text-align: center; gap: 10px; }
+            .filter-card { grid-template-columns: 1fr; }
+            .section-header { flex-direction: column; align-items: flex-start; }
+            .export-buttons { width: 100%; justify-content: space-between; }
+            .table-container { overflow-x: auto; }
+        }
+    </style>
 </head>
 
 <body>
 <div class="overlay">
 
-<header>
-<img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png">
-<h1>
-Bidang Tanaman Pangan dan Hortikultura<br>
-</h1>
-</header>
+    <header>
+        <div class="header-left">
+            <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png" alt="Logo Inhil">
+            <div class="header-title">
+                <h1>DINAS PERTANIAN DAN KETAHANAN PANGAN</h1>
+                <p>Kabupaten Indragiri Hilir - Laporan LTT Bulanan</p>
+            </div>
+        </div>
+        <div id="current-date" style="font-size: 0.85rem; opacity: 0.8;"></div>
+    </header>
 
-<div class="container">
+    <div class="container">
+        
+        <!-- Filter Section -->
+        <div class="filter-card">
+            <div class="filter-group">
+                <label for="bulan">Pilih Bulan & Tahun</label>
+                <input type="month" id="bulan">
+            </div>
+            <div class="filter-group">
+                <label for="kecamatan">Kecamatan</label>
+                <select id="kecamatan">
+                    <option value="">Semua Kecamatan</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="desa">Desa / Kelurahan</label>
+                <select id="desa">
+                    <option value="">Semua Desa</option>
+                </select>
+            </div>
+            <button class="btn-apply" onclick="render()">
+                <i data-lucide="search" size="18"></i> Tampilkan Laporan
+            </button>
+        </div>
 
-<div class="filter">
-<input type="month" id="bulan">
-<select id="kecamatan"><option value="">Semua Kecamatan</option></select>
-<select id="desa"><option value="">Semua Desa</option></select>
-<button onclick="render()">Terapkan</button>
-</div>
+        <!-- Summary Stats -->
+        <div class="stats-grid" id="summary-stats">
+            <div class="stat-card">
+                <div class="stat-icon"><i data-lucide="sprout"></i></div>
+                <div class="stat-info">
+                    <p>Total Luas Tambah Tanam</p>
+                    <h2 id="total-ltt">0.00</h2>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i data-lucide="map"></i></div>
+                <div class="stat-info">
+                    <p>Jumlah Lokasi (Desa)</p>
+                    <h2 id="total-lokasi">0</h2>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fff3e0; color: #ef6c00;"><i data-lucide="calendar"></i></div>
+                <div class="stat-info">
+                    <p>Periode Laporan</p>
+                    <h2 id="periode-text">-</h2>
+                </div>
+            </div>
+        </div>
 
-<h3>Rekap Kecamatan</h3>
-<button onclick="downloadExcel('kecamatan')">Download Excel</button>
-<button onclick="downloadPDF('kecamatan')">Download PDF</button>
-<table id="tabelKecamatan">
-<thead>
-<tr><th>Kecamatan</th><th>Oplah</th><th>Reguler</th></tr>
-</thead>
-<tbody></tbody>
-</table>
+        <!-- Rekap Kecamatan -->
+        <div class="section-header">
+            <h3><i data-lucide="layers"></i> Rekapitulasi Per Kecamatan</h3>
+            <div class="export-buttons">
+                <button class="btn-export btn-excel" onclick="downloadExcel('kecamatan')">
+                    <i data-lucide="file-spreadsheet" size="16"></i> Excel
+                </button>
+                <button class="btn-export btn-pdf" onclick="downloadPDF('kecamatan')">
+                    <i data-lucide="file-text" size="16"></i> PDF
+                </button>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="tabelKecamatan">
+                <thead>
+                    <tr>
+                        <th>Kecamatan</th>
+                        <th>Oplah (Ha)</th>
+                        <th>Reguler (Ha)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
 
-<h3>Rekap Desa</h3>
-<button onclick="downloadExcel('desa')">Download Excel</button>
-<button onclick="downloadPDF('desa')">Download PDF</button>
-<table id="tabelDesa">
-<thead>
-<tr><th>Desa</th><th>Oplah</th><th>Reguler</th></tr>
-</thead>
-<tbody></tbody>
-</table>
+        <!-- Rekap Desa -->
+        <div class="section-header">
+            <h3><i data-lucide="map-pin"></i> Rekapitulasi Per Desa / Kelurahan</h3>
+            <div class="export-buttons">
+                <button class="btn-export btn-excel" onclick="downloadExcel('desa')">
+                    <i data-lucide="file-spreadsheet" size="16"></i> Excel
+                </button>
+                <button class="btn-export btn-pdf" onclick="downloadPDF('desa')">
+                    <i data-lucide="file-text" size="16"></i> PDF
+                </button>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="tabelDesa">
+                <thead>
+                    <tr>
+                        <th>Desa / Kelurahan</th>
+                        <th>Oplah (Ha)</th>
+                        <th>Reguler (Ha)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
 
+    </div>
 </div>
 
 <script>
+    // Inisialisasi Icons
+    lucide.createIcons();
 
-const API="https://script.google.com/macros/s/AKfycbzN3Ak0JmBowwPePkwIIzIonYgGOEM9muR2V8ic5Z92LaqV1LriWdWlIBhNn5DA8ffT/exec";
-let raw=[];
+    // Set Tanggal Hari Ini di Header
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID', options);
 
-function num(x){return parseFloat((x+"").replace(",", "."))||0;}
+    const API = "https://script.google.com/macros/s/AKfycbzN3Ak0JmBowwPePkwIIzIonYgGOEM9muR2V8ic5Z92LaqV1LriWdWlIBhNn5DA8ffT/exec";
+    let raw = [];
 
-async function load(){
-let r=await fetch(API);
-raw=await r.json();
+    function num(x) {
+        return parseFloat((x + "").replace(",", ".")) || 0;
+    }
 
-let kecSet=new Set(), desaSet=new Set();
-raw.forEach(d=>{
-kecSet.add(d.KECAMATAN);
-desaSet.add(d["DESA/KELURAHAN"]);
-});
+    async function load() {
+        try {
+            let r = await fetch(API);
+            raw = await r.json();
 
-kecSet.forEach(k=>kecamatan.innerHTML+=`<option>${k}</option>`);
-desaSet.forEach(d=>desa.innerHTML+=`<option>${d}</option>`);
+            let kecSet = new Set(), desaSet = new Set();
+            raw.forEach(d => {
+                if(d.KECAMATAN) kecSet.add(d.KECAMATAN);
+                if(d["DESA/KELURAHAN"]) desaSet.add(d["DESA/KELURAHAN"]);
+            });
 
-render();
-}
+            const kecSelect = document.getElementById('kecamatan');
+            const desaSelect = document.getElementById('desa');
 
-function render(){
+            [...kecSet].sort().forEach(k => kecSelect.innerHTML += `<option value="${k}">${k}</option>`);
+            [...desaSet].sort().forEach(d => desaSelect.innerHTML += `<option value="${d}">${d}</option>`);
 
-let b=bulan.value;
-let k=kecamatan.value;
-let d=desa.value;
+            // Set default month to current
+            const now = new Date();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            document.getElementById('bulan').value = `${now.getFullYear()}-${month}`;
 
-// FILTER
-let data=raw.filter(x=>{
-if(b && !x.TANGGAL.startsWith(b)) return false;
-if(k && x.KECAMATAN!=k) return false;
-if(d && x["DESA/KELURAHAN"] != d) return false;
-return true;
-});
+            render();
+        } catch (e) {
+            console.error("Gagal memuat data:", e);
+            alert("Gagal mengambil data dari server.");
+        }
+    }
 
-// ========================
-// DETEKSI SEMUA JENIS
-// ========================
-let jenisSet=new Set();
-data.forEach(x=>{
-jenisSet.add(x["JENIS LTT"]);
-});
-let jenisList=[...jenisSet];
+    function render() {
+        let b = document.getElementById('bulan').value;
+        let k = document.getElementById('kecamatan').value;
+        let d = document.getElementById('desa').value;
 
-// ========================
-// REKAP KECAMATAN
-// ========================
-let kecMap={};
+        // Update Periode Text
+        if(b) {
+            const dateObj = new Date(b + "-01");
+            document.getElementById('periode-text').innerText = dateObj.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+        }
 
-data.forEach(x=>{
-let kc=x.KECAMATAN;
-let jenis=x["JENIS LTT"];
-let luas=num(x["LUAS TAMBAH TANAM"]);
+        // FILTER DATA
+        let data = raw.filter(x => {
+            if (b && !x.TANGGAL.startsWith(b)) return false;
+            if (k && x.KECAMATAN !== k) return false;
+            if (d && x["DESA/KELURAHAN"] !== d) return false;
+            return true;
+        });
 
-if(!kecMap[kc]) kecMap[kc]={};
+        // DETEKSI JENIS LTT SECARA DINAMIS
+        let jenisSet = new Set();
+        data.forEach(x => { if(x["JENIS LTT"]) jenisSet.add(x["JENIS LTT"]); });
+        let jenisList = [...jenisSet].sort();
 
-kecMap[kc][jenis]=(kecMap[kc][jenis]||0)+luas;
-});
+        // ========================
+        // REKAP KECAMATAN
+        // ========================
+        let kecMap = {};
+        let grandTotal = 0;
 
-// HEADER
-let head="<tr><th>Kecamatan</th>";
-jenisList.forEach(j=> head+=`<th>${j}</th>`);
-head+="</tr>";
-tabelKecamatan.querySelector("thead").innerHTML=head;
+        data.forEach(x => {
+            let kc = x.KECAMATAN;
+            let jenis = x["JENIS LTT"];
+            let luas = num(x["LUAS TAMBAH TANAM"]);
+            grandTotal += luas;
 
-// BODY
-let body="";
-let totalKolom={};
+            if (!kecMap[kc]) kecMap[kc] = {};
+            kecMap[kc][jenis] = (kecMap[kc][jenis] || 0) + luas;
+        });
 
-Object.keys(kecMap).forEach(kc=>{
-let row=`<tr><td>${kc}</td>`;
+        // Update Stats
+        document.getElementById('total-ltt').innerText = grandTotal.toFixed(2);
+        
+        // Header Tabel Kecamatan
+        let head = `<tr><th>Kecamatan</th>`;
+        jenisList.forEach(j => head += `<th>${j} (Ha)</th>`);
+        head += `</tr>`;
+        document.getElementById('tabelKecamatan').querySelector("thead").innerHTML = head;
 
-jenisList.forEach(j=>{
-let val=kecMap[kc][j]||0;
+        // Body Tabel Kecamatan
+        let body = "";
+        let totalKolom = {};
+        Object.keys(kecMap).sort().forEach(kc => {
+            let row = `<tr><td>${kc}</td>`;
+            jenisList.forEach(j => {
+                let val = kecMap[kc][j] || 0;
+                totalKolom[j] = (totalKolom[j] || 0) + val;
+                row += `<td>${val.toLocaleString('id-ID', {minimumFractionDigits: 2})}</td>`;
+            });
+            row += `</tr>`;
+            body += row;
+        });
 
-totalKolom[j]=(totalKolom[j]||0)+val;
+        // Total Row Kecamatan
+        let totalRow = `<tr class="total-row"><td>TOTAL KABUPATEN</td>`;
+        jenisList.forEach(j => {
+            totalRow += `<td>${(totalKolom[j] || 0).toLocaleString('id-ID', {minimumFractionDigits: 2})}</td>`;
+        });
+        totalRow += `</tr>`;
+        document.getElementById('tabelKecamatan').querySelector("tbody").innerHTML = body + totalRow;
 
-row+=`<td>${val.toFixed(2)}</td>`;
-});
+        // ========================
+        // REKAP DESA
+        // ========================
+        let desaMap = {};
+        let desaCount = new Set();
 
-row+="</tr>";
-body+=row;
-});
+        data.forEach(x => {
+            let ds = x["DESA/KELURAHAN"];
+            let jenis = x["JENIS LTT"];
+            let luas = num(x["LUAS TAMBAH TANAM"]);
+            desaCount.add(ds);
 
-// TOTAL ROW
-let totalRow="<tr style='font-weight:bold;background:#e8f5e9'><td>TOTAL</td>";
+            if (!desaMap[ds]) desaMap[ds] = {};
+            desaMap[ds][jenis] = (desaMap[ds][jenis] || 0) + luas;
+        });
 
-jenisList.forEach(j=>{
-totalRow+=`<td>${(totalKolom[j]||0).toFixed(2)}</td>`;
-});
+        document.getElementById('total-lokasi').innerText = desaCount.size;
 
-totalRow+="</tr>";
+        // Header Tabel Desa
+        let head2 = `<tr><th>Desa / Kelurahan</th>`;
+        jenisList.forEach(j => head2 += `<th>${j} (Ha)</th>`);
+        head2 += `</tr>`;
+        document.getElementById('tabelDesa').querySelector("thead").innerHTML = head2;
 
-tabelKecamatan.querySelector("tbody").innerHTML=body+totalRow;
+        // Body Tabel Desa
+        let body2 = "";
+        let totalKolom2 = {};
+        Object.keys(desaMap).sort().forEach(ds => {
+            let row = `<tr><td>${ds}</td>`;
+            jenisList.forEach(j => {
+                let val = desaMap[ds][j] || 0;
+                totalKolom2[j] = (totalKolom2[j] || 0) + val;
+                row += `<td>${val.toLocaleString('id-ID', {minimumFractionDigits: 2})}</td>`;
+            });
+            row += `</tr>`;
+            body2 += row;
+        });
 
+        // Total Row Desa
+        let totalRow2 = `<tr class="total-row"><td>TOTAL KESELURUHAN</td>`;
+        jenisList.forEach(j => {
+            totalRow2 += `<td>${(totalKolom2[j] || 0).toLocaleString('id-ID', {minimumFractionDigits: 2})}</td>`;
+        });
+        totalRow2 += `</tr>`;
+        document.getElementById('tabelDesa').querySelector("tbody").innerHTML = body2 + totalRow2;
+    }
 
-// ========================
-// REKAP DESA
-// ========================
-let desaMap={};
+    function downloadExcel(type) {
+        let table = type === 'kecamatan' ? document.getElementById('tabelKecamatan') : document.getElementById('tabelDesa');
+        let wb = XLSX.utils.table_to_book(table);
+        let filename = `LTT_Bulanan_${type}_${document.getElementById('bulan').value}.xlsx`;
+        XLSX.writeFile(wb, filename);
+    }
 
-data.forEach(x=>{
-let ds = x["DESA/KELURAHAN"];
-let jenis=x["JENIS LTT"];
-let luas=num(x["LUAS TAMBAH TANAM"]);
+    function downloadPDF(type) {
+        const { jsPDF } = window.jspdf;
+        let doc = new jsPDF('p', 'mm', 'a4');
+        let table = type === 'kecamatan' ? document.getElementById('tabelKecamatan') : document.getElementById('tabelDesa');
+        let periode = document.getElementById('periode-text').innerText;
 
-if(!desaMap[ds]) desaMap[ds]={};
+        doc.setFontSize(14);
+        doc.setTextColor(27, 94, 32);
+        doc.text("LAPORAN LUAS TAMBAH TANAM (LTT)", 105, 15, { align: 'center' });
+        
+        doc.setFontSize(11);
+        doc.setTextColor(100);
+        doc.text(`Rekapitulasi Per ${type.charAt(0).toUpperCase() + type.slice(1)}`, 105, 22, { align: 'center' });
+        doc.text(`Periode: ${periode}`, 105, 28, { align: 'center' });
 
-desaMap[ds][jenis]=(desaMap[ds][jenis]||0)+luas;
-});
+        doc.autoTable({
+            html: table,
+            startY: 35,
+            styles: { fontSize: 9, cellPadding: 3 },
+            headStyles: { fillColor: [46, 125, 50], textColor: 255, fontStyle: 'bold' },
+            alternateRowStyles: { fillColor: [245, 245, 245] },
+            margin: { top: 35 }
+        });
 
-// HEADER
-let head2="<tr><th>Desa</th>";
-jenisList.forEach(j=> head2+=`<th>${j}</th>`);
-head2+="</tr>";
-tabelDesa.querySelector("thead").innerHTML=head2;
+        doc.save(`LTT_Bulanan_${type}_${document.getElementById('bulan').value}.pdf`);
+    }
 
-// BODY
-let body2="";
-let totalKolom2={};
-
-Object.keys(desaMap).forEach(ds=>{
-let row=`<tr><td>${ds}</td>`;
-
-jenisList.forEach(j=>{
-let val=desaMap[ds][j]||0;
-
-totalKolom2[j]=(totalKolom2[j]||0)+val;
-
-row+=`<td>${val.toFixed(2)}</td>`;
-});
-
-row+="</tr>";
-body2+=row;
-});
-
-// TOTAL
-let totalRow2="<tr style='font-weight:bold;background:#e8f5e9'><td>TOTAL</td>";
-
-jenisList.forEach(j=>{
-totalRow2+=`<td>${(totalKolom2[j]||0).toFixed(2)}</td>`;
-});
-
-totalRow2+="</tr>";
-
-tabelDesa.querySelector("tbody").innerHTML=body2+totalRow2;
-
-}
-
-function downloadExcel(type){
-
-let table = type==='kecamatan'?tabelKecamatan:tabelDesa;
-
-let wb=XLSX.utils.table_to_book(table);
-XLSX.writeFile(wb,`LTT_${type}.xlsx`);
-}
-
-function downloadPDF(type){
-
-const { jsPDF } = window.jspdf;
-let doc=new jsPDF();
-
-let table = type==='kecamatan'?tabelKecamatan:tabelDesa;
-
-doc.text("Laporan LTT Bulanan",14,10);
-
-doc.autoTable({
-html:table,
-startY:15,
-styles:{fontSize:8},
-headStyles:{fillColor:[46,125,50]}
-});
-
-doc.save(`LTT_${type}.pdf`);
-}
-
-load();
-
+    // Load data saat pertama kali buka
+    load();
 </script>
 
 </body>
