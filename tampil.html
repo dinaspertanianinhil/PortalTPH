@@ -1,363 +1,536 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Stok & Harga - Dashboard LTT</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-green: #2d6a4f;
+            --dark-green: #1b4332;
+            --light-green: #d8f3dc;
+            --accent-green: #52b788;
+            --bg-overlay: rgba(255, 255, 255, 0.95);
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-<title>Dashboard Data Stok & Harga</title>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
 
-<style>
+        body {
+            background: url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png") no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            color: #1f2937;
+            padding: 20px;
+            line-height: 1.5;
+        }
 
-body{
-font-family:"Segoe UI",sans-serif;
-background:url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png") no-repeat center center fixed;
-background-size:cover;
-margin:0;
-padding:20px;
-}
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-header{
-background:linear-gradient(135deg,#1b4332,#2d6a4f);
-color:white;
-padding:18px;
-text-align:center;
-border-radius:10px;
-margin-bottom:20px;
-box-shadow:0 6px 12px rgba(0,0,0,0.25);
-}
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-out;
+        }
 
-header h2{margin:0;}
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
+            color: white;
+            padding: 30px 24px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
 
-.dashboard-info{
-margin-top:8px;
-font-size:13px;
-opacity:.9;
-}
+        header h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.025em;
+        }
 
-.content{
-background:rgba(255,255,255,0.93);
-padding:20px;
-border-radius:12px;
-box-shadow:0 6px 15px rgba(0,0,0,0.2);
-}
+        .dashboard-info {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
 
-.filter-container{
-display:flex;
-justify-content:center;
-gap:10px;
-flex-wrap:wrap;
-margin-bottom:15px;
-}
+        /* Card Utama */
+        .main-card {
+            background: var(--bg-overlay);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
 
-select,input{
-padding:8px 10px;
-border-radius:6px;
-border:1px solid #ccc;
-font-size:14px;
-background:white;
-}
+        /* Filter Section */
+        .filter-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
 
-input[type="text"]{width:200px;}
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
 
-.action-bar{
-display:flex;
-justify-content:flex-end;
-gap:10px;
-margin-bottom:10px;
-flex-wrap:wrap;
-}
+        .input-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--dark-green);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding-left: 4px;
+        }
 
-button{
-background:#2d6a4f;
-color:white;
-border:none;
-padding:7px 14px;
-border-radius:6px;
-cursor:pointer;
-font-size:13px;
-font-weight:600;
-}
+        select, input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid #d1d5db;
+            background: white;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            outline: none;
+        }
 
-button:hover{background:#1b4332;}
+        select:focus, input:focus {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 4px rgba(82, 183, 136, 0.15);
+        }
 
-.btn-danger{background:#d9534f;}
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
 
-.table-frame{
-width:100%;
-overflow-x:auto;
-}
+        button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
 
-table{
-width:100%;
-border-collapse:collapse;
-background:white;
-}
+        button:hover {
+            background: var(--dark-green);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
 
-th,td{
-border:1px solid #ccc;
-padding:8px;
-font-size:13px;
-text-align:left;
-max-width:150px;
-}
+        button:active { transform: translateY(0); }
 
-th{
-background:#2d6a4f;
-color:white;
-text-align:center;
-}
+        .btn-outline {
+            background: white;
+            color: var(--primary-green);
+            border: 1.5px solid var(--primary-green);
+        }
 
-tr:nth-child(even){background:#f3f6f4;}
+        .btn-outline:hover {
+            background: var(--light-green);
+            color: var(--dark-green);
+        }
 
-.total-box{
-margin-top:15px;
-font-weight:600;
-font-size:14px;
-color:#1b4332;
-background:#e9f5ee;
-border:1px solid #b7dfc4;
-padding:10px;
-border-radius:6px;
-width:fit-content;
-}
+        /* Table */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            margin-bottom: 24px;
+        }
 
-.data-count{
-margin-top:8px;
-font-size:13px;
-color:#555;
-}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
 
-.loading{
-text-align:center;
-padding:30px;
-font-size:15px;
-}
+        th {
+            background: #f8fafc;
+            color: var(--dark-green);
+            font-weight: 700;
+            text-align: left;
+            padding: 16px;
+            border-bottom: 2px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
 
-@media print{
-.filter-container,.action-bar{display:none;}
-}
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+        }
 
-</style>
+        tr:hover td { background-color: #f0fdf4; }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            border-left: 5px solid var(--accent-green);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .summary-card:hover { transform: translateY(-3px); box-shadow: var(--card-shadow); }
+
+        .summary-card span {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .summary-card h3 {
+            font-size: 1.5rem;
+            color: var(--dark-green);
+            font-weight: 800;
+        }
+
+        /* Loading */
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid var(--light-green);
+            border-top: 5px solid var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+            body { padding: 12px; }
+            .main-card { padding: 16px; border-radius: 16px; }
+            header { padding: 24px 16px; border-radius: 16px; }
+            header h2 { font-size: 1.4rem; }
+            .action-bar { flex-direction: column; }
+            button { width: 100%; }
+            .summary-card { padding: 18px; }
+        }
+
+        @media print {
+            body { background: none; padding: 0; }
+            .filter-section, .action-bar { display: none; }
+            .main-card { box-shadow: none; border: none; background: white; }
+            header { background: white; color: black; border: 1px solid #ccc; }
+        }
+    </style>
 </head>
-
 <body>
 
-<header>
-<h2>📊 Dashboard Laporan Stok & Harga Gabah & Beras</h2>
-<div class="dashboard-info">
-Sistem Monitoring Produksi dan Stok Penggilingan
+<div class="container">
+    <header>
+        <h2>📊 Dashboard Monitoring Stok & Harga</h2>
+        <div class="dashboard-info">Sistem Informasi Penggilingan Padi & Beras Terintegrasi</div>
+    </header>
+
+    <div class="main-card">
+        <!-- Filters -->
+        <div class="filter-section">
+            <div class="input-group">
+                <label>Pilih Bulan</label>
+                <select id="filterBulan">
+                    <option value="">🗓️ Semua Bulan</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Pilih Penggilingan</label>
+                <select id="filterPenggilingan">
+                    <option value="">🏭 Semua Penggilingan</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Filter Tanggal</label>
+                <input type="date" id="filterTanggal">
+            </div>
+            <div class="input-group">
+                <label>Cari Data</label>
+                <input type="text" id="search" placeholder="Cari nama atau data...">
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="action-bar">
+            <button class="btn-outline" onclick="printTable()">🖨️ Cetak</button>
+            <button class="btn-outline" onclick="downloadExcel()">⬇️ Export Excel</button>
+            <button onclick="downloadPDF()">📄 Download PDF</button>
+        </div>
+
+        <!-- Table -->
+        <div id="data-container">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p style="font-weight: 500; color: var(--primary-green);">Menghubungkan ke database...</p>
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div id="data-count" style="font-size: 0.8rem; color: #64748b; margin-top: 16px; font-weight: 600; text-align: right;"></div>
+
+        <!-- Summary -->
+        <div id="total-container" class="summary-grid">
+            <!-- Cards injected by JS -->
+        </div>
+    </div>
 </div>
-</header>
 
-<div class="content">
-
-<div class="filter-container">
-
-<select id="filterBulan">
-<option value="">🗓️ Semua Bulan</option>
-</select>
-
-<select id="filterPenggilingan">
-<option value="">🏭 Semua Penggilingan</option>
-</select>
-
-<input type="date" id="filterTanggal">
-
-<input type="text" id="search" placeholder="🔍 Cari data...">
-
-</div>
-
-<div class="action-bar">
-<button onclick="printTable()">🖨️ Print</button>
-<button onclick="downloadExcel()">⬇️ Excel</button>
-<button onclick="downloadPDF()">📄 PDF</button>
-</div>
-
-<div id="data-container" class="loading">Memuat data...</div>
-
-<div id="data-count" class="data-count"></div>
-
-<div id="total-container" class="total-box"></div>
-
-</div>
-
+<!-- Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 
 <script>
+    const url = "https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
+    let allData = [];
 
-const url="https://script.google.com/macros/s/AKfycbxrEF7plzQoncqgCN_ShlIR_wzdsfRc6zfpYJaoulU8IGvCrngrbAqTfcUUbLc7d6jqDg/exec";
+    async function loadData() {
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            allData = data;
+            populateFilters(data);
+            renderTable();
+        } catch (error) {
+            document.getElementById("data-container").innerHTML = `
+                <div style="text-align:center; padding:50px; color:#ef4444;">
+                    <p style="font-weight:700; font-size:1.1rem;">Gagal Memuat Data</p>
+                    <p style="font-size:0.9rem; margin-top:8px;">Silakan periksa koneksi internet atau coba beberapa saat lagi.</p>
+                </div>
+            `;
+            console.error("Error:", error);
+        }
+    }
 
-let allData=[];
+    function getNamaBulan(dateStr) {
+        const bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const d = new Date(dateStr);
+        if (isNaN(d)) return "Tidak diketahui";
+        return bulan[d.getMonth()] + " " + d.getFullYear();
+    }
 
-async function loadData(){
-  const res=await fetch(url);
-  const data=await res.json();
+    function populateFilters(data) {
+        const rows = data.slice(1);
+        const bulanSet = new Set();
+        const penggilinganSet = new Set();
 
-  allData=data;
+        rows.forEach(r => {
+            if (r[0]) bulanSet.add(getNamaBulan(r[0]));
+            if (r[1]) penggilinganSet.add(r[1]);
+        });
 
-  populateFilters(data);
-  renderTable();
-}
+        const filterBulan = document.getElementById("filterBulan");
+        const filterPenggilingan = document.getElementById("filterPenggilingan");
 
-function getNamaBulan(dateStr){
-  const bulan=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-  const d=new Date(dateStr);
-  if(isNaN(d))return"Tidak diketahui";
-  return bulan[d.getMonth()]+" "+d.getFullYear();
-}
+        bulanSet.forEach(b => {
+            const opt = document.createElement("option");
+            opt.value = b; opt.textContent = b;
+            filterBulan.appendChild(opt);
+        });
 
-function populateFilters(data){
-  const rows=data.slice(1);
+        penggilinganSet.forEach(p => {
+            const opt = document.createElement("option");
+            opt.value = p; opt.textContent = p;
+            filterPenggilingan.appendChild(opt);
+        });
+    }
 
-  const bulanSet=new Set();
-  const penggilinganSet=new Set();
+    function getFilteredRows() {
+        const rows = allData.slice(1);
+        const searchValue = document.getElementById("search").value.toLowerCase();
+        const selectedBulan = document.getElementById("filterBulan").value;
+        const selectedPenggilingan = document.getElementById("filterPenggilingan").value;
+        const selectedTanggal = document.getElementById("filterTanggal").value;
 
-  rows.forEach(r=>{
-    bulanSet.add(getNamaBulan(r[0]));
-    penggilinganSet.add(r[1]);
-  });
+        return rows.filter(row => {
+            const bulan = getNamaBulan(row[0]);
+            const tanggal = row[0] ? row[0].split("T")[0] : "";
 
-  bulanSet.forEach(b=>{
-    document.getElementById("filterBulan").innerHTML+=`<option value="${b}">${b}</option>`;
-  });
+            const cocokBulan = !selectedBulan || bulan === selectedBulan;
+            const cocokPenggilingan = !selectedPenggilingan || row[1] === selectedPenggilingan;
+            const cocokTanggal = !selectedTanggal || tanggal === selectedTanggal;
+            const cocokSearch = row.join(" ").toLowerCase().includes(searchValue);
 
-  penggilinganSet.forEach(p=>{
-    document.getElementById("filterPenggilingan").innerHTML+=`<option value="${p}">${p}</option>`;
-  });
-}
+            return cocokBulan && cocokPenggilingan && cocokTanggal && cocokSearch;
+        });
+    }
 
-function getFilteredRows(){
-  const rows=allData.slice(1);
+    function sumUnique(rows, index) {
+        const seen = new Set();
+        let total = 0;
+        rows.forEach(r => {
+            const val = Number(r[index]) || 0;
+            if (seen.has(val)) return;
+            seen.add(val);
+            total += val;
+        });
+        return total;
+    }
 
-  const searchValue=document.getElementById("search").value.toLowerCase();
-  const selectedBulan=document.getElementById("filterBulan").value;
-  const selectedPenggilingan=document.getElementById("filterPenggilingan").value;
-  const selectedTanggal=document.getElementById("filterTanggal").value;
+    function renderTable() {
+        if (allData.length === 0) return;
 
-  return rows.filter(row=>{
+        const header = allData[0];
+        const rows = getFilteredRows();
 
-    const bulan=getNamaBulan(row[0]);
-    const tanggal=row[0]?.split("T")[0];
+        let html = `
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>${header.map(h => `<th>${h}</th>`).join("")}</tr>
+                    </thead>
+                    <tbody>
+        `;
 
-    const cocokBulan=!selectedBulan||bulan===selectedBulan;
-    const cocokPenggilingan=!selectedPenggilingan||row[1]===selectedPenggilingan;
-    const cocokTanggal=!selectedTanggal||tanggal===selectedTanggal;
-    const cocokSearch=row.join(" ").toLowerCase().includes(searchValue);
+        rows.forEach(row => {
+            html += "<tr>";
+            row.forEach(cell => {
+                html += `<td>${cell !== null && cell !== undefined ? cell : '-'}</td>`;
+            });
+            html += "</tr>";
+        });
 
-    return cocokBulan&&cocokPenggilingan&&cocokTanggal&&cocokSearch;
-  });
-}
+        if (rows.length === 0) {
+            html += `<tr><td colspan="${header.length}" style="text-align:center; padding:50px; color:#64748b;">Data tidak ditemukan</td></tr>`;
+        }
 
-function sumUnique(rows,index){
-  const seen=new Set();
-  let total=0;
+        html += "</tbody></table></div>";
 
-  rows.forEach(r=>{
-    const val=Number(r[index])||0;
-    if(seen.has(val))return;
-    seen.add(val);
-    total+=val;
-  });
+        document.getElementById("data-container").innerHTML = html;
+        document.getElementById("data-count").innerHTML = `MENAMPILKAN ${rows.length} DARI ${allData.length - 1} DATA`;
 
-  return total;
-}
+        const totalProduksi = sumUnique(rows, 17);
+        const totalGKP = sumUnique(rows, 4);
+        const totalGKG = sumUnique(rows, 8);
+        const totalBeras = sumUnique(rows, 12);
 
-function renderTable(){
+        document.getElementById("total-container").innerHTML = `
+            <div class="summary-card">
+                <span>Total Produksi Beras</span>
+                <h3>${(totalProduksi / 1000).toLocaleString('id-ID', {minimumFractionDigits: 2})} Ton</h3>
+            </div>
+            <div class="summary-card">
+                <span>Total Stok GKP</span>
+                <h3>${(totalGKP / 1000).toLocaleString('id-ID', {minimumFractionDigits: 2})} Ton</h3>
+            </div>
+            <div class="summary-card">
+                <span>Total Stok GKG</span>
+                <h3>${(totalGKG / 1000).toLocaleString('id-ID', {minimumFractionDigits: 2})} Ton</h3>
+            </div>
+            <div class="summary-card">
+                <span>Total Stok Beras</span>
+                <h3>${(totalBeras / 1000).toLocaleString('id-ID', {minimumFractionDigits: 2})} Ton</h3>
+            </div>
+        `;
+    }
 
-  if(allData.length===0)return;
+    function printTable() { window.print(); }
 
-  const header=allData[0];
-  const rows=getFilteredRows();
+    function downloadExcel() {
+        const rows = getFilteredRows();
+        const header = allData[0];
+        const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Laporan");
+        XLSX.writeFile(wb, "Laporan_Stok_Harga.xlsx");
+    }
 
-  let html = `<div class="table-frame"><table><tr>${header.map(h=>`<th>${h}</th>`).join("")}</tr>`;
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('l', 'mm', 'legal');
+        const header = allData[0];
+        const rows = getFilteredRows();
+        const now = new Date().toLocaleString("id-ID");
 
-  rows.forEach(row=>{
-    html += "<tr>";
-    row.forEach(cell => html += `<td>${cell}</td>`);
-    html += "</tr>";
-  });
+        doc.setFontSize(18);
+        doc.setTextColor(27, 67, 50);
+        doc.text("LAPORAN STOK DAN HARGA GABAH BERAS", 14, 15);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`Dicetak pada: ${now}`, 14, 22);
 
-  html+="</table></div>";
+        doc.autoTable({
+            head: [header],
+            body: rows,
+            startY: 30,
+            styles: { fontSize: 7, cellPadding: 2 },
+            headStyles: { fillColor: [45, 106, 79] },
+            theme: 'grid'
+        });
 
-  document.getElementById("data-container").innerHTML=html;
+        doc.save("Laporan_Stok_Harga.pdf");
+    }
 
-  document.getElementById("data-count").innerHTML="Jumlah Data Ditampilkan : "+rows.length;
+    document.getElementById("filterBulan").addEventListener("change", renderTable);
+    document.getElementById("filterPenggilingan").addEventListener("change", renderTable);
+    document.getElementById("filterTanggal").addEventListener("change", renderTable);
+    document.getElementById("search").addEventListener("input", renderTable);
 
-  // ===== TOTAL SESUAI DATA =====
-  const totalProduksi=sumUnique(rows,17); // Hasil Beras
-  const totalGKP=sumUnique(rows,4);
-  const totalGKG=sumUnique(rows,8);
-  const totalBeras=sumUnique(rows,12);
-
-  document.getElementById("total-container").innerHTML=
-  `
-  Total Produksi Beras : ${(totalProduksi/1000).toFixed(2)} Ton<br>
-  Total Stok GKP : ${(totalGKP/1000).toFixed(2)} Ton<br>
-  Total Stok GKG : ${(totalGKG/1000).toFixed(2)} Ton<br>
-  Total Stok Beras : ${(totalBeras/1000).toFixed(2)} Ton
-  `;
-}
-
-function printTable(){window.print();}
-
-function downloadExcel(){
-
-  const rows=getFilteredRows();
-  const header=allData[0];
-
-  const ws=XLSX.utils.aoa_to_sheet([header,...rows]);
-  const wb=XLSX.utils.book_new();
-
-  XLSX.utils.book_append_sheet(wb,ws,"Laporan");
-
-  XLSX.writeFile(wb,"Laporan_Stok_Harga.xlsx");
-}
-
-function downloadPDF(){
-
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF('l','mm','legal');
-
-  const header=allData[0];
-  const rows=getFilteredRows();
-
-  const tanggalCetak=new Date().toLocaleDateString("id-ID");
-
-  doc.setFontSize(16);
-  doc.text("LAPORAN STOK DAN HARGA GABAH BERAS",14,15);
-
-  doc.setFontSize(10);
-  doc.text("Tanggal Cetak : "+tanggalCetak,14,22);
-
-  const filterBulan=document.getElementById("filterBulan").value||"Semua";
-  const filterPenggilingan=document.getElementById("filterPenggilingan").value||"Semua";
-  const filterTanggal=document.getElementById("filterTanggal").value||"Semua";
-
-  doc.text("Filter Bulan : "+filterBulan,14,28);
-  doc.text("Filter Penggilingan : "+filterPenggilingan,14,34);
-  doc.text("Filter Tanggal : "+filterTanggal,14,40);
-
-  doc.autoTable({
-    head:[header],
-    body:rows,
-    startY:45,
-    styles:{fontSize:8},
-    theme:'grid'
-  });
-
-  doc.save("Laporan_Stok_Harga.pdf");
-}
-
-document.getElementById("filterBulan").addEventListener("change",renderTable);
-document.getElementById("filterPenggilingan").addEventListener("change",renderTable);
-document.getElementById("filterTanggal").addEventListener("change",renderTable);
-document.getElementById("search").addEventListener("input",renderTable);
-
-loadData();
-
+    loadData();
 </script>
 
 </body>
