@@ -385,13 +385,15 @@ function toggleMenu(){
 }
 
 function toggleDrop(el){
+  const parent = el.closest(".dropdown");
+
   document.querySelectorAll(".dropdown").forEach(d=>{
-    if(d.contains(el)){
-      d.classList.toggle("active");
-    }else{
+    if(d !== parent){
       d.classList.remove("active");
     }
   });
+
+  parent.classList.toggle("active");
 }
 
 document.addEventListener("click", e=>{
