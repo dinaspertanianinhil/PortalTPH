@@ -5,408 +5,361 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Dinas Pertanian</title>
 
-<style>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Segoe UI,system-ui,sans-serif
+<style>
+:root {
+    --accent: #4ade80;
+    --accent-glow: rgba(74, 222, 128, 0.2);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --nav-height: 80px;
 }
 
-body{
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
 
-background:
-linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.75)),
-url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png")
-center/cover no-repeat;
+body {
+    background: 
+        linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.8) 100%),
+        url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #fff;
+    overflow-x: hidden;
+}
 
-min-height:100vh;
-color:white;
-overflow-x:hidden;
+/* Subtle Animated Overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 50%, var(--accent-glow) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+    animation: pulse 8s infinite alternate;
+}
 
+@keyframes pulse {
+    0% { transform: scale(1) translate(0, 0); opacity: 0.3; }
+    100% { transform: scale(1.2) translate(5%, 5%); opacity: 0.5; }
 }
 
 /* ===== NAVBAR ===== */
-
-nav{
-
-position:fixed;
-top:0;
-width:100%;
-
-background:rgba(0,0,0,.35);
-backdrop-filter:blur(14px);
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-padding:16px 24px;
-
-z-index:999;
-
-border-bottom:1px solid rgba(255,255,255,.15);
-
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: var(--nav-height);
+    background: rgba(10, 10, 10, 0.3);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 60px;
+    z-index: 1000;
+    border-bottom: 1px solid var(--glass-border);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.brand{
-font-weight:700;
-font-size:1rem;
-letter-spacing:.5px;
-opacity:.95;
+.brand {
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -0.03em;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+    cursor: default;
+}
+
+.brand span.sub {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-top: 4px;
+    opacity: 0.8;
 }
 
 /* ===== MENU ===== */
-
-.menu{
-display:flex;
-gap:24px;
-align-items:center;
+.menu {
+    display: flex;
+    gap: 40px;
+    align-items: center;
 }
 
 .menu a,
-.dropbtn{
-
-color:white;
-text-decoration:none;
-font-weight:600;
-cursor:pointer;
-
-opacity:.9;
-
-font-size:.95rem;
-
-transition:.25s;
-
+.dropbtn {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    padding: 10px 0;
+    position: relative;
 }
 
 .menu a:hover,
-.dropbtn:hover{
-opacity:1;
-transform:translateY(-1px);
+.dropbtn:hover {
+    color: #fff;
+}
+
+.menu a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 10px;
+}
+
+.menu a:hover::after {
+    width: 100%;
 }
 
 /* ===== DROPDOWN ===== */
-
-.dropdown{
-position:relative;
+.dropdown {
+    position: relative;
 }
 
-.dropdown-content{
-
-position:absolute;
-
-top:44px;
-left:0;
-
-background:rgba(0,0,0,.6);
-
-backdrop-filter:blur(14px);
-
-border-radius:14px;
-
-min-width:220px;
-
-overflow:hidden;
-
-box-shadow:0 20px 50px rgba(0,0,0,.45);
-
-max-height:0;
-opacity:0;
-
-transition:.35s ease;
-
+.dropdown-content {
+    position: absolute;
+    top: calc(100% + 15px);
+    left: 50%;
+    transform: translateX(-50%) translateY(15px);
+    background: rgba(15, 15, 15, 0.8);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    min-width: 260px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 10px;
 }
 
-.dropdown-content a{
-
-display:block;
-padding:14px 16px;
-color:white;
-font-weight:500;
-
-transition:.25s;
-
+.dropdown-content a {
+    display: block;
+    padding: 14px 18px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    font-size: 0.88rem;
+    border-radius: 12px;
+    transition: all 0.2s ease;
 }
 
-.dropdown-content a:hover{
-
-background:rgba(255,255,255,.15);
-
-padding-left:22px;
-
+.dropdown-content a:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--accent);
+    padding-left: 24px;
 }
 
-.dropdown.active .dropdown-content{
-max-height:500px;
-opacity:1;
+.dropdown-content a::after { display: none; }
+
+.dropdown.active .dropdown-content {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* ===== HERO ===== */
-
-.hero{
-
-padding-top:160px;
-text-align:center;
-padding-inline:20px;
-
-display:flex;
-justify-content:center;
-
-animation:fade .7s ease;
-
+.hero {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 120px 24px 60px;
+    position: relative;
+    z-index: 1;
 }
 
-/* card glass */
-
-.hero-card{
-
-background:rgba(255,255,255,.07);
-
-backdrop-filter:blur(14px);
-
-border:1px solid rgba(255,255,255,.18);
-
-padding:40px 35px;
-
-border-radius:20px;
-
-max-width:600px;
-
-box-shadow:0 30px 70px rgba(0,0,0,.5);
-
+.hero-card {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--glass-border);
+    padding: 80px 60px;
+    border-radius: 40px;
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 
+        0 40px 100px rgba(0, 0, 0, 0.4),
+        inset 0 0 40px rgba(255, 255, 255, 0.02);
+    animation: heroEntrance 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.hero h1{
-
-font-size:clamp(1.8rem,4vw,2.5rem);
-
-margin-bottom:10px;
-
-letter-spacing:.5px;
-
+@keyframes heroEntrance {
+    0% { opacity: 0; transform: translateY(60px) scale(0.96); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.hero p{
+.hero h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 800;
+    margin-bottom: 20px;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    
+    background: linear-gradient(135deg, #ffffff 30%, #d1fae5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 
-font-size:clamp(.95rem,2.8vw,1.1rem);
-
-opacity:.9;
-
+    text-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 
-/* ===== ANIMATION ===== */
-
-@keyframes fade{
-
-from{
-opacity:0;
-transform:translateY(30px);
-}
-
-to{
-opacity:1;
-transform:translateY(0);
-}
-
+.hero p {
+    font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+    max-width: 620px;
+    margin: 0 auto;
 }
 
 /* ===== MOBILE BUTTON ===== */
-
-.mobile-btn{
-display:none;
-font-size:26px;
-cursor:pointer;
+.mobile-btn {
+    display: none;
+    font-size: 28px;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.05);
+    transition: all 0.3s ease;
 }
 
 /* ===== RESPONSIVE ===== */
-
-@media(max-width:820px){
-
-body{
-background-position:center top;
+@media (max-width: 1024px) {
+    nav { padding: 0 30px; }
+    .menu { gap: 25px; }
 }
 
-/* menu */
+@media (max-width: 820px) {
+    .mobile-btn { display: flex; }
+    .menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: rgba(10, 10, 10, 0.98);
+        backdrop-filter: blur(30px);
+        flex-direction: column;
+        padding: 30px;
+        gap: 10px;
+        border-bottom: 1px solid var(--glass-border);
+        animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
-.menu{
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-display:none;
-
-position:absolute;
-
-top:65px;
-left:0;
-
-width:100%;
-
-background:rgba(0,0,0,.92);
-
-flex-direction:column;
-
-padding:10px 0 25px 0;
-
-animation:menuSlide .25s ease;
-
+    .menu.show { display: flex; }
+    .menu a, .dropbtn {
+        width: 100%;
+        padding: 16px 24px;
+        border-radius: 15px;
+        text-align: left;
+        font-size: 1.05rem;
+    }
+    .menu a:hover, .dropbtn:hover { background: rgba(255,255,255,0.05); }
+    
+    .dropdown { width: 100%; }
+    .dropdown-content {
+        position: static;
+        transform: none;
+        visibility: visible;
+        opacity: 1;
+        max-height: 0;
+        min-width: 100%;
+        box-shadow: none;
+        background: transparent;
+        border: none;
+        padding: 0;
+        transition: max-height 0.5s ease;
+    }
+    .dropdown.active .dropdown-content {
+        max-height: 800px;
+        padding: 10px 0 10px 20px;
+    }
+    .hero-card { padding: 50px 30px; border-radius: 30px; }
 }
-
-@keyframes menuSlide{
-
-from{
-opacity:0;
-transform:translateY(-10px);
-}
-
-to{
-opacity:1;
-transform:translateY(0);
-}
-
-}
-
-.menu.show{
-display:flex;
-}
-
-.menu a,
-.dropbtn{
-
-padding:14px 0;
-font-size:1rem;
-
-width:100%;
-text-align:center;
-
-}
-
-.mobile-btn{
-display:block;
-}
-
-/* dropdown */
-
-.dropdown{
-width:100%;
-text-align:center;
-}
-
-.dropdown-content{
-
-position:static;
-
-background:rgba(255,255,255,.05);
-
-box-shadow:none;
-
-border-radius:10px;
-
-margin-top:6px;
-
-}
-
-.dropdown-content a{
-
-padding:12px 0;
-
-font-size:.95rem;
-
-}
-
-/* hero */
-
-.hero{
-padding-top:120px;
-}
-
-.hero-card{
-padding:28px 20px;
-}
-
-.hero h1{
-font-size:1.5rem;
-}
-
-.hero p{
-font-size:.9rem;
-}
-
-}
-
 </style>
 </head>
 
 <body>
 
 <nav>
+    <div class="brand">
+        🌾 BIDANG TANAMAN PANGAN DAN HORTIKULTURA
+        <span class="sub">INTERNAL SYSTEM • KABUPATEN INDRAGIRI HILIR</span>
+    </div>
 
-<div class="brand">
-🌾 BIDANG TANAMAN PANGAN DAN HORTIKULTURA 
-<span style="font-size:12px;opacity:.7;">(INTERNAL)</span>
-</div>
+    <div class="mobile-btn" onclick="toggleMenu()">☰</div>
 
-<div class="mobile-btn" onclick="toggleMenu()">☰</div>
+    <div class="menu" id="menu">
+        <a href="#">Dashboard</a>
 
-<div class="menu" id="menu">
+        <div class="dropdown">
+            <span class="dropbtn" onclick="toggleDrop(this)">Input Data ▾</span>
+            <div class="dropdown-content">
+                <a href="form_stokharga_TP.html">Harga & Stok Beras</a>
+                <a href="form_horti.html">Harga Horti</a>
+                <a href="form_LTT.html">LTT</a>
+                <a href="Formlapserangan.html">Laporan Serangan</a>
+                <a href="Formubinan.html">Form UBINAN</a>
+            </div>
+        </div>
 
-<a href="#">Dashboard</a>
+        <div class="dropdown">
+            <span class="dropbtn" onclick="toggleDrop(this)">Rekap ▾</span>
+            <div class="dropdown-content">
+                <a href="tampil.html">Rekap Beras</a>
+                <a href="Tampilhorti.html">Rekap Horti</a>
+                <a href="Tampilltt.html">Rekap LTT</a>
+                <a href="tampilopt.html">Rekap Serangan Hama</a>
+                <a href="Tampilubinan.html">Rekap UBINAN</a>
+            </div>
+        </div>
 
-<div class="dropdown">
-
-<span class="dropbtn" onclick="toggleDrop(this)">Input Data ▾</span>
-
-<div class="dropdown-content">
-
-<a href="form_stokharga_TP.html">Harga & Stok Beras</a>
-
-<a href="form_horti.html">Harga Horti</a>
-
-<a href="form_LTT.html">LTT</a>
-
-<a href="Formlapserangan.html">Laporan Serangan</a>
-
-<a href="Formubinan.html">Form UBINAN</a>
-</div>
-</div>
-
-<div class="dropdown">
-
-<span class="dropbtn" onclick="toggleDrop(this)">Rekap ▾</span>
-
-<div class="dropdown-content">
-
-<a href="tampil.html">Rekap Beras</a>
-
-<a href="Tampilhorti.html">Rekap Horti</a>
-
-<a href="Tampilltt.html">Rekap LTT</a>
-
-<a href="tampilopt.html">Rekap Serangan<br>Hama</a>
-
-<a href="Tampilubinan.html">Rekap UBINAN</a>
-
-</div>
-
-</div>
-
-<a href="javascript:void(0)" onclick="logout()">Logout</a>
-
-</div>
-
+        <a href="javascript:void(0)" onclick="logout()">Logout</a>
+    </div>
 </nav>
 
 <section class="hero">
-
-<div class="hero-card">
-
-<h1>📊 Sistem Informasi Pertanian</h1>
-
-<p>
-Monitoring Harga • Produksi • Stok • Serangan Hama tanaman • Luas Tambah Tanam Kabupaten Indragiri Hilir
-</p>
-
-</div>
-
+    <div class="hero-card">
+        <h1>Pusat Monitoring Pertanian Digital</h1>
+        <br>
+            Monitoring Harga • Produksi • Stok • Serangan Hama Tanaman • Luas Tambah Tanam Kabupaten Indragiri Hilir
+        </p>
+    </div>
 </section>
 
 <!-- AUDIO (WAJIB DI SINI) -->
@@ -428,7 +381,6 @@ document.addEventListener("click", function(){
 </script>
 
 <script>
-
 // ===== MENU =====
 function toggleMenu(){
   document.getElementById("menu").classList.toggle("show");
@@ -452,7 +404,6 @@ document.addEventListener("click", e=>{
 
 // ===== AUDIO (SUDAH FIX) =====
 window.addEventListener("load", function(){
-
   const audio = document.getElementById("welcomeAudio");
 
   if(!localStorage.getItem("welcomePlayed")){
@@ -467,14 +418,12 @@ window.addEventListener("load", function(){
   document.addEventListener("click", function(){
     audio.play();
   }, { once:true });
-
 });
 
 // ===== LOGOUT =====
 function logout(){
   window.location.href = "index.html";
 }
-
 </script>
 
 </body>
