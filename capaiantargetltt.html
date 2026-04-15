@@ -12,8 +12,6 @@
 :root {
     --primary: #1b5e20;
     --primary-light: #2e7d32;
-    --primary-gradient: linear-gradient(135deg, #1b5e20 0%, #43a047 100%);
-    --accent: #ff9800;
     --bg-glass: rgba(255, 255, 255, 0.9);
 }
 
@@ -25,16 +23,18 @@ body {
 }
 
 .overlay {
-    background:rgba(248,250,252,0.85);
+    background: linear-gradient(135deg, rgba(248,250,252,0.92), rgba(240,249,245,0.88));
     min-height:100vh;
 }
 
+/* HEADER */
 header {
     display:flex;
     align-items:center;
     gap:15px;
     padding:15px 5%;
     background:var(--bg-glass);
+    box-shadow:0 2px 10px rgba(0,0,0,0.06);
 }
 
 header img { width:45px; }
@@ -43,6 +43,7 @@ header img { width:45px; }
     padding:25px 5%;
 }
 
+/* CARD */
 .cards {
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -54,6 +55,7 @@ header img { width:45px; }
     background:white;
     padding:20px;
     border-radius:12px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
 }
 
 .card h3 {
@@ -69,13 +71,16 @@ header img { width:45px; }
     color:var(--primary);
 }
 
+/* BOX */
 .box {
     background:white;
     padding:20px;
     border-radius:12px;
     margin-bottom:15px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.06);
 }
 
+/* BAR */
 .bar {
     height:18px;
     background:#e5e7eb;
@@ -88,8 +93,12 @@ header img { width:45px; }
     color:white;
     font-size:11px;
     text-align:right;
-    padding-right:5px;
+    padding-right:6px;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
 }
+
 </style>
 </head>
 
@@ -123,7 +132,6 @@ header img { width:45px; }
     </div>
 </div>
 
-<!-- LIST -->
 <div id="listCapaian"></div>
 
 </div>
@@ -136,8 +144,19 @@ const API_TARGET = API + "?type=target";
 let realisasi = [];
 let target = [];
 
+/* =========================
+   FIX: parsing angka LTT
+========================= */
 function safeNumber(val){
-    return parseFloat((val+"").replace(",", ".")) || 0;
+    if(val === null || val === undefined || val === "") return 0;
+    return Number(String(val).replace(",", ".")) || 0;
+}
+
+/* =========================
+   FORMAT angka konsisten
+========================= */
+function format2(n){
+    return Number(n).toFixed(2);
 }
 
 async function load(){
@@ -175,19 +194,20 @@ function render(){
 
     const persen = totalT ? (totalR/totalT*100) : 0;
 
-    document.getElementById("totalTarget").innerText = totalT.toFixed(0) + " Ha";
-    document.getElementById("totalRealisasi").innerText = totalR.toFixed(0) + " Ha";
+    /* =========================
+       FIX OUTPUT DESIMAL
+    ========================= */
+    document.getElementById("totalTarget").innerText = format2(totalT) + " Ha";
+    document.getElementById("totalRealisasi").innerText = format2(totalR) + " Ha";
 
     const persenEl = document.getElementById("persenCapaian");
     persenEl.innerText = persen.toFixed(2) + " %";
 
-    let warna = "#ef4444";
-    if(persen>=80) warna="#16a34a";
-    else if(persen>=50) warna="#f59e0b";
+    persenEl.style.color =
+        persen >= 80 ? "#16a34a" :
+        persen >= 50 ? "#f59e0b" : "#ef4444";
 
-    persenEl.style.color = warna;
-
-    // LIST PER KECAMATAN
+    /* LIST */
     const container = document.getElementById("listCapaian");
     container.innerHTML = "";
 
@@ -197,25 +217,25 @@ function render(){
         const t = targetMap[kec] || 0;
         const p = t ? (r/t*100) : 0;
 
-        let warna = "#ef4444";
-        if(p>=80) warna="#16a34a";
-        else if(p>=50) warna="#f59e0b";
+        let warna =
+            p >= 80 ? "#16a34a" :
+            p >= 50 ? "#f59e0b" : "#ef4444";
 
         const div = document.createElement("div");
         div.className = "box";
 
         div.innerHTML = `
             <b>${kec}</b>
-            <p>${r.toFixed(1)} / ${t.toFixed(1)} Ha (${p.toFixed(1)}%)</p>
+            <p>${format2(r)} / ${format2(t)} Ha (${p.toFixed(2)}%)</p>
+
             <div class="bar">
                 <div class="fill" style="width:${p}%; background:${warna}">
-                    ${p.toFixed(0)}%
+                    ${p.toFixed(2)}%
                 </div>
             </div>
         `;
 
         container.appendChild(div);
-
     });
 }
 
