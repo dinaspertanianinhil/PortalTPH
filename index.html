@@ -189,44 +189,62 @@
   </footer>
 
   <script>
-    function login() {
-      const user = document.getElementById("username").value.trim();
-      const pass = document.getElementById("password").value.trim();
-      const msg = document.getElementById("errorMsg");
+const API_LOGIN = "https://script.google.com/macros/s/AKfycbzjwkQfUUYs0Vf48d-gxzcqLI3g6s0i4xK2GL2OwVXK-wJlwtAspUCaTF0XT-3VoBGMJA/exec";
 
-      if (!user || !pass) {
-        msg.textContent = "Harap isi username dan password.";
-        return;
-      }
+function login() {
+  const user = document.getElementById("username").value.trim();
+  const pass = document.getElementById("password").value.trim();
+  const msg = document.getElementById("errorMsg");
 
-      const akun = {
-        kabidtph: "12345",
-        kabidkdp: "12345",
-        kadis: "123",
-        sekre: "123"
-      };
+  if (!user || !pass) {
+    msg.textContent = "Harap isi username dan password.";
+    return;
+  }
 
-      if (akun[user] && akun[user] === pass) {
-        localStorage.setItem("loginUser", user);
+  msg.textContent = "Memproses...";
 
-        if (user === "kadis" || user === "kabidtph" || user === "kabidkdp") {
-          window.location.href = "dashboad.html";
-        } else if (user === "sekre") {
-          window.location.href = "dashboad.html";
-        }
+  fetch(API_LOGIN, {
+    method: "POST",
+    body: JSON.stringify({
+      username: user,
+      password: pass
+    })
+  })
+  .then(res => res.json())
+  .then(res => {
+
+    if (res.status === "ok") {
+
+      localStorage.setItem("loginUser", user);
+      localStorage.setItem("role", res.role);
+
+      // arahkan sesuai role
+      if (res.role === "admin" || res.role === "kadis") {
+        window.location.href = "dashboad.html";
+      } else if (res.role === "sekre") {
+        window.location.href = "dashboad.html";
       } else {
-        msg.textContent = "Username atau password salah.";
+        window.location.href = "dashboard2.html";
       }
+
+    } else {
+      msg.textContent = "Username atau password salah.";
     }
 
-    function guestLogin() {
-      localStorage.setItem("loginUser", "guest");
-      window.location.href = "dashboard2.html";
-    }
+  })
+  .catch(err => {
+    msg.textContent = "Koneksi gagal!";
+  });
+}
 
-    document.addEventListener("keypress", e => {
-      if (e.key === "Enter") login();
-    });
-  </script>
+function guestLogin() {
+  localStorage.setItem("loginUser", "guest");
+  window.location.href = "dashboard2.html";
+}
+
+document.addEventListener("keypress", e => {
+  if (e.key === "Enter") login();
+});
+</script>
 </body>
 </html>
