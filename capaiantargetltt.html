@@ -11,7 +11,6 @@
 <style>
 :root {
     --primary: #1b5e20;
-    --primary-light: #2e7d32;
 }
 
 body {
@@ -41,7 +40,7 @@ header img { width:45px; }
     padding:25px 5%;
 }
 
-/* FILTER BULAN */
+/* FILTER */
 .filter-box {
     margin-bottom:15px;
 }
@@ -57,7 +56,7 @@ header img { width:45px; }
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
     gap:20px;
-    margin-bottom:25px;
+    margin-bottom:20px;
 }
 
 .card {
@@ -74,38 +73,76 @@ header img { width:45px; }
 }
 
 .card p {
-    font-size:1.8rem;
+    font-size:1.6rem;
     margin-top:10px;
     font-weight:800;
     color:var(--primary);
 }
 
-/* BOX */
-.box {
+/* ===== LAYOUT ===== */
+.capaian-area{
+    display:flex;
+    gap:15px;
+}
+
+/* kiri */
+.list-area{
+    flex:1;
+}
+
+/* kanan */
+.chart-area{
+    flex:1;
+    height:380px;
     background:white;
-    padding:20px;
     border-radius:12px;
-    margin-bottom:15px;
+    padding:10px;
     box-shadow:0 8px 20px rgba(0,0,0,0.06);
 }
 
-/* BAR */
-.bar {
-    height:18px;
+/* ===== LIST 1 FRAME ===== */
+.list-frame{
+    background:white;
+    border-radius:12px;
+    padding:12px;
+    box-shadow:0 6px 15px rgba(0,0,0,0.06);
+}
+
+/* baris kecamatan */
+.item{
+    margin-bottom:10px;
+}
+
+/* teks */
+.item-top{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    font-weight:500;
+}
+
+/* bar tipis */
+.bar{
+    height:8px;
     background:#e5e7eb;
     border-radius:10px;
     overflow:hidden;
+    margin-top:3px;
 }
 
-.fill {
+.fill{
     height:100%;
-    color:white;
-    font-size:11px;
-    text-align:right;
-    padding-right:6px;
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+    .capaian-area{
+        flex-direction:column;
+    }
+
+    .chart-area{
+        height:280px;
+    }
 }
 </style>
 </head>
@@ -124,12 +161,10 @@ header img { width:45px; }
 
 <div class="container">
 
-<!-- FILTER BULAN -->
 <div class="filter-box">
     <input type="month" id="filterBulan" onchange="setMonth(this.value)">
 </div>
 
-<!-- CARD -->
 <div class="cards">
     <div class="card">
         <h3>Total Target</h3>
@@ -145,7 +180,19 @@ header img { width:45px; }
     </div>
 </div>
 
-<div id="listCapaian"></div>
+<div class="capaian-area">
+
+    <!-- KIRI -->
+    <div class="list-area">
+        <div class="list-frame" id="listCapaian"></div>
+    </div>
+
+    <!-- KANAN -->
+    <div class="chart-area">
+        <canvas id="chartBatang"></canvas>
+    </div>
+
+</div>
 
 </div>
 </div>
@@ -157,11 +204,10 @@ const API_TARGET = API + "?type=target";
 let realisasi = [];
 let target = [];
 let selectedMonth = "";
+let chart;
 
-/* ambil YYYY-MM */
 function getMonth(tgl){
-    if(!tgl) return "";
-    return tgl.toString().slice(0,7);
+    return tgl?.toString().slice(0,7) || "";
 }
 
 function safeNumber(val){
@@ -179,7 +225,6 @@ async function load(){
     realisasi = await r1.json();
     target = await r2.json();
 
-    // auto set bulan sekarang
     const now = new Date().toISOString().slice(0,7);
     document.getElementById("filterBulan").value = now;
     selectedMonth = now;
@@ -192,7 +237,6 @@ function setMonth(val){
     render();
 }
 
-/* FILTER BULAN */
 function filterData(data){
     if(!selectedMonth) return data;
     return data.filter(d => getMonth(d.TANGGAL) === selectedMonth);
@@ -203,66 +247,72 @@ function render(){
     let realMap = {};
     let targetMap = {};
 
-    let realFiltered = filterData(realisasi);
-
-    realFiltered.forEach(d=>{
-        const kec = (d.KECAMATAN||"").toUpperCase();
-        const luas = safeNumber(d["LUAS TAMBAH TANAM"]);
-        realMap[kec] = (realMap[kec]||0)+luas;
+    filterData(realisasi).forEach(d=>{
+        const k = d.KECAMATAN.toUpperCase();
+        realMap[k] = (realMap[k]||0) + safeNumber(d["LUAS TAMBAH TANAM"]);
     });
 
     target.forEach(d=>{
-        const kec = (d.KECAMATAN||"").toUpperCase();
-        const t = safeNumber(d["TARGET"]);
-        targetMap[kec] = (targetMap[kec]||0)+t;
+        const k = d.KECAMATAN.toUpperCase();
+        targetMap[k] = (targetMap[k]||0) + safeNumber(d["TARGET"]);
     });
 
-    let totalR = 0;
-    let totalT = 0;
+    let totalR = Object.values(realMap).reduce((a,b)=>a+b,0);
+    let totalT = Object.values(targetMap).reduce((a,b)=>a+b,0);
+    let persen = totalT ? totalR/totalT*100 : 0;
 
-    Object.values(realMap).forEach(v=> totalR += v);
-    Object.values(targetMap).forEach(v=> totalT += v);
-
-    let persen = totalT ? (totalR/totalT*100) : 0;
-
-    document.getElementById("totalTarget").innerText = format2(totalT) + " Ha";
-    document.getElementById("totalRealisasi").innerText = format2(totalR) + " Ha";
+    document.getElementById("totalTarget").innerText = format2(totalT)+" Ha";
+    document.getElementById("totalRealisasi").innerText = format2(totalR)+" Ha";
 
     const el = document.getElementById("persenCapaian");
-    el.innerText = persen.toFixed(2) + " %";
-
-    el.style.color =
-        persen >= 80 ? "#16a34a" :
-        persen >= 50 ? "#f59e0b" : "#ef4444";
+    el.innerText = persen.toFixed(2)+" %";
+    el.style.color = persen>=80?"#16a34a":persen>=50?"#f59e0b":"#ef4444";
 
     const container = document.getElementById("listCapaian");
     container.innerHTML = "";
 
-    Object.keys(targetMap).forEach(kec=>{
+    let labels=[], tData=[], rData=[];
 
-        const r = realMap[kec] || 0;
-        const t = targetMap[kec] || 0;
-        const p = t ? (r/t*100) : 0;
+    Object.keys(targetMap).forEach(k=>{
 
-        let warna =
-            p >= 80 ? "#16a34a" :
-            p >= 50 ? "#f59e0b" : "#ef4444";
+        let r = realMap[k]||0;
+        let t = targetMap[k]||0;
+        let p = t ? r/t*100 : 0;
 
-        const div = document.createElement("div");
-        div.className = "box";
+        labels.push(k);
+        tData.push(t);
+        rData.push(r);
 
-        div.innerHTML = `
-            <b>${kec}</b>
-            <p>${format2(r)} / ${format2(t)} Ha (${p.toFixed(2)}%)</p>
+        let warna = p>=80?"#16a34a":p>=50?"#f59e0b":"#ef4444";
 
-            <div class="bar">
-                <div class="fill" style="width:${p}%; background:${warna}">
-                    ${p.toFixed(2)}%
-                </div>
+        container.innerHTML += `
+        <div class="item">
+            <div class="item-top">
+                <span>${k}</span>
+                <span>${format2(r)} / ${format2(t)} Ha (${p.toFixed(2)}%)</span>
             </div>
-        `;
+            <div class="bar">
+                <div class="fill" style="width:${p}%; background:${warna}"></div>
+            </div>
+        </div>`;
+    });
 
-        container.appendChild(div);
+    if(chart) chart.destroy();
+
+    chart = new Chart(document.getElementById("chartBatang"),{
+        type:'bar',
+        data:{
+            labels:labels,
+            datasets:[
+                {label:'Target', data:tData},
+                {label:'Realisasi', data:rData}
+            ]
+        },
+        options:{
+            responsive:true,
+            maintainAspectRatio:false,
+            scales:{y:{beginAtZero:true}}
+        }
     });
 }
 
