@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Form Laporan Panen</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --primary: #1a5c20;
+    --primary-light: #2d7a35;
+    --primary-muted: #e8f4ea;
+    --primary-subtle: #f3faf4;
+    --surface: #ffffff;
+    --surface-secondary: #f8fbf8;
+    --border: rgba(26, 92, 32, 0.12);
+    --border-hover: rgba(26, 92, 32, 0.25);
+    --text-primary: #0f2110;
+    --text-secondary: #4a6650;
+    --text-muted: #7a9a80;
+    --shadow-sm: 0 1px 3px rgba(15, 33, 16, 0.06), 0 1px 2px rgba(15, 33, 16, 0.04);
+    --shadow-md: 0 4px 16px rgba(15, 33, 16, 0.08), 0 1px 4px rgba(15, 33, 16, 0.04);
+    --shadow-card: 0 2px 8px rgba(15, 33, 16, 0.06), 0 0 1px rgba(15, 33, 16, 0.08);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: url('https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-rice-fields-with-green-rice-with-dew-and-mountains-image_15860694.jpg') center/cover fixed;
+    min-height: 100vh;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+}
+
+.overlay {
+    min-height: 100vh;
+    background: linear-gradient(
+        160deg,
+        rgba(243, 250, 244, 0.94) 0%,
+        rgba(235, 246, 237, 0.91) 50%,
+        rgba(240, 249, 242, 0.93) 100%
+    );
+    backdrop-filter: blur(2px);
+}
+
+/* ── HEADER ── */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 5%;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+header img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+}
+
+.header-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--border);
+}
+
+.header-text strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    letter-spacing: -0.01em;
+}
+
+.header-text small {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+}
+
+.header-badge {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: var(--primary-muted);
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--primary);
+    border: 1px solid rgba(26, 92, 32, 0.15);
+}
+
+.header-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    box-shadow: 0 0 0 2px rgba(45, 122, 53, 0.25);
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ── CONTAINER ── */
+.container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 28px 5% 48px;
+}
+
+/* ── PAGE TITLE ── */
+.page-title {
+    margin-bottom: 24px;
+}
+
+.page-title h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--primary);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.page-title p {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: 400;
+}
+
+/* ── CARD ── */
+.card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    padding: 22px 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-card);
+    transition: box-shadow var(--transition), border-color var(--transition);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-hover);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--primary-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.card-header h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* ── GRID ── */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+}
+
+/* ── FIELD ── */
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+label {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+input, select, textarea {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 400;
+    color: var(--text-primary);
+    width: 100%;
+    padding: 10px 13px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface-secondary);
+    outline: none;
+    transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a6650' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    cursor: pointer;
+}
+
+input:hover, select:hover, textarea:hover {
+    border-color: var(--border-hover);
+    background: var(--surface);
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--primary);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px rgba(26, 92, 32, 0.1);
+}
+
+input[type="date"] {
+    color: var(--text-secondary);
+}
+
+input[type="date"]:not(:placeholder-shown),
+input[type="date"]:valid {
+    color: var(--text-primary);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+}
+
+::placeholder {
+    color: var(--text-muted);
+    font-weight: 300;
+}
+
+/* ── PRODUKSI OUTPUT ── */
+.output-panel {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: var(--primary-subtle);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(26, 92, 32, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.output-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.output-value {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+}
+
+.output-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: var(--primary);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    transition: color var(--transition);
+}
+
+.output-unit {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+/* ── BUTTON ── */
+.button-wrapper {
+    margin-top: 8px;
+}
+
+.button {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: #fff;
+    background: var(--primary);
+    width: 100%;
+    padding: 14px 24px;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+    transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+    box-shadow: 0 2px 8px rgba(26, 92, 32, 0.3), 0 1px 2px rgba(26, 92, 32, 0.2);
+}
+
+.button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background var(--transition);
+}
+
+.button:hover {
+    background: var(--primary-light);
+    box-shadow: 0 4px 16px rgba(26, 92, 32, 0.35), 0 2px 4px rgba(26, 92, 32, 0.2);
+    transform: translateY(-1px);
+}
+
+.button:active {
+    transform: translateY(0px);
+    box-shadow: 0 1px 4px rgba(26, 92, 32, 0.25);
+}
+
+.button-icon {
+    font-size: 16px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px 4% 40px;
+    }
+    .card {
+        padding: 18px;
+    }
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    .page-title h1 {
+        font-size: 22px;
+    }
+    .header-badge {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="overlay">
+
+<header>
+    <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png" alt="Logo Inhil">
+    <div class="header-divider"></div>
+    <div class="header-text">
+        <strong>Form Laporan Panen</strong>
+        <small>Dinas Pertanian Kabupaten Indragiri Hilir</small>
+    </div>
+    <div class="header-badge">Formulir Aktif</div>
+</header>
+
+<div class="container">
+
+    <div class="page-title">
+        <h1>Laporan Data Panen</h1>
+        <p>Isi seluruh kolom dengan data yang akurat dan sesuai kondisi lapangan.</p>
+    </div>
+
+    <!-- IDENTITAS -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon">📋</div>
+            <h3>Identitas Laporan</h3>
+        </div>
+        <div class="grid">
+            <div class="field">
+                <label>Nama Petugas</label>
+                <input type="text" placeholder="Masukkan nama petugas">
+            </div>
+            <div class="field">
+                <label>Kecamatan</label>
+                <input type="text" placeholder="Nama kecamatan">
+            </div>
+            <div class="field">
+                <label>Desa</label>
+                <input type="text" placeholder="Nama desa">
+            </div>
+            <div class="field">
+                <label>Tanggal Laporan</label>
+                <input type="date">
+            </div>
+        </div>
+    </div>
+
+    <!-- PETANI -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon">👨‍🌾</div>
+            <h3>Data Petani</h3>
+        </div>
+        <div class="grid">
+            <div class="field">
+                <label>Kelompok Tani</label>
+                <input type="text" placeholder="Nama kelompok tani">
+            </div>
+            <div class="field">
+                <label>Luas Lahan (Ha)</label>
+                <input type="number" step="0.01" placeholder="0.00">
+            </div>
+            <div class="field">
+                <label>Status Lahan</label>
+                <select>
+                    <option>Milik</option>
+                    <option>Sewa</option>
+                    <option>Bagi Hasil</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- TANAMAN -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon">🌱</div>
+            <h3>Data Tanaman</h3>
+        </div>
+        <div class="grid">
+            <div class="field">
+                <label>Komoditas</label>
+                <select>
+                    <option>Padi</option>
+                    <option>Jagung</option>
+                    <option>Kedelai</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Varietas</label>
+                <input type="text" placeholder="Nama varietas">
+            </div>
+            <div class="field">
+                <label>Musim Tanam</label>
+                <select>
+                    <option>MT 1</option>
+                    <option>MT 2</option>
+                    <option>MT 3</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEN -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon">🌾</div>
+            <h3>Data Panen</h3>
+        </div>
+        <div class="grid">
+            <div class="field">
+                <label>Luas Panen (Ha)</label>
+                <input type="number" id="luas" step="0.01" placeholder="0.00">
+            </div>
+            <div class="field">
+                <label>Produktivitas (Ton/Ha)</label>
+                <input type="number" id="produktivitas" step="0.01" placeholder="0.00">
+            </div>
+            <div class="field">
+                <label>Tanggal Panen</label>
+                <input type="date">
+            </div>
+        </div>
+
+        <div class="output-panel">
+            <span class="output-label">Total Produksi</span>
+            <div class="output-value">
+                <span class="output-number" id="produksi">0</span>
+                <span class="output-unit">TON</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- HARGA -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon">💰</div>
+            <h3>Data Harga</h3>
+        </div>
+        <div class="grid">
+            <div class="field">
+                <label>Harga GKP</label>
+                <input type="number" placeholder="Rp 0">
+            </div>
+            <div class="field">
+                <label>Harga GKG</label>
+                <input type="number" placeholder="Rp 0">
+            </div>
+            <div class="field">
+                <label>Harga Beras</label>
+                <input type="number" placeholder="Rp 0">
+            </div>
+        </div>
+    </div>
+
+    <!-- KENDALA -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon">⚠️</div>
+            <h3>Kendala Lapangan</h3>
+        </div>
+        <div class="field">
+            <textarea placeholder="Tuliskan kendala yang ditemui di lapangan selama proses panen..."></textarea>
+        </div>
+    </div>
+
+    <div class="button-wrapper">
+        <button class="button">
+            <span class="button-icon">💾</span>
+            Simpan Laporan
+        </button>
+    </div>
+
+</div>
+</div>
+
+<script>
+    const luas = document.getElementById('luas');
+    const produktivitas = document.getElementById('produktivitas');
+    const produksi = document.getElementById('produksi');
+
+    function hitung() {
+        const l = parseFloat(luas.value) || 0;
+        const p = parseFloat(produktivitas.value) || 0;
+        const total = l * p;
+        produksi.textContent = total > 0 ? total.toFixed(2) : '0';
+    }
+
+    luas.addEventListener('input', hitung);
+    produktivitas.addEventListener('input', hitung);
+</script>
+</body>
+</html>
