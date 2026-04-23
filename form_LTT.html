@@ -6,100 +6,394 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-  font-family: "Segoe UI", Arial, sans-serif;
-  background:#f4f6f8;
-  padding:16px;
-  margin:0;
-}
-h2,h3 { margin:0 0 10px; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-.header {
-  background:#ffffff;
-  padding:16px;
-  border-radius:10px;
-  display:flex;
-  align-items:center;
-  gap:16px;
-  margin-bottom:16px;
-  box-shadow:0 4px 12px rgba(0,0,0,.06);
-}
-.header img { width:60px; }
-.header .title { font-size:16px; font-weight:600; }
-.header .subtitle { font-size:13px; color:#6b7280; }
+  :root {
+    --green-50:  #f0fdf9;
+    --green-100: #ccfbef;
+    --green-200: #99f6e0;
+    --green-400: #2dd4a8;
+    --green-600: #0f766e;
+    --green-700: #0d6b63;
+    --green-800: #0a5952;
+    --green-900: #073d38;
+    --red-500:   #ef4444;
+    --red-600:   #dc2626;
+    --red-700:   #b91c1c;
+    --gray-50:   #f9fafb;
+    --gray-100:  #f3f4f6;
+    --gray-200:  #e5e7eb;
+    --gray-300:  #d1d5db;
+    --gray-400:  #9ca3af;
+    --gray-500:  #6b7280;
+    --gray-600:  #4b5563;
+    --gray-700:  #374151;
+    --gray-800:  #1f2937;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.04);
+    --shadow-focus: 0 0 0 3px rgba(15,118,110,.18);
+    --transition: 150ms ease;
+  }
 
-.box {
-  background:#fff;
-  padding:16px;
-  margin-bottom:16px;
-  border-radius:10px;
-  box-shadow:0 4px 12px rgba(0,0,0,.06);
-}
-label {
-  font-size:13px;
-  font-weight:600;
-  display:block;
-  margin-top:12px;
-}
-input, select {
-  width:100%;
-  padding:10px 1px;
-  margin-top:6px;
-  border-radius:8px;
-  border:1px solid #cfd6dd;
-  font-size:14px;
-}
-button {
-  margin-top:12px;
-  padding:10px 16px;
-  border-radius:8px;
-  border:none;
-  background:#0f766e;
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
-}
-button:hover { opacity:.9 }
-.btn-hapus { background:#dc2626; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    background: linear-gradient(160deg, #f0fdf9 0%, #f1f5f9 60%);
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    color: var(--gray-800);
+    font-size: 14px;
+  }
 
-.desa {
-  border:1px dashed #b6bec8;
-  padding:14px;
-  margin-top:14px;
-  border-radius:8px;
-  background:#fafafa;
-}
+  /* ======= HEADER ======= */
+  .header {
+    background: #fff;
+    padding: 18px 20px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow-md);
+    border-top: 3px solid var(--green-600);
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    right: -30px; top: -30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: var(--green-50);
+    opacity: .7;
+    pointer-events: none;
+  }
+  .header img {
+    width: 54px;
+    height: 54px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,.12));
+  }
+  .header-text { flex: 1; }
+  .header .title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--green-800);
+    letter-spacing: .01em;
+    line-height: 1.3;
+  }
+  .header .subtitle {
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-top: 3px;
+  }
+  .header-badge {
+    background: var(--green-50);
+    color: var(--green-700);
+    border: 1px solid var(--green-200);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    letter-spacing: .02em;
+  }
 
-.poktan {
-  display:grid;
-  grid-template-columns: 1fr 110px 170px 90px;
-  gap:10px;
-  margin-top:10px;
-}
-@media (max-width:600px){
-  .poktan { grid-template-columns: 1fr; }
-}
+  /* ======= SECTION CARD ======= */
+  .box {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 16px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(0,0,0,.04);
+    transition: box-shadow var(--transition);
+  }
+  .box:hover { box-shadow: 0 6px 18px rgba(0,0,0,.09), 0 2px 4px rgba(0,0,0,.04); }
 
-.rekap div {
-  font-size:14px;
-  margin-top:6px;
-}
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--green-700);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid var(--green-100);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title .icon {
+    width: 20px; height: 20px;
+    background: var(--green-100);
+    border-radius: 5px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px;
+  }
+
+  /* ======= LABEL & INPUT ======= */
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-600);
+    display: block;
+    margin-top: 14px;
+    margin-bottom: 5px;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-200);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+  }
+  input:hover, select:hover { border-color: var(--gray-300); background: #fff; }
+  input:focus, select:focus {
+    border-color: var(--green-600);
+    background: #fff;
+    box-shadow: var(--shadow-focus);
+  }
+  input[type="date"] { cursor: pointer; }
+
+  /* ======= BUTTONS ======= */
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: .01em;
+    transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  }
+  button:active { transform: scale(.97); }
+
+  /* primary */
+  button:not(.btn-hapus):not(.btn-secondary) {
+    background: var(--green-600);
+    color: #fff;
+    box-shadow: 0 1px 4px rgba(15,118,110,.3);
+  }
+  button:not(.btn-hapus):not(.btn-secondary):hover {
+    background: var(--green-700);
+    box-shadow: 0 3px 8px rgba(15,118,110,.35);
+  }
+
+  /* danger */
+  .btn-hapus {
+    background: #fff1f1;
+    color: var(--red-600);
+    border: 1.5px solid #fecaca;
+  }
+  .btn-hapus:hover { background: #fee2e2; border-color: #fca5a5; }
+
+  /* ======= DESA BLOCK ======= */
+  .desa {
+    background: var(--gray-50);
+    border: 1.5px solid var(--gray-200);
+    padding: 16px;
+    margin-top: 14px;
+    border-radius: var(--radius-md);
+    position: relative;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+  .desa:hover { border-color: var(--green-200); box-shadow: 0 2px 8px rgba(15,118,110,.07); }
+
+  .desa-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .desa-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--green-700);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+
+  .poktan-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  /* ======= POKTAN ROW ======= */
+  .poktan {
+    display: grid;
+    grid-template-columns: 1fr 100px 165px 80px;
+    gap: 8px;
+    margin-top: 10px;
+    align-items: end;
+    background: #fff;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    transition: border-color var(--transition);
+  }
+  .poktan:hover { border-color: var(--green-200); }
+  .poktan label { margin-top: 0; font-size: 11px; }
+
+  .poktan-field { display: flex; flex-direction: column; }
+
+  @media (max-width: 600px) {
+    .poktan {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+    }
+    .poktan > *:last-child { grid-column: 1 / -1; }
+    .header { flex-wrap: wrap; gap: 10px; }
+    .header-badge { display: none; }
+  }
+
+  /* ======= REKAP ======= */
+  .rekap {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .rekap-item {
+    background: var(--gray-50);
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: border-color var(--transition), background var(--transition);
+  }
+  .rekap-item:hover { border-color: var(--green-300); background: var(--green-50); }
+  .rekap-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+  .rekap-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--green-700);
+    line-height: 1.1;
+  }
+  .rekap-unit {
+    font-size: 11px;
+    color: var(--gray-400);
+    font-weight: 400;
+  }
+
+  /* ======= SAVE BUTTON ======= */
+  #btnSimpan {
+    width: 100%;
+    justify-content: center;
+    padding: 13px;
+    font-size: 15px;
+    border-radius: var(--radius-md);
+    background: var(--green-600);
+    letter-spacing: .02em;
+  }
+  #btnSimpan:not(:disabled):hover {
+    background: var(--green-700);
+    box-shadow: 0 4px 14px rgba(15,118,110,.38);
+  }
+  #btnSimpan:disabled {
+    background: var(--gray-300);
+    color: var(--gray-500);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* ======= DIVIDER ======= */
+  .poktan-container-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
+  .poktan-container-header span {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    white-space: nowrap;
+  }
+  .poktan-container-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gray-200);
+  }
+
+  /* Poktan column labels */
+  .poktan-col-labels {
+    display: grid;
+    grid-template-columns: 1fr 100px 165px 80px;
+    gap: 8px;
+    padding: 0 10px;
+    margin-top: 10px;
+  }
+  .poktan-col-labels span {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+  @media (max-width: 600px) {
+    .poktan-col-labels { display: none; }
+    .rekap { grid-template-columns: 1fr 1fr; }
+  }
+
+  h2, h3 { display: none; } /* replaced by section-title */
 </style>
 </head>
 
 <body>
 
 <div class="header">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg">
-  <div>
-    <div class="title">Form LTT Kecamatan - Kabupaten Indragiri Hilir</div>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg" alt="Logo">
+  <div class="header-text">
+    <div class="title">Form Pelaporan LTT Kecamatan</div>
     <div class="subtitle">Dinas Pertanian Kabupaten Indragiri Hilir</div>
   </div>
+  <div class="header-badge">e-Laporan</div>
 </div>
 
 <div class="box">
+  <div class="section-title"><span class="icon">👤</span> Identitas Pelapor</div>
+
   <label>Nama Pelapor</label>
-  <input type="text" id="pelapor" oninput="formatKapital(this)">
+  <input type="text" id="pelapor" placeholder="Masukkan nama lengkap..." oninput="formatKapital(this)">
 
   <label>Kecamatan</label>
   <select id="kecamatan">
@@ -130,29 +424,69 @@ button:hover { opacity:.9 }
 </div>
 
 <div class="box">
-  <h3>Data Desa & Poktan</h3>
+  <div class="section-title"><span class="icon">🌾</span> Data Desa &amp; Kelompok Tani</div>
   <div id="desaContainer"></div>
-  <button type="button" onclick="tambahDesa()">+ Tambah Desa/Kelurahan</button>
+  <button type="button" onclick="tambahDesa()" style="margin-top:14px;">+ Tambah Desa / Kelurahan</button>
 </div>
 
 <div class="box">
-  <h3>Rekap Otomatis LTT (Preview)</h3>
+  <div class="section-title"><span class="icon">📊</span> Rekap Otomatis LTT</div>
   <div class="rekap">
-    <div>LT Reguler : <b id="reguler">0</b> Ha</div>
-    <div>LT OPLAH : <b id="oplah">0</b> Ha</div>
-    <div>LT CSR : <b id="csr">0</b> Ha</div>
-    <div>LT Pompa : <b id="pompa">0</b> Ha</div>
-    <div>LT DAS/Bendungan : <b id="das">0</b> Ha</div>
-    <div>LT Padi Tusip Sawit/Kelapa : <b id="padi">0</b> Ha</div>
-    <div>LT GOGO : <b id="gogo">0</b> Ha</div>
-    <div>LT Jagung : <b id="jagung">0</b> Ha</div>
-    <div>LT Jagung Polri : <b id="jagung_polri">0</b> Ha</div>
-    <div>LT Kedelai : <b id="kedelai">0</b> Ha</div>    
+    <div class="rekap-item">
+      <span class="rekap-label">Reguler</span>
+      <span class="rekap-value" id="reguler">0</span>
+      <span class="rekap-unit">Hektare</span>
+    </div>
+    <div class="rekap-item">
+      <span class="rekap-label">OPLAH</span>
+      <span class="rekap-value" id="oplah">0</span>
+      <span class="rekap-unit">Hektare</span>
+    </div>
+    <div class="rekap-item">
+      <span class="rekap-label">CSR</span>
+      <span class="rekap-value" id="csr">0</span>
+      <span class="rekap-unit">Hektare</span>
+    </div>
+    <div class="rekap-item">
+      <span class="rekap-label">Pompa</span>
+      <span class="rekap-value" id="pompa">0</span>
+      <span class="rekap-unit">Hektare</span>
+    </div>
+    <div class="rekap-item">
+      <span class="rekap-label">DAS / Bendungan</span>
+      <span class="rekap-value" id="das">0</span>
+      <span class="rekap-unit">Hektare</span>
+    </div>
+    <div class="rekap-item">
+      <span class="rekap-label">Tusip Sawit/Kelapa</span>
+      <span class="rekap-value" id="padi">0</span>
+      <span class="rekap-unit">Hektare</span>
+    </div>
+    <div class="rekap-item">
+      <span class="rekap-label">GOGO</span>
+      <span class="rekap-value" id="gogo">0</span>
+      <span class="rekap-unit">Hektare</span>
+    </div>
+    <div class="rekap-item">
+      <span class="rekap-label">Jagung</span>
+      <span class="rekap-value" id="jagung">0</span>
+      <span class="rekap-unit">Hektare</span>
+    </div>
+    <div class="rekap-item">
+      <span class="rekap-label">Jagung Polri</span>
+      <span class="rekap-value" id="jagung_polri">0</span>
+      <span class="rekap-unit">Hektare</span>
+    </div>
+    <div class="rekap-item">
+      <span class="rekap-label">Kedelai</span>
+      <span class="rekap-value" id="kedelai">0</span>
+      <span class="rekap-unit">Hektare</span>
+    </div>
   </div>
 </div>
 
 <div class="box">
-  <button id="btnSimpan" onclick="simpan()">Simpan Laporan</button>
+  <button id="btnSimpan" onclick="simpan()">💾 Simpan Laporan</button>
 </div>
 
 <script>
@@ -166,358 +500,166 @@ function formatKapital(el) {
 }
 
 // =============================
-// DATA WILAYAH (PAKAI PUNYA KAMU)
+// DATA WILAYAH
 // =============================
 const dataWilayah = {
   "Batang Tuaka": {
     kelurahan: ["Sungai Piring"],
     desa: [
-      "Gemilang Jaya",
-      "Kuala Sebatu",
-      "Pasir Emas",
-      "Sialang Jaya",
-      "Simpang Jaya",
-      "Sungai Dusun",
-      "Sungai Junjangan",
-      "Sungai Luar",
-      "Sungai Rawa",
-      "Sungai Raya",
-      "Tanjung Siantar",
-      "Tasik Raya"
+      "Gemilang Jaya","Kuala Sebatu","Pasir Emas","Sialang Jaya","Simpang Jaya",
+      "Sungai Dusun","Sungai Junjangan","Sungai Luar","Sungai Rawa","Sungai Raya",
+      "Tanjung Siantar","Tasik Raya"
     ]
   },
-
   "Concong": {
     kelurahan: ["Concong Luar"],
-    desa: [
-      "Concong Dalam",
-      "Concong Tengah",
-      "Kampung Baru",
-      "Panglima Raja",
-      "Sungai Berapit"
-    ]
+    desa: ["Concong Dalam","Concong Tengah","Kampung Baru","Panglima Raja","Sungai Berapit"]
   },
-
   "Enok": {
-    kelurahan: ["Enok", "Pusaran", "Pantai Seberang Makmur", "Simpang Tiga"],
+    kelurahan: ["Enok","Pusaran","Pantai Seberang Makmur","Simpang Tiga"],
     desa: [
-      "Bagan Jaya",
-      "Jaya Bhakti",
-      "Pengalihan",
-      "Rantau Panjang",
-      "Simpang Tiga Daratan",
-      "Suhada",
-      "Sungai Ambat",
-      "Sungai Lokan",
-      "Sungai Rukam",
-      "Teluk Medan"
+      "Bagan Jaya","Jaya Bhakti","Pengalihan","Rantau Panjang","Simpang Tiga Daratan",
+      "Suhada","Sungai Ambat","Sungai Lokan","Sungai Rukam","Teluk Medan"
     ]
   },
-
   "Gaung": {
     kelurahan: ["Kuala Lahang"],
     desa: [
-      "Belantaraya",
-      "Gembira",
-      "Jerambang",
-      "Lahang Baru",
-      "Lahang Hulu",
-      "Lahang Tengah",
-      "Pintasan",
-      "Pungkat",
-      "Semambu Kuning",
-      "Simpang Gaung",
-      "Soren",
-      "Sungai Baru",
-      "Teluk Kabung",
-      "Teluk Merbau",
-      "Teluk Nibung",
-      "Terusan Kempas"
+      "Belantaraya","Gembira","Jerambang","Lahang Baru","Lahang Hulu","Lahang Tengah",
+      "Pintasan","Pungkat","Semambu Kuning","Simpang Gaung","Soren","Sungai Baru",
+      "Teluk Kabung","Teluk Merbau","Teluk Nibung","Terusan Kempas"
     ]
   },
-
   "Gaung Anak Serka": {
-    kelurahan: ["Teluk Pinang", "Tanjung Harapan", "Sungai Empat"],
+    kelurahan: ["Teluk Pinang","Tanjung Harapan","Sungai Empat"],
     desa: [
-      "Harapan Makmur",
-      "Idaman",
-      "Kelumpang",
-      "Kuala Gaung",
-      "Rambaian",
-      "Sungai Iliran",
-      "Teluk Pantaian",
-      "Teluk Sungka",
-      "Teluk Tuasan"
+      "Harapan Makmur","Idaman","Kelumpang","Kuala Gaung","Rambaian",
+      "Sungai Iliran","Teluk Pantaian","Teluk Sungka","Teluk Tuasan"
     ]
   },
-
   "Kateman": {
-    kelurahan: ["Tagaraja", "Bandar Sri Gemilang", "Amal Bhakti"],
+    kelurahan: ["Tagaraja","Bandar Sri Gemilang","Amal Bhakti"],
     desa: [
-      "Air Tawar",
-      "Kuala Selat",
-      "Penjuru",
-      "Sari Mulya",
-      "Sungai Simbar",
-      "Sungai Teritip",
-      "Tanjung Raja",
-      "Makmur Jaya"
+      "Air Tawar","Kuala Selat","Penjuru","Sari Mulya","Sungai Simbar",
+      "Sungai Teritip","Tanjung Raja","Makmur Jaya"
     ]
   },
-
   "Kempas": {
-    kelurahan: ["Kempas Jaya", "Harapan Tani"],
+    kelurahan: ["Kempas Jaya","Harapan Tani"],
     desa: [
-      "Bayas Jaya",
-      "Danau Pulai Indah",
-      "Karya Tani",
-      "Kerta Jaya",
-      "Kulim Jaya",
-      "Pekan Tua",
-      "Rumbai Jaya",
-      "Sungai Ara",
-      "Sungai Gantang",
-      "Sungai Rabit"
+      "Bayas Jaya","Danau Pulai Indah","Karya Tani","Kerta Jaya","Kulim Jaya",
+      "Pekan Tua","Rumbai Jaya","Sungai Ara","Sungai Gantang","Sungai Rabit"
     ]
   },
-
   "Kemuning": {
     kelurahan: ["Selensen"],
     desa: [
-      "Air Balui",
-      "Batu Ampar",
-      "Tuk Jimun",
-      "Kemuning Muda",
-      "Kemuning Tua",
-      "Keritang",
-      "Limau Manis",
-      "Lubuk Besar",
-      "Sekara",
-      "Sekayan",
-      "Talang Jangkang"
+      "Air Balui","Batu Ampar","Tuk Jimun","Kemuning Muda","Kemuning Tua",
+      "Keritang","Limau Manis","Lubuk Besar","Sekara","Sekayan","Talang Jangkang"
     ]
   },
-
   "Keritang": {
     kelurahan: ["Kota Baru Reteh"],
     desa: [
-      "Kayu Raja",
-      "Kembang Mekar Sari",
-      "Kota Baru Seberida",
-      "Kuala Keritang",
-      "Kuala Lemang",
-      "Lintas Utara",
-      "Nusantara Jaya",
-      "Nyiur Permai",
-      "Pancur",
-      "Pasar Kembang",
-      "Pebenaan",
-      "Pengalihan",
-      "Petalongan",
-      "Seberang Pebenaan",
-      "Sencalang",
-      "Teluk Kelasa"
+      "Kayu Raja","Kembang Mekar Sari","Kota Baru Seberida","Kuala Keritang",
+      "Kuala Lemang","Lintas Utara","Nusantara Jaya","Nyiur Permai","Pancur",
+      "Pasar Kembang","Pebenaan","Pengalihan","Petalongan","Seberang Pebenaan",
+      "Sencalang","Teluk Kelasa"
     ]
   },
-
   "Kuala Indragiri": {
     kelurahan: ["Sapat"],
     desa: [
-      "Perigi Raja",
-      "Sungai Bela",
-      "Sungai Buluh",
-      "Sungai Piyai",
-      "Tanjung Lajau",
-      "Tanjung Melayu",
-      "Teluk Dalam"
+      "Perigi Raja","Sungai Bela","Sungai Buluh","Sungai Piyai",
+      "Tanjung Lajau","Tanjung Melayu","Teluk Dalam"
     ]
   },
-
   "Mandah": {
     kelurahan: ["Khairiah Mandah"],
     desa: [
-      "Bakau Aceh",
-      "Bantaian",
-      "Batang Sari",
-      "Batang Tumu",
-      "Bekawan",
-      "Belaras",
-      "Belaras Barat",
-      "Bente",
-      "Bidari Tanjung Datuk",
-      "Bolak Raya",
-      "Cahaya Baru",
-      "Igal",
-      "Pelanduk",
-      "Pulau Cawan",
-      "Sepakat Jaya",
-      "Surayya Mandiri"
+      "Bakau Aceh","Bantaian","Batang Sari","Batang Tumu","Bekawan","Belaras",
+      "Belaras Barat","Bente","Bidari Tanjung Datuk","Bolak Raya","Cahaya Baru",
+      "Igal","Pelanduk","Pulau Cawan","Sepakat Jaya","Surayya Mandiri"
     ]
   },
-
   "Pelangiran": {
     kelurahan: ["Pelangiran"],
     desa: [
-      "Bagan Jaya",
-      "Baung Rejo Jaya",
-      "Catur Karya",
-      "Hidayah",
-      "Intan Mulya Jaya",
-      "Pinang Jaya",
-      "Rotan Semelur",
-      "Saka Palas Jaya",
-      "Simpang Kateman",
-      "Tagagiri Raja",
-      "Tagagiri Tama Jaya",
-      "Tanjung Simpang",
-      "Tegal Rejo Jaya",
-      "Teluk Bunian",
-      "Terusan Beringin Jaya",
-      "Wonosari"
+      "Bagan Jaya","Baung Rejo Jaya","Catur Karya","Hidayah","Intan Mulya Jaya",
+      "Pinang Jaya","Rotan Semelur","Saka Palas Jaya","Simpang Kateman",
+      "Tagagiri Raja","Tagagiri Tama Jaya","Tanjung Simpang","Tegal Rejo Jaya",
+      "Teluk Bunian","Terusan Beringin Jaya","Wonosari"
     ]
   },
-
   "Pulau Burung": {
     kelurahan: [],
     desa: [
-      "Bangun Harjo Jaya",
-      "Beringin Jaya",
-      "Binangun Jaya",
-      "Bukit Sari Intan Jaya",
-      "Keramat Jaya",
-      "Manunggal Jaya",
-      "Mayang Sari Jaya",
-      "Pulau Burung",
-      "Ringin Jaya",
-      "Sapta Jaya",
-      "Sempadan Jaya",
-      "Sri Danai",
-      "Suka Jaya",
-      "Suko Harjo Jaya",
-      "Sungai Danai",
-      "Teluk Nibung"
+      "Bangun Harjo Jaya","Beringin Jaya","Binangun Jaya","Bukit Sari Intan Jaya",
+      "Keramat Jaya","Manunggal Jaya","Mayang Sari Jaya","Pulau Burung","Ringin Jaya",
+      "Sapta Jaya","Sempadan Jaya","Sri Danai","Suka Jaya","Suko Harjo Jaya",
+      "Sungai Danai","Teluk Nibung"
     ]
   },
-
   "Reteh": {
-    kelurahan: ["Pulau Kijang", "Madani", "Metro"],
+    kelurahan: ["Pulau Kijang","Madani","Metro"],
     desa: [
-      "Seberang Pulau Kijang",
-      "Pulau Kecil",
-      "Pulau Ruku",
-      "Sanglar",
-      "Seberang Sanglar",
-      "Sungai Asam",
-      "Sungai Mahang",
-      "Sungai Terab",
-      "Sungai Undan",
-      "Tanjung Labuh",
-      "Mekar Sari"
+      "Seberang Pulau Kijang","Pulau Kecil","Pulau Ruku","Sanglar","Seberang Sanglar",
+      "Sungai Asam","Sungai Mahang","Sungai Terab","Sungai Undan","Tanjung Labuh","Mekar Sari"
     ]
   },
-
   "Sungai Batang": {
     kelurahan: ["Benteng"],
     desa: [
-      "Benteng Barat",
-      "Benteng Utara",
-      "Kuala Patah Parang",
-      "Kuala Sungai Batang",
-      "Mugo Mulyo",
-      "Pandan Sari",
-      "Pasenggarahan"
+      "Benteng Barat","Benteng Utara","Kuala Patah Parang","Kuala Sungai Batang",
+      "Mugo Mulyo","Pandan Sari","Pasenggarahan"
     ]
   },
-
   "Tanah Merah": {
     kelurahan: ["Kuala Enok"],
     desa: [
-      "Selat Nama",
-      "Sungai Laut",
-      "Sungai Nyiur",
-      "Tanah Merah",
-      "Tanjung Baru",
-      "Tanjung Pasir",
-      "Tekulai Bugis",
-      "Tekulai Hilir",
-      "Tekulai Hulu"
+      "Selat Nama","Sungai Laut","Sungai Nyiur","Tanah Merah","Tanjung Baru",
+      "Tanjung Pasir","Tekulai Bugis","Tekulai Hilir","Tekulai Hulu"
     ]
   },
-
   "Teluk Belengkong": {
     kelurahan: [],
     desa: [
-      "Beringin Mulya",
-      "Gembaran",
-      "Griya Mukti Jaya",
-      "Hibrida Jaya",
-      "Hibrida Mulya",
-      "Indra Sari Jaya",
-      "Kelapa Patih Jaya",
-      "Saka Rotan",
-      "Sapta Mulya Jaya",
-      "Sumber Jaya",
-      "Sumber Makmur Jaya",
-      "Sumber Sari Jaya",
-      "Tunggal Rahayu Jaya"
+      "Beringin Mulya","Gembaran","Griya Mukti Jaya","Hibrida Jaya","Hibrida Mulya",
+      "Indra Sari Jaya","Kelapa Patih Jaya","Saka Rotan","Sapta Mulya Jaya",
+      "Sumber Jaya","Sumber Makmur Jaya","Sumber Sari Jaya","Tunggal Rahayu Jaya"
     ]
   },
-
   "Tembilahan": {
     kelurahan: [
-      "Tembilahan Hilir",
-      "Pekan Arba",
-      "Seberang Tembilahan",
-      "Seberang Tembilahan Barat",
-      "Seberang Tembilahan Selatan"
+      "Tembilahan Hilir","Pekan Arba","Seberang Tembilahan",
+      "Seberang Tembilahan Barat","Seberang Tembilahan Selatan"
     ],
-    desa: [
-      "Sungai Beringin",
-      "Sungai Perak",
-      "Tembilahan Kota"
-    ]
+    desa: ["Sungai Beringin","Sungai Perak","Tembilahan Kota"]
   },
-
   "Tembilahan Hulu": {
-    kelurahan: ["Tembilahan Barat", "Tembilahan Hulu"],
-    desa: [
-      "Sungai Intan",
-      "Pekan Kamis",
-      "Pulau Palas",
-      "Sialang Panjang"
-    ]
+    kelurahan: ["Tembilahan Barat","Tembilahan Hulu"],
+    desa: ["Sungai Intan","Pekan Kamis","Pulau Palas","Sialang Panjang"]
   },
-
   "Tempuling": {
-    kelurahan: ["Harapan Jaya", "Karya Tunas Jaya", "Mumpa"],
-    desa: [
-      "Pangkalan Tujuh",
-      "Sungai Salak",
-      "Teluk Jira",
-      "Tempuling Jaya"
-    ]
+    kelurahan: ["Harapan Jaya","Karya Tunas Jaya","Mumpa"],
+    desa: ["Pangkalan Tujuh","Sungai Salak","Teluk Jira","Tempuling Jaya"]
   }
 };
+
 // =============================
 // TANGGAL OTOMATIS & DIKUNCI
 // =============================
 (function(){
   const t = document.getElementById("tanggal");
   const now = new Date();
-
   const yyyy = now.getFullYear();
   const mm = String(now.getMonth()+1).padStart(2,'0');
   const dd = String(now.getDate()).padStart(2,'0');
-
   const today = `${yyyy}-${mm}-${dd}`;
-
   t.value = today;
   t.min = today;
   t.max = today;
-
-  t.addEventListener("change", function(){
-    this.value = today;
-  });
+  t.addEventListener("change", function(){ this.value = today; });
 })();
 
 // =============================
@@ -527,11 +669,19 @@ function tambahDesa() {
   const desa = document.createElement("div");
   desa.className = "desa";
   desa.innerHTML = `
-    <label>Desa/Kelurahan</label>
+    <div class="desa-header">
+      <span class="desa-label">📍 Desa / Kelurahan</span>
+    </div>
     <select class="desaSelect"></select>
+    <div class="poktan-container-header"><span>Kelompok Tani</span></div>
+    <div class="poktan-col-labels">
+      <span>Nama Poktan</span><span>Luas (Ha)</span><span>Jenis LTT</span><span></span>
+    </div>
     <div class="poktanContainer"></div>
-    <button type="button" onclick="tambahPoktan(this)">+ Tambah Poktan</button>
-    <button type="button" class="btn-hapus" onclick="this.parentElement.remove()">Hapus Desa</button>
+    <div class="poktan-actions">
+      <button type="button" onclick="tambahPoktan(this)">+ Tambah Poktan</button>
+      <button type="button" class="btn-hapus" onclick="this.closest('.desa').remove(); hitungRekap()">Hapus Desa</button>
+    </div>
   `;
   document.getElementById("desaContainer").appendChild(desa);
   isiDropdownDesa(desa.querySelector(".desaSelect"));
@@ -540,17 +690,16 @@ function tambahDesa() {
 function isiDropdownDesa(selectEl) {
   const kec = document.getElementById("kecamatan").value;
   selectEl.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
-
   if (dataWilayah[kec]) {
     dataWilayah[kec].kelurahan.forEach(k=>{
       let o = document.createElement("option");
-      o.value = "Kelurahan " + k;   // 🔥 INI DIUBAH
+      o.value = "Kelurahan " + k;
       o.textContent = k + " (Kelurahan)";
       selectEl.appendChild(o);
     });
     dataWilayah[kec].desa.forEach(d=>{
       let o = document.createElement("option");
-      o.value = "Desa " + d;        // 🔥 INI DIUBAH
+      o.value = "Desa " + d;
       o.textContent = d + " (Desa)";
       selectEl.appendChild(o);
     });
@@ -562,14 +711,15 @@ document.getElementById("kecamatan").addEventListener("change", ()=>{
 });
 
 // =============================
+// POKTAN
+// =============================
 function tambahPoktan(btn){
-  const c = btn.parentElement.querySelector(".poktanContainer");
+  const c = btn.closest(".desa").querySelector(".poktanContainer");
   const p = document.createElement("div");
-  p.className="poktan";
-
-  p.innerHTML=`
-    <input placeholder="Nama Poktan" oninput="hitungRekap()">
-    <input placeholder="Luas (Ha)" oninput="hitungRekap()">
+  p.className = "poktan";
+  p.innerHTML = `
+    <input placeholder="Nama kelompok tani..." oninput="hitungRekap()">
+    <input placeholder="0" type="number" step="0.01" min="0" oninput="hitungRekap()">
     <select onchange="hitungRekap()">
       <option value="reguler">Reguler</option>
       <option value="oplah">OPLAH</option>
@@ -582,22 +732,20 @@ function tambahPoktan(btn){
       <option value="jagung_polri">Jagung Polri</option>
       <option value="kedelai">Kedelai</option>
     </select>
-    <button class="btn-hapus" onclick="this.parentElement.remove(); hitungRekap()">Hapus</button>
+    <button class="btn-hapus" onclick="this.parentElement.remove(); hitungRekap()" style="padding:8px 10px; font-size:12px;">Hapus</button>
   `;
-
   c.appendChild(p);
 }
+
 function hitungRekap(){
   let total = {
     reguler:0, oplah:0, csr:0, pompa:0,
     das:0, padi:0, gogo:0,
     jagung:0, jagung_polri:0, kedelai:0
   };
-
   document.querySelectorAll(".poktan").forEach(p=>{
     let luas = parseFloat((p.children[1].value || "0").replace(",", ".")) || 0;
     let jenis = p.children[2].value.toLowerCase();
-
     if(jenis === "reguler") total.reguler += luas;
     else if(jenis === "oplah") total.oplah += luas;
     else if(jenis === "csr") total.csr += luas;
@@ -609,25 +757,26 @@ function hitungRekap(){
     else if(jenis.includes("polri")) total.jagung_polri += luas;
     else if(jenis === "kedelai") total.kedelai += luas;
   });
-
-  document.getElementById("reguler").innerText = total.reguler;
-  document.getElementById("oplah").innerText = total.oplah;
-  document.getElementById("csr").innerText = total.csr;
-  document.getElementById("pompa").innerText = total.pompa;
-  document.getElementById("das").innerText = total.das;
-  document.getElementById("padi").innerText = total.padi;
-  document.getElementById("gogo").innerText = total.gogo;
-  document.getElementById("jagung").innerText = total.jagung;
-  document.getElementById("jagung_polri").innerText = total.jagung_polri;
-  document.getElementById("kedelai").innerText = total.kedelai;
+  const fmt = v => Number.isInteger(v) ? v : parseFloat(v.toFixed(2));
+  document.getElementById("reguler").innerText = fmt(total.reguler);
+  document.getElementById("oplah").innerText = fmt(total.oplah);
+  document.getElementById("csr").innerText = fmt(total.csr);
+  document.getElementById("pompa").innerText = fmt(total.pompa);
+  document.getElementById("das").innerText = fmt(total.das);
+  document.getElementById("padi").innerText = fmt(total.padi);
+  document.getElementById("gogo").innerText = fmt(total.gogo);
+  document.getElementById("jagung").innerText = fmt(total.jagung);
+  document.getElementById("jagung_polri").innerText = fmt(total.jagung_polri);
+  document.getElementById("kedelai").innerText = fmt(total.kedelai);
 }
 
+// =============================
+// SIMPAN
 // =============================
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbVcYABQDZtLGkEHo7u1BKDMAHAw7Jrv_Z_Zm0ImRMs8Dnrhxj1mGylRNMrg2Dkg/exec";
 
 function simpan() {
   const btn = document.getElementById("btnSimpan");
-
   if (btn.disabled) return;
 
   const pelapor   = document.getElementById("pelapor").value.trim();
@@ -640,12 +789,8 @@ function simpan() {
   }
 
   let rows = [];
-
   document.querySelectorAll(".desa").forEach(desaBox => {
-
-    // 🔥 INI YANG DIREVISI
     const desa = desaBox.querySelector("select").value;
-
     desaBox.querySelectorAll(".poktan").forEach(p => {
       rows.push({
         desa,
@@ -662,7 +807,7 @@ function simpan() {
   }
 
   btn.disabled = true;
-  btn.innerText = "Menyimpan...";
+  btn.innerText = "⏳ Menyimpan...";
 
   const data = new URLSearchParams();
   data.append("pelapor", pelapor);
@@ -670,66 +815,55 @@ function simpan() {
   data.append("tanggal", tanggal);
   data.append("rows", JSON.stringify(rows));
 
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    body: data
-  })
-  .then(r => r.text())
-  .then(r => {
-    if (r.startsWith("OK")) {
-      alert("✅ Data berhasil disimpan");
-      location.reload();
-    } else {
+  fetch(SCRIPT_URL, { method: "POST", body: data })
+    .then(r => r.text())
+    .then(r => {
+      if (r.startsWith("OK")) {
+        alert("✅ Data berhasil disimpan");
+        location.reload();
+      } else {
+        btn.disabled = false;
+        btn.innerText = "💾 Simpan Laporan";
+        alert("❌ Server error:\n" + r);
+      }
+    })
+    .catch(err => {
+      console.error(err);
       btn.disabled = false;
-      btn.innerText = "Simpan Laporan";
-      alert("❌ Server error:\n" + r);
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    btn.disabled = false;
-    btn.innerText = "Simpan Laporan";
-    alert("❌ Gagal mengirim data");
-  });
+      btn.innerText = "💾 Simpan Laporan";
+      alert("❌ Gagal mengirim data");
+    });
 }
 </script>
-  <script>
+
+<script>
 /* Kunci tanggal hanya hari ini */
 (function(){
   const t = document.getElementById("tanggal");
   const now = new Date();
-
   const yyyy = now.getFullYear();
   const mm = String(now.getMonth()+1).padStart(2,'0');
   const dd = String(now.getDate()).padStart(2,'0');
-
   const today = `${yyyy}-${mm}-${dd}`;
-
   t.value = today;
   t.min = today;
   t.max = today;
-
-  t.addEventListener("change", function(){
-    this.value = today;
-  });
+  t.addEventListener("change", function(){ this.value = today; });
 })();
 
 /* Batas waktu laporan jam 15:00 */
 (function(){
   const btn = document.getElementById("btnSimpan");
-
   function cekBatasWaktu(){
     const now = new Date();
     const jam = now.getHours();
     const menit = now.getMinutes();
-
     if (jam > 15 || (jam === 15 && menit > 0)) {
       btn.disabled = true;
-      btn.innerText = "Waktu Laporan Sudah Lewat";
+      btn.innerText = "⏰ Waktu Laporan Sudah Lewat";
       alert("Waktu pelaporan hari ini sudah lewat. Silakan melaporkan besok hari.");
     }
   }
-
   cekBatasWaktu();
 })();
 </script>
