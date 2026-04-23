@@ -25,7 +25,6 @@ body {
     min-height:100vh;
 }
 
-/* HEADER */
 header {
     display:flex;
     align-items:center;
@@ -40,7 +39,6 @@ header img { width:45px; }
     padding:25px 5%;
 }
 
-/* FILTER */
 .filter-box {
     margin-bottom:15px;
 }
@@ -51,7 +49,6 @@ header img { width:45px; }
     border:1px solid #ddd;
 }
 
-/* CARD */
 .cards {
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -79,18 +76,13 @@ header img { width:45px; }
     color:var(--primary);
 }
 
-/* ===== LAYOUT ===== */
 .capaian-area{
     display:flex;
     gap:15px;
 }
 
-/* kiri */
-.list-area{
-    flex:1;
-}
+.list-area{ flex:1; }
 
-/* kanan */
 .chart-area{
     flex:1;
     height:380px;
@@ -100,7 +92,6 @@ header img { width:45px; }
     box-shadow:0 8px 20px rgba(0,0,0,0.06);
 }
 
-/* ===== LIST 1 FRAME ===== */
 .list-frame{
     background:white;
     border-radius:12px;
@@ -108,12 +99,8 @@ header img { width:45px; }
     box-shadow:0 6px 15px rgba(0,0,0,0.06);
 }
 
-/* baris kecamatan */
-.item{
-    margin-bottom:10px;
-}
+.item{ margin-bottom:10px; }
 
-/* teks */
 .item-top{
     display:flex;
     justify-content:space-between;
@@ -121,7 +108,6 @@ header img { width:45px; }
     font-weight:500;
 }
 
-/* bar tipis */
 .bar{
     height:8px;
     background:#e5e7eb;
@@ -130,19 +116,11 @@ header img { width:45px; }
     margin-top:3px;
 }
 
-.fill{
-    height:100%;
-}
+.fill{ height:100%; }
 
-/* MOBILE */
 @media(max-width:768px){
-    .capaian-area{
-        flex-direction:column;
-    }
-
-    .chart-area{
-        height:280px;
-    }
+    .capaian-area{ flex-direction:column; }
+    .chart-area{ height:280px; }
 }
 </style>
 </head>
@@ -182,12 +160,10 @@ header img { width:45px; }
 
 <div class="capaian-area">
 
-    <!-- KIRI -->
     <div class="list-area">
         <div class="list-frame" id="listCapaian"></div>
     </div>
 
-    <!-- KANAN -->
     <div class="chart-area">
         <canvas id="chartBatang"></canvas>
     </div>
@@ -206,6 +182,7 @@ let target = [];
 let selectedMonth = "";
 let chart;
 
+// ===== HELPER =====
 function getMonth(tgl){
     return tgl?.toString().slice(0,7) || "";
 }
@@ -218,6 +195,16 @@ function format2(n){
     return Number(n).toFixed(2);
 }
 
+function namaBulanToNumber(nama){
+    const map = {
+        "JANUARI":"01","FEBRUARI":"02","MARET":"03","APRIL":"04",
+        "MEI":"05","JUNI":"06","JULI":"07","AGUSTUS":"08",
+        "SEPTEMBER":"09","OKTOBER":"10","NOVEMBER":"11","DESEMBER":"12"
+    };
+    return map[nama?.toUpperCase()] || "";
+}
+
+// ===== LOAD =====
 async function load(){
     const r1 = await fetch(API);
     const r2 = await fetch(API_TARGET);
@@ -242,19 +229,31 @@ function filterData(data){
     return data.filter(d => getMonth(d.TANGGAL) === selectedMonth);
 }
 
+// ===== RENDER =====
 function render(){
 
     let realMap = {};
     let targetMap = {};
 
+    // REALISASI
     filterData(realisasi).forEach(d=>{
         const k = d.KECAMATAN.toUpperCase();
         realMap[k] = (realMap[k]||0) + safeNumber(d["LUAS TAMBAH TANAM"]);
     });
 
+    // TARGET (SUDAH PER BULAN)
     target.forEach(d=>{
         const k = d.KECAMATAN.toUpperCase();
-        targetMap[k] = (targetMap[k]||0) + safeNumber(d["TARGET"]);
+
+        let bulanData = namaBulanToNumber(d.BULAN);
+        if(!bulanData) return;
+
+        let tahunData = String(d.TAHUN);
+        let gabung = tahunData + "-" + bulanData;
+
+        if(!selectedMonth || selectedMonth === gabung){
+            targetMap[k] = (targetMap[k]||0) + safeNumber(d["TARGET"]);
+        }
     });
 
     let totalR = Object.values(realMap).reduce((a,b)=>a+b,0);
