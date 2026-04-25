@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard LTT - Analitik Produksi</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --primary:#0b3d2e;
+    --accent:#1b8a5a;
+    --bg:#f5f7f8;
+    --card:#ffffff;
+    --text:#1a1a1a;
+    --muted:#6b7280;
+    --danger:#d32f2f;
+    --warn:#f9a825;
+    --success:#2e7d32;
+}
+
+body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+}
+
+/* HEADER */
+header{
+    background:var(--primary);
+    color:white;
+    padding:14px 16px;
+    font-weight:700;
+    font-size:15px;
+}
+
+/* WRAPPER */
+.container{
+    padding:14px;
+    max-width:1200px;
+    margin:auto;
+}
+
+/* KPI */
+.kpi-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin-bottom:12px;
+}
+
+.kpi{
+    background:var(--card);
+    padding:12px;
+    border-radius:10px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.06);
+}
+
+.kpi h4{
+    margin:0;
+    font-size:11px;
+    color:var(--muted);
+    font-weight:600;
+}
+
+.kpi p{
+    margin:6px 0 0;
+    font-size:16px;
+    font-weight:700;
+}
+
+/* FILTER */
+.filter{
+    margin:10px 0;
+}
+
+select{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #e5e7eb;
+    background:white;
+}
+
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:12px;
+    margin-top:12px;
+}
+
+/* CARD */
+.card{
+    background:var(--card);
+    padding:12px;
+    border-radius:10px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.06);
+}
+
+.title{
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+/* TABLE */
+table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+}
+
+th{
+    text-align:left;
+    color:var(--muted);
+    font-weight:600;
+    border-bottom:1px solid #eee;
+    padding:8px 6px;
+}
+
+td{
+    padding:8px 6px;
+    border-bottom:1px solid #f1f1f1;
+}
+
+.badge{
+    padding:3px 6px;
+    border-radius:6px;
+    font-size:10px;
+    font-weight:600;
+}
+
+.red{background:#ffebee;color:var(--danger);}
+.yellow{background:#fff8e1;color:var(--warn);}
+.green{background:#e8f5e9;color:var(--success);}
+
+/* MOBILE */
+@media(max-width:900px){
+    .kpi-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+    .grid{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+📊 Dashboard LTT & Panen - Analisis Produktivitas
+</header>
+
+<div class="container">
+
+<!-- KPI -->
+<div class="kpi-grid">
+    <div class="kpi">
+        <h4>Total LTT</h4>
+        <p id="ltt">0</p>
+    </div>
+    <div class="kpi">
+        <h4>Total Panen</h4>
+        <p id="panen">0</p>
+    </div>
+    <div class="kpi">
+        <h4>Produktivitas</h4>
+        <p id="rasio">0%</p>
+    </div>
+    <div class="kpi">
+        <h4>Selisih</h4>
+        <p id="selisih">0</p>
+    </div>
+</div>
+
+<!-- FILTER -->
+<div class="filter">
+<select id="kec" onchange="render()">
+<option value="">Semua Kecamatan</option>
+</select>
+</div>
+
+<!-- GRID -->
+<div class="grid">
+
+<!-- CHART -->
+<div class="card">
+<div class="title">Perbandingan LTT vs Panen</div>
+<canvas id="chart"></canvas>
+</div>
+
+<!-- TABLE -->
+<div class="card">
+<div class="title">Status Kecamatan</div>
+<table>
+<thead>
+<tr>
+<th>Kec</th>
+<th>LTT</th>
+<th>Panen</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody id="tb"></tbody>
+</table>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const API_URL="https://script.google.com/macros/s/AKfycbz9BbxHtegnOrlIdwMBjsRRfK1weywnjIXnbX4YgGY-F6egmvMFUO3pqZ5CAXg99ac/exec";
+
+let raw=[];
+let chart;
+
+function num(v){return parseFloat(v)||0;}
+
+async function load(){
+const res=await fetch(API_URL);
+raw=await res.json();
+
+init();
+render();
+}
+
+function init(){
+let s=new Set();
+raw.forEach(d=>s.add(d.KECAMATAN));
+
+let sel=document.getElementById("kec");
+s.forEach(v=>sel.innerHTML+=`<option>${v}</option>`);
+}
+
+function render(){
+
+let kec=document.getElementById("kec").value;
+
+let map={};
+let totalLtt=0;
+let totalPanen=0;
+
+raw.forEach(d=>{
+
+if(kec && d.KECAMATAN!==kec) return;
+
+let k=d.KECAMATAN;
+
+if(!map[k]){
+map[k]={ltt:0,panen:0};
+}
+
+map[k].ltt+=num(d["LUAS TAMBAH TANAM"]);
+map[k].panen+=num(d["LUAS PANEN"]);
+
+totalLtt+=num(d["LUAS TAMBAH TANAM"]);
+totalPanen+=num(d["LUAS PANEN"]);
+
+});
+
+let rasio= totalLtt? (totalPanen/totalLtt*100):0;
+
+document.getElementById("ltt").innerText=totalLtt.toFixed(2);
+document.getElementById("panen").innerText=totalPanen.toFixed(2);
+document.getElementById("rasio").innerText=rasio.toFixed(1)+"%";
+document.getElementById("selisih").innerText=(totalLtt-totalPanen).toFixed(2);
+
+// TABLE
+let tb=document.getElementById("tb");
+tb.innerHTML="";
+
+let labels=[],lttData=[],panenData=[];
+
+Object.keys(map).forEach(k=>{
+
+let l=map[k].ltt;
+let p=map[k].panen;
+let r=l? (p/l*100):0;
+
+let status="green";
+if(p<l) status="red";
+else if(r<80) status="yellow";
+
+tb.innerHTML+=`
+<tr>
+<td>${k}</td>
+<td>${l.toFixed(1)}</td>
+<td>${p.toFixed(1)}</td>
+<td><span class="badge ${status}">${r.toFixed(0)}%</span></td>
+</tr>
+`;
+
+labels.push(k);
+lttData.push(l);
+panenData.push(p);
+
+});
+
+// CHART
+if(chart) chart.destroy();
+
+chart=new Chart(document.getElementById("chart"),{
+type:"bar",
+data:{
+labels:labels,
+datasets:[
+{
+label:"LTT",
+data:lttData,
+backgroundColor:"#0b3d2e"
+},
+{
+label:"Panen",
+data:panenData,
+backgroundColor:"#1b8a5a"
+}
+]
+},
+options:{
+responsive:true,
+plugins:{legend:{position:"bottom"}}
+}
+});
+
+}
+
+load();
+
+</script>
+
+</body>
+</html>
