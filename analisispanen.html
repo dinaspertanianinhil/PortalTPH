@@ -6,334 +6,877 @@
 <title>Dashboard LTT - Analitik Produksi</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-:root{
-    --primary:#0b3d2e;
-    --accent:#1b8a5a;
-    --bg:#f5f7f8;
-    --card:#ffffff;
-    --text:#1a1a1a;
-    --muted:#6b7280;
-    --danger:#d32f2f;
-    --warn:#f9a825;
-    --success:#2e7d32;
+/* ============================================================
+   VARIABLES & RESET
+   ============================================================ */
+:root {
+  --primary:       #0a2e1f;
+  --primary-mid:   #0f4a31;
+  --accent:        #16a965;
+  --accent-light:  #22d47c;
+  --accent-glow:   rgba(22, 169, 101, 0.25);
+  --blue:          #1a6bbd;
+  --blue-light:    #3a8fdf;
+  --bg:            #0d1f17;
+  --bg2:           #101c14;
+  --surface:       rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.07);
+  --border:        rgba(255,255,255,0.08);
+  --border-accent: rgba(22,169,101,0.3);
+  --text:          #e8f0eb;
+  --text-dim:      #7a9e88;
+  --text-muted:    #4a6657;
+  --danger:        #f04b4b;
+  --warn:          #f5a623;
+  --success:       #16a965;
+  --card-shadow:   0 4px 24px rgba(0,0,0,0.35);
+  --radius:        14px;
+  --radius-sm:     8px;
 }
 
-body{
-    margin:0;
-    font-family:'Inter',sans-serif;
-    background:var(--bg);
-    color:var(--text);
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* HEADER */
-header{
-    background:var(--primary);
-    color:white;
-    padding:14px 16px;
-    font-weight:700;
-    font-size:15px;
+/* NOISE TEXTURE OVERLAY */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
 }
 
-/* WRAPPER */
-.container{
-    padding:14px;
-    max-width:1200px;
-    margin:auto;
+/* BACKGROUND GRADIENT ORBS */
+body::after {
+  content: '';
+  position: fixed;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(22,169,101,0.07) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* KPI */
-.kpi-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:10px;
-    margin-bottom:12px;
+.bg-orb-2 {
+  position: fixed;
+  bottom: -150px;
+  left: -150px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(26,107,189,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
-.kpi{
-    background:var(--card);
-    padding:12px;
-    border-radius:10px;
-    box-shadow:0 1px 3px rgba(0,0,0,0.06);
+/* ============================================================
+   HEADER
+   ============================================================ */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 46, 31, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: slideDown 0.5s ease-out;
 }
 
-.kpi h4{
-    margin:0;
-    font-size:11px;
-    color:var(--muted);
-    font-weight:600;
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
 }
 
-.kpi p{
-    margin:6px 0 0;
-    font-size:16px;
-    font-weight:700;
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* FILTER */
-.filter{
-    margin:10px 0;
+.header-icon {
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, var(--accent), var(--blue));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 0 16px var(--accent-glow);
+  flex-shrink: 0;
 }
 
-select{
-    width:100%;
-    padding:10px;
-    border-radius:8px;
-    border:1px solid #e5e7eb;
-    background:white;
+.header-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: var(--text);
 }
 
-/* GRID */
-.grid{
-    display:grid;
-    grid-template-columns:2fr 1fr;
-    gap:12px;
-    margin-top:12px;
+.header-sub {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
-/* CARD */
-.card{
-    background:var(--card);
-    padding:12px;
-    border-radius:10px;
-    box-shadow:0 1px 3px rgba(0,0,0,0.06);
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.title{
-    font-size:13px;
-    font-weight:700;
-    margin-bottom:10px;
+.status-dot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 10px;
 }
 
-/* TABLE */
-table{
-    width:100%;
-    border-collapse:collapse;
-    font-size:12px;
+.dot-live {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  box-shadow: 0 0 8px var(--accent-light);
+  animation: pulse-dot 2s infinite;
 }
 
-th{
-    text-align:left;
-    color:var(--muted);
-    font-weight:600;
-    border-bottom:1px solid #eee;
-    padding:8px 6px;
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--accent-light); }
+  50%       { opacity: 0.6; box-shadow: 0 0 3px var(--accent-light); }
 }
 
-td{
-    padding:8px 6px;
-    border-bottom:1px solid #f1f1f1;
+/* ============================================================
+   CONTAINER
+   ============================================================ */
+.container {
+  position: relative;
+  z-index: 1;
+  padding: 20px 16px 40px;
+  max-width: 1200px;
+  margin: auto;
 }
 
-.badge{
-    padding:3px 6px;
-    border-radius:6px;
-    font-size:10px;
-    font-weight:600;
+/* ============================================================
+   KPI GRID
+   ============================================================ */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
-.red{background:#ffebee;color:var(--danger);}
-.yellow{background:#fff8e1;color:var(--warn);}
-.green{background:#e8f5e9;color:var(--success);}
+.kpi {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 16px;
+  border-radius: var(--radius);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  animation: fadeUp 0.5s ease-out both;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  cursor: default;
+}
 
-/* MOBILE */
-@media(max-width:900px){
-    .kpi-grid{
-        grid-template-columns:repeat(2,1fr);
-    }
-    .grid{
-        grid-template-columns:1fr;
-    }
+.kpi:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-accent);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.3), 0 0 0 1px var(--border-accent);
+}
+
+.kpi:nth-child(1) { animation-delay: 0.05s; }
+.kpi:nth-child(2) { animation-delay: 0.10s; }
+.kpi:nth-child(3) { animation-delay: 0.15s; }
+.kpi:nth-child(4) { animation-delay: 0.20s; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.kpi::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.kpi:hover::before { opacity: 1; }
+
+.kpi-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.kpi-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.kpi-icon.green { background: rgba(22,169,101,0.12); border: 1px solid rgba(22,169,101,0.2); }
+.kpi-icon.blue  { background: rgba(26,107,189,0.12); border: 1px solid rgba(26,107,189,0.2); }
+.kpi-icon.gold  { background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.2); }
+.kpi-icon.red   { background: rgba(240,75,75,0.12);  border: 1px solid rgba(240,75,75,0.2); }
+
+.kpi h4 {
+  font-size: 10px;
+  color: var(--text-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+}
+
+.kpi p {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+}
+
+/* ============================================================
+   FILTER BAR
+   ============================================================ */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  animation: fadeUp 0.5s 0.25s ease-out both;
+}
+
+.filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+}
+
+.filter-icon {
+  font-size: 14px;
+}
+
+/* Override select */
+select {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%237a9e88' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+select:focus {
+  border-color: var(--border-accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+select option {
+  background: #1a2e22;
+  color: var(--text);
+}
+
+/* ============================================================
+   MAIN GRID
+   ============================================================ */
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 14px;
+  animation: fadeUp 0.5s 0.3s ease-out both;
+}
+
+/* ============================================================
+   CARD
+   ============================================================ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 18px;
+  border-radius: var(--radius);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.25s;
+}
+
+.card:hover {
+  border-color: rgba(255,255,255,0.12);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.title-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+}
+
+.chart-legend {
+  display: flex;
+  gap: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th {
+  text-align: left;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 1px solid var(--border);
+  padding: 0 0 10px;
+}
+
+td {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: var(--text);
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+tr:last-child td { border-bottom: none; }
+
+tbody tr {
+  transition: background 0.15s;
+}
+
+tbody tr:hover td {
+  background: var(--surface-hover);
+}
+
+tbody tr:hover td:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+tbody tr:hover td:last-child  { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+
+.kec-name {
+  font-weight: 600;
+  font-size: 11px;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.num-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  gap: 3px;
+}
+
+.badge::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.red    { background: rgba(240,75,75,0.12);   color: #f87171; border: 1px solid rgba(240,75,75,0.2); }
+.red::before { background: #f87171; }
+
+.yellow { background: rgba(245,166,35,0.12);  color: #fbbf24; border: 1px solid rgba(245,166,35,0.2); }
+.yellow::before { background: #fbbf24; }
+
+.green  { background: rgba(22,169,101,0.12);  color: #34d399; border: 1px solid rgba(22,169,101,0.2); }
+.green::before { background: #34d399; }
+
+/* ============================================================
+   LOADING STATE
+   ============================================================ */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  transition: opacity 0.5s ease, visibility 0.5s;
+}
+
+.loading-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-ring {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loader-text {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer-bar {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: var(--text-muted);
+  animation: fadeUp 0.5s 0.4s ease-out both;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .grid     { grid-template-columns: 1fr; }
+  .header-sub { display: none; }
+  .filter-label { display: none; }
+}
+
+@media (max-width: 480px) {
+  header { padding: 0 12px; }
+  .container { padding: 14px 12px 32px; }
+  .kpi-grid { gap: 8px; }
+  .kpi p { font-size: 18px; }
+  .kpi { padding: 12px; }
+  .card { padding: 14px; }
+  .chart-legend { display: none; }
 }
 </style>
 </head>
 
 <body>
+<div class="bg-orb-2"></div>
 
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loader-ring"></div>
+  <div class="loader-text">Memuat data produksi...</div>
+</div>
+
+<!-- HEADER -->
 <header>
-📊 Dashboard LTT & Panen - Analisis Produktivitas
+  <div class="header-left">
+    <div class="header-icon">🌾</div>
+    <div>
+      <div class="header-title">Dashboard LTT & Panen</div>
+      <div class="header-sub">Sistem Analitik Produktivitas Pertanian</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-dot">
+      <span class="dot-live"></span>
+      Live Data
+    </div>
+  </div>
 </header>
 
 <div class="container">
 
-<!-- KPI -->
-<div class="kpi-grid">
+  <!-- KPI -->
+  <div class="kpi-grid">
     <div class="kpi">
-        <h4>Total LTT</h4>
-        <p id="ltt">0</p>
+      <div class="kpi-inner">
+        <div>
+          <h4>Total LTT</h4>
+          <p id="ltt">—</p>
+        </div>
+        <div class="kpi-icon green">🌱</div>
+      </div>
     </div>
     <div class="kpi">
-        <h4>Total Panen</h4>
-        <p id="panen">0</p>
+      <div class="kpi-inner">
+        <div>
+          <h4>Total Panen</h4>
+          <p id="panen">—</p>
+        </div>
+        <div class="kpi-icon blue">🌾</div>
+      </div>
     </div>
     <div class="kpi">
-        <h4>Produktivitas</h4>
-        <p id="rasio">0%</p>
+      <div class="kpi-inner">
+        <div>
+          <h4>Produktivitas</h4>
+          <p id="rasio">—</p>
+        </div>
+        <div class="kpi-icon gold">📊</div>
+      </div>
     </div>
     <div class="kpi">
-        <h4>Selisih</h4>
-        <p id="selisih">0</p>
+      <div class="kpi-inner">
+        <div>
+          <h4>Selisih</h4>
+          <p id="selisih">—</p>
+        </div>
+        <div class="kpi-icon red">⚖️</div>
+      </div>
     </div>
-</div>
+  </div>
 
-<!-- FILTER -->
-<div class="filter">
-<select id="kec" onchange="render()">
-<option value="">Semua Kecamatan</option>
-</select>
-</div>
+  <!-- FILTER -->
+  <div class="filter-bar">
+    <span class="filter-icon">🏘️</span>
+    <span class="filter-label">Filter Wilayah</span>
+    <select id="kec" onchange="render()">
+      <option value="">Semua Kecamatan</option>
+    </select>
+  </div>
 
-<!-- GRID -->
-<div class="grid">
+  <!-- GRID -->
+  <div class="grid">
 
-<!-- CHART -->
-<div class="card">
-<div class="title">Perbandingan LTT vs Panen</div>
-<canvas id="chart"></canvas>
-</div>
+    <!-- CHART CARD -->
+    <div class="card">
+      <div class="card-header">
+        <div class="title">
+          <span class="title-dot"></span>
+          Perbandingan LTT vs Panen
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#22d47c"></div> LTT
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#3a8fdf"></div> Panen
+          </div>
+        </div>
+      </div>
+      <canvas id="chart"></canvas>
+    </div>
 
-<!-- TABLE -->
-<div class="card">
-<div class="title">Status Kecamatan</div>
-<table>
-<thead>
-<tr>
-<th>Kec</th>
-<th>LTT</th>
-<th>Panen</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody id="tb"></tbody>
-</table>
-</div>
+    <!-- TABLE CARD -->
+    <div class="card">
+      <div class="card-header">
+        <div class="title">
+          <span class="title-dot" style="background:#3a8fdf;box-shadow:0 0 6px #3a8fdf"></span>
+          Status Kecamatan
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Kecamatan</th>
+            <th>LTT</th>
+            <th>Panen</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tb"></tbody>
+      </table>
+    </div>
 
-</div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-bar">
+    <span>Dinas Pertanian · Sistem Monitoring Produktivitas</span>
+    <span id="lastUpdate">—</span>
+  </div>
 
 </div>
 
 <script>
+const API_URL = "https://script.google.com/macros/s/AKfycbz9BbxHtegnOrlIdwMBjsRRfK1weywnjIXnbX4YgGY-F6egmvMFUO3pqZ5CAXg99ac/exec";
 
-const API_URL="https://script.google.com/macros/s/AKfycbz9BbxHtegnOrlIdwMBjsRRfK1weywnjIXnbX4YgGY-F6egmvMFUO3pqZ5CAXg99ac/exec";
-
-let raw=[];
+let raw = [];
 let chart;
 
-function num(v){return parseFloat(v)||0;}
+function num(v) { return parseFloat(v) || 0; }
 
-async function load(){
-const res=await fetch(API_URL);
-raw=await res.json();
+async function load() {
+  try {
+    const res = await fetch(API_URL);
+    raw = await res.json();
+  } catch(e) {
+    console.error('Gagal memuat data:', e);
+  }
 
-init();
-render();
+  init();
+  render();
+
+  // Hide loading overlay
+  document.getElementById('loadingOverlay').classList.add('hidden');
+
+  // Update timestamp
+  const now = new Date();
+  document.getElementById('lastUpdate').textContent =
+    'Diperbarui: ' + now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 }
 
-function init(){
-let s=new Set();
-raw.forEach(d=>s.add(d.KECAMATAN));
+function init() {
+  let s = new Set();
+  raw.forEach(d => s.add(d.KECAMATAN));
 
-let sel=document.getElementById("kec");
-s.forEach(v=>sel.innerHTML+=`<option>${v}</option>`);
+  let sel = document.getElementById("kec");
+  s.forEach(v => sel.innerHTML += `<option>${v}</option>`);
 }
 
-function render(){
+function render() {
+  let kec = document.getElementById("kec").value;
 
-let kec=document.getElementById("kec").value;
+  let map = {};
+  let totalLtt = 0;
+  let totalPanen = 0;
 
-let map={};
-let totalLtt=0;
-let totalPanen=0;
+  raw.forEach(d => {
+    if (kec && d.KECAMATAN !== kec) return;
 
-raw.forEach(d=>{
+    let k = d.KECAMATAN;
+    if (!map[k]) map[k] = { ltt: 0, panen: 0 };
 
-if(kec && d.KECAMATAN!==kec) return;
+    map[k].ltt   += num(d["LUAS TAMBAH TANAM"]);
+    map[k].panen += num(d["LUAS PANEN"]);
 
-let k=d.KECAMATAN;
+    totalLtt   += num(d["LUAS TAMBAH TANAM"]);
+    totalPanen += num(d["LUAS PANEN"]);
+  });
 
-if(!map[k]){
-map[k]={ltt:0,panen:0};
+  let rasio = totalLtt ? (totalPanen / totalLtt * 100) : 0;
+
+  // Animate KPI numbers
+  animateValue('ltt',    0, totalLtt,    800);
+  animateValue('panen',  0, totalPanen,  800);
+  animateValue('selisih',0, totalLtt - totalPanen, 800);
+
+  document.getElementById("rasio").innerText   = rasio.toFixed(1) + "%";
+
+  // TABLE
+  let tb = document.getElementById("tb");
+  tb.innerHTML = "";
+
+  let labels = [], lttData = [], panenData = [];
+
+  Object.keys(map).forEach(k => {
+    let l = map[k].ltt;
+    let p = map[k].panen;
+    let r = l ? (p / l * 100) : 0;
+
+    let status = "green";
+    if (p < l) status = "red";
+    else if (r < 80) status = "yellow";
+
+    let label = r >= 100 ? "Surplus" : r >= 80 ? "Baik" : "Defisit";
+
+    tb.innerHTML += `
+      <tr>
+        <td><div class="kec-name" title="${k}">${k}</div></td>
+        <td><span class="num-val">${l.toFixed(1)}</span></td>
+        <td><span class="num-val">${p.toFixed(1)}</span></td>
+        <td><span class="badge ${status}">${label} ${r.toFixed(0)}%</span></td>
+      </tr>
+    `;
+
+    labels.push(k);
+    lttData.push(l);
+    panenData.push(p);
+  });
+
+  // CHART
+  if (chart) chart.destroy();
+
+  Chart.defaults.color = '#7a9e88';
+  Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+
+  chart = new Chart(document.getElementById("chart"), {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "LTT",
+          data: lttData,
+          backgroundColor: "rgba(34,212,124,0.75)",
+          borderRadius: 5,
+          borderSkipped: false,
+          barPercentage: 0.6,
+          categoryPercentage: 0.7,
+        },
+        {
+          label: "Panen",
+          data: panenData,
+          backgroundColor: "rgba(58,143,223,0.75)",
+          borderRadius: 5,
+          borderSkipped: false,
+          barPercentage: 0.6,
+          categoryPercentage: 0.7,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 600, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(10,46,31,0.95)',
+          borderColor: 'rgba(22,169,101,0.3)',
+          borderWidth: 1,
+          padding: 12,
+          titleFont: { size: 12, weight: '700' },
+          bodyFont: { size: 11 },
+          titleColor: '#e8f0eb',
+          bodyColor: '#7a9e88',
+          cornerRadius: 8,
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+          ticks: { font: { size: 10, weight: '600' }, maxRotation: 30 }
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
+          ticks: { font: { size: 10 } }
+        }
+      }
+    }
+  });
 }
 
-map[k].ltt+=num(d["LUAS TAMBAH TANAM"]);
-map[k].panen+=num(d["LUAS PANEN"]);
+// Smooth number animation
+function animateValue(id, start, end, duration) {
+  const el = document.getElementById(id);
+  if (!el) return;
 
-totalLtt+=num(d["LUAS TAMBAH TANAM"]);
-totalPanen+=num(d["LUAS PANEN"]);
+  const startTime = performance.now();
+  const isDecimal = !Number.isInteger(end);
 
-});
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const current = start + (end - start) * ease;
 
-let rasio= totalLtt? (totalPanen/totalLtt*100):0;
+    el.innerText = isDecimal ? current.toFixed(2) : Math.round(current).toFixed(2);
 
-document.getElementById("ltt").innerText=totalLtt.toFixed(2);
-document.getElementById("panen").innerText=totalPanen.toFixed(2);
-document.getElementById("rasio").innerText=rasio.toFixed(1)+"%";
-document.getElementById("selisih").innerText=(totalLtt-totalPanen).toFixed(2);
+    if (progress < 1) requestAnimationFrame(update);
+    else el.innerText = end.toFixed(2);
+  }
 
-// TABLE
-let tb=document.getElementById("tb");
-tb.innerHTML="";
-
-let labels=[],lttData=[],panenData=[];
-
-Object.keys(map).forEach(k=>{
-
-let l=map[k].ltt;
-let p=map[k].panen;
-let r=l? (p/l*100):0;
-
-let status="green";
-if(p<l) status="red";
-else if(r<80) status="yellow";
-
-tb.innerHTML+=`
-<tr>
-<td>${k}</td>
-<td>${l.toFixed(1)}</td>
-<td>${p.toFixed(1)}</td>
-<td><span class="badge ${status}">${r.toFixed(0)}%</span></td>
-</tr>
-`;
-
-labels.push(k);
-lttData.push(l);
-panenData.push(p);
-
-});
-
-// CHART
-if(chart) chart.destroy();
-
-chart=new Chart(document.getElementById("chart"),{
-type:"bar",
-data:{
-labels:labels,
-datasets:[
-{
-label:"LTT",
-data:lttData,
-backgroundColor:"#0b3d2e"
-},
-{
-label:"Panen",
-data:panenData,
-backgroundColor:"#1b8a5a"
-}
-]
-},
-options:{
-responsive:true,
-plugins:{legend:{position:"bottom"}}
-}
-});
-
+  requestAnimationFrame(update);
 }
 
 load();
-
 </script>
 
 </body>
