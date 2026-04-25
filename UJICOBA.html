@@ -765,13 +765,25 @@ for(let k in dataWilayah){
 // isi desa
 function isiDesa(select){
   let kec = document.getElementById("kecamatan").value;
-  select.innerHTML = "";
-  dataWilayah[kec].desa.forEach(d=>{
-    let o = document.createElement("option");
-    o.value = d;
-    o.textContent = d;
-    select.appendChild(o);
-  });
+  select.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
+
+  if(dataWilayah[kec]){
+    // tampilkan kelurahan dulu
+    dataWilayah[kec].kelurahan.forEach(k=>{
+      let o = document.createElement("option");
+      o.value = "Kelurahan " + k;
+      o.textContent = k + " (Kelurahan)";
+      select.appendChild(o);
+    });
+
+    // lalu desa
+    dataWilayah[kec].desa.forEach(d=>{
+      let o = document.createElement("option");
+      o.value = "Desa " + d;
+      o.textContent = d + " (Desa)";
+      select.appendChild(o);
+    });
+  }
 }
 
 kec.onchange = () => {
