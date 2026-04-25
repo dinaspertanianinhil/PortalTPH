@@ -2,506 +2,613 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Pelaporan LTT – Sekali Input Semua Jenis</title>
+<title>Form LTT Dinas</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --primary:      #0d9488;
+  --primary-dark: #0f766e;
+  --primary-light:#ccfbf1;
+  --primary-glow: rgba(13,148,136,.18);
+  --accent:       #f59e0b;
+  --danger:       #ef4444;
+  --danger-dark:  #dc2626;
+  --surface:      #ffffff;
+  --surface-2:    #f8fafc;
+  --border:       #e2e8f0;
+  --border-focus: #0d9488;
+  --text:         #0f172a;
+  --text-muted:   #64748b;
+  --text-light:   #94a3b8;
+  --shadow-sm:    0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
+  --shadow-lg:    0 10px 32px rgba(0,0,0,.10), 0 4px 12px rgba(0,0,0,.06);
+  --radius:       14px;
+  --radius-sm:    9px;
+  --transition:   all .22s cubic-bezier(.4,0,.2,1);
+}
 
-  :root {
-    --green-50:  #f0fdf9;
-    --green-100: #ccfbef;
-    --green-200: #99f6e0;
-    --green-400: #2dd4a8;
-    --green-600: #0f766e;
-    --green-700: #0d6b63;
-    --green-800: #0a5952;
-    --green-900: #073d38;
-    --red-500:   #ef4444;
-    --red-600:   #dc2626;
-    --red-700:   #b91c1c;
-    --gray-50:   #f9fafb;
-    --gray-100:  #f3f4f6;
-    --gray-200:  #e5e7eb;
-    --gray-300:  #d1d5db;
-    --gray-400:  #9ca3af;
-    --gray-500:  #6b7280;
-    --gray-600:  #4b5563;
-    --gray-700:  #374151;
-    --gray-800:  #1f2937;
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-    --shadow-md: 0 4px 12px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.04);
-    --shadow-focus: 0 0 0 3px rgba(15,118,110,.18);
-    --transition: 150ms ease;
-  }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
-    background: linear-gradient(160deg, #f0fdf9 0%, #f1f5f9 60%);
-    min-height: 100vh;
-    padding: 20px 16px 40px;
-    color: var(--gray-800);
-    font-size: 14px;
-  }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #eef6f5;
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgba(13,148,136,.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 100%, rgba(13,148,136,.08) 0%, transparent 55%);
+  min-height: 100vh;
+  padding: 18px 14px 40px;
+  color: var(--text);
+}
 
-  /* ======= HEADER ======= */
-  .header {
-    background: #fff;
-    padding: 18px 20px;
-    border-radius: var(--radius-lg);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 18px;
-    box-shadow: var(--shadow-md);
-    border-top: 3px solid var(--green-600);
-    position: relative;
-    overflow: hidden;
-  }
-  .header::after {
-    content: '';
-    position: absolute;
-    right: -30px; top: -30px;
-    width: 120px; height: 120px;
-    border-radius: 50%;
-    background: var(--green-50);
-    opacity: .7;
-    pointer-events: none;
-  }
-  .header img {
-    width: 54px;
-    height: 54px;
-    object-fit: contain;
-    flex-shrink: 0;
-    filter: drop-shadow(0 1px 3px rgba(0,0,0,.12));
-  }
-  .header-text { flex: 1; }
-  .header .title {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--green-800);
-    letter-spacing: .01em;
-    line-height: 1.3;
-  }
-  .header .subtitle {
-    font-size: 12px;
-    color: var(--gray-500);
-    margin-top: 3px;
-  }
-  .header-badge {
-    background: var(--green-50);
-    color: var(--green-700);
-    border: 1px solid var(--green-200);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
-    letter-spacing: .02em;
-  }
+/* ───── HEADER ───── */
+.header {
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 60%, #14b8a6 100%);
+  padding: 20px 22px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  box-shadow: 0 6px 24px rgba(13,148,136,.35), 0 2px 6px rgba(0,0,0,.08);
+  position: relative;
+  overflow: hidden;
+}
 
-  /* ======= SECTION CARD ======= */
-  .box {
-    background: #fff;
-    padding: 20px;
-    margin-bottom: 16px;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    border: 1px solid rgba(0,0,0,.04);
-    transition: box-shadow var(--transition);
-  }
-  .box:hover { box-shadow: 0 6px 18px rgba(0,0,0,.09), 0 2px 4px rgba(0,0,0,.04); }
+.header::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.08);
+}
 
-  .section-title {
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .07em;
-    color: var(--green-700);
-    margin-bottom: 16px;
-    padding-bottom: 10px;
-    border-bottom: 1.5px solid var(--green-100);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .section-title .icon {
-    width: 20px; height: 20px;
-    background: var(--green-100);
-    border-radius: 5px;
-    display: inline-flex; align-items: center; justify-content: center;
-    font-size: 11px;
-  }
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; left: 60px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.06);
+}
 
-  /* ======= LABEL & INPUT ======= */
-  label {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--gray-600);
-    display: block;
-    margin-top: 14px;
-    margin-bottom: 5px;
-    letter-spacing: .02em;
-    text-transform: uppercase;
-  }
+.header img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: rgba(255,255,255,.15);
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
 
-  input, select {
-    width: 100%;
-    padding: 9px 12px;
-    border-radius: var(--radius-sm);
-    border: 1.5px solid var(--gray-200);
-    font-size: 14px;
-    font-family: inherit;
-    color: var(--gray-800);
-    background: var(--gray-50);
-    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
-    -webkit-appearance: none;
-    appearance: none;
-    outline: none;
-  }
-  select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    padding-right: 30px;
-  }
-  input:hover, select:hover { border-color: var(--gray-300); background: #fff; }
-  input:focus, select:focus {
-    border-color: var(--green-600);
-    background: #fff;
-    box-shadow: var(--shadow-focus);
-  }
-  input[type="date"] { cursor: pointer; }
+.header-text {
+  position: relative;
+  z-index: 1;
+}
 
-  /* ======= BUTTONS ======= */
-  button {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 9px 16px;
-    border-radius: var(--radius-sm);
-    border: none;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    letter-spacing: .01em;
-    transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-  }
-  button:active { transform: scale(.97); }
+.header-text b {
+  display: block;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -.2px;
+}
 
-  /* primary */
-  button:not(.btn-hapus):not(.btn-secondary) {
-    background: var(--green-600);
-    color: #fff;
-    box-shadow: 0 1px 4px rgba(15,118,110,.3);
-  }
-  button:not(.btn-hapus):not(.btn-secondary):hover {
-    background: var(--green-700);
-    box-shadow: 0 3px 8px rgba(15,118,110,.35);
-  }
+.header-text small {
+  font-size: 12px;
+  color: rgba(255,255,255,.78);
+  font-weight: 500;
+  letter-spacing: .3px;
+}
 
-  /* danger */
-  .btn-hapus {
-    background: #fff1f1;
-    color: var(--red-600);
-    border: 1.5px solid #fecaca;
-  }
-  .btn-hapus:hover { background: #fee2e2; border-color: #fca5a5; }
+.header-badge {
+  margin-left: auto;
+  position: relative;
+  z-index: 1;
+  background: rgba(255,255,255,.18);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 20px;
+  padding: 5px 11px;
+  font-size: 11px;
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
 
-  /* ======= DESA BLOCK ======= */
-  .desa {
-    background: var(--gray-50);
-    border: 1.5px solid var(--gray-200);
-    padding: 16px;
-    margin-top: 14px;
-    border-radius: var(--radius-md);
-    position: relative;
-    transition: border-color var(--transition), box-shadow var(--transition);
-  }
-  .desa:hover { border-color: var(--green-200); box-shadow: 0 2px 8px rgba(15,118,110,.07); }
+/* ───── SECTION LABEL ───── */
+.section-label {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--primary-dark);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
 
-  .desa-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 4px;
-  }
-  .desa-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--green-700);
-    text-transform: uppercase;
-    letter-spacing: .06em;
-  }
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--primary-light), transparent);
+}
 
-  .poktan-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 14px;
-    flex-wrap: wrap;
-  }
+/* ───── BOX / CARD ───── */
+.box {
+  background: var(--surface);
+  padding: 20px;
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  transition: var(--transition);
+  animation: fadeUp .4s ease both;
+}
 
-  /* ======= POKTAN ROW ======= */
+.box:hover { box-shadow: var(--shadow-lg); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.box:nth-child(2) { animation-delay: .07s; }
+.box:nth-child(3) { animation-delay: .14s; }
+.box:nth-child(4) { animation-delay: .21s; }
+
+/* ───── LABEL ───── */
+label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 14px;
+  margin-bottom: 5px;
+  display: block;
+  letter-spacing: .2px;
+}
+
+/* ───── INPUT / SELECT ───── */
+input, select {
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--surface-2);
+  transition: var(--transition);
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+}
+
+input:focus, select:focus {
+  border-color: var(--border-focus);
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+input::placeholder { color: var(--text-light); }
+
+/* Custom arrow for select */
+.select-wrap {
+  position: relative;
+}
+
+.select-wrap::after {
+  content: '\f107';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  font-size: 13px;
+}
+
+.select-wrap select { padding-right: 32px; cursor: pointer; }
+
+/* ───── BUTTON BASE ───── */
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 11px 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  width: 100%;
+  letter-spacing: .1px;
+}
+
+/* Primary green button */
+.btn-primary, button:not(.btn-hapus):not(.btn-poktan):not(.btn-save) {
+  background: linear-gradient(135deg, #0f766e, #0d9488);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(13,148,136,.3);
+}
+
+.btn-primary:hover,
+button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):hover {
+  background: linear-gradient(135deg, #115e59, #0f766e);
+  box-shadow: 0 5px 18px rgba(13,148,136,.4);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active,
+button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(13,148,136,.25);
+}
+
+/* Hapus button */
+.btn-hapus {
+  background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(239,68,68,.25) !important;
+  width: auto !important;
+  padding: 8px 12px !important;
+  font-size: 12px !important;
+}
+
+.btn-hapus:hover {
+  background: linear-gradient(135deg, #b91c1c, #dc2626) !important;
+  box-shadow: 0 4px 14px rgba(239,68,68,.35) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Poktan button */
+.btn-poktan {
+  background: linear-gradient(135deg, #0369a1, #0284c7) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(3,105,161,.25) !important;
+  width: auto !important;
+  padding: 8px 14px !important;
+  font-size: 12px !important;
+}
+
+.btn-poktan:hover {
+  background: linear-gradient(135deg, #075985, #0369a1) !important;
+  box-shadow: 0 4px 14px rgba(3,105,161,.35) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Save button */
+.btn-save {
+  background: linear-gradient(135deg, #0f766e, #0d9488, #14b8a6) !important;
+  color: #fff !important;
+  padding: 14px 20px !important;
+  font-size: 15px !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 5px 20px rgba(13,148,136,.4), 0 2px 6px rgba(0,0,0,.1) !important;
+  letter-spacing: .2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-save::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, transparent 0%, rgba(255,255,255,.12) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform .6s ease;
+}
+
+.btn-save:hover::before { transform: translateX(100%); }
+
+.btn-save:hover {
+  box-shadow: 0 8px 28px rgba(13,148,136,.5), 0 4px 10px rgba(0,0,0,.12) !important;
+  transform: translateY(-2px);
+}
+
+.btn-save:disabled {
+  background: linear-gradient(135deg, #94a3b8, #cbd5e1) !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ───── DESA CARD ───── */
+.desa {
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  padding: 16px;
+  margin-top: 14px;
+  border-radius: var(--radius);
+  transition: var(--transition);
+  animation: fadeUp .3s ease both;
+}
+
+.desa:hover { border-color: #a7f3d0; box-shadow: 0 3px 12px rgba(13,148,136,.1); }
+
+.desa-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.desa-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+
+.desa-actions {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+/* ───── POKTAN ROW ───── */
+.poktanContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.poktan {
+  display: grid;
+  grid-template-columns: 1fr 90px 150px 75px 75px 1fr 42px;
+  gap: 7px;
+  background: #fff;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  align-items: center;
+  transition: var(--transition);
+  animation: fadeUp .25s ease both;
+}
+
+.poktan:hover { border-color: #99f6e4; box-shadow: 0 2px 10px rgba(13,148,136,.08); }
+
+.poktan input, .poktan select {
+  font-size: 13px;
+  padding: 8px 10px;
+  background: var(--surface-2);
+}
+
+.poktan .btn-hapus {
+  width: 34px !important;
+  height: 34px !important;
+  padding: 0 !important;
+  border-radius: 7px !important;
+  font-size: 11px !important;
+}
+
+.poktan-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 2px;
+  display: none;
+}
+
+/* ───── REKAP GRID ───── */
+.rekap {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.rekap div {
+  background: linear-gradient(135deg, #f0fdf9, #ecfdf5);
+  border: 1px solid #a7f3d0;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.rekap div:hover { border-color: var(--primary); transform: scale(1.02); }
+
+.rekap div span {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary-dark);
+  line-height: 1.1;
+}
+
+.rekap div .rekap-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
+
+/* ───── EMPTY STATE ───── */
+.empty-state {
+  text-align: center;
+  padding: 28px 16px;
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.empty-state i { font-size: 32px; color: #a7f3d0; }
+.empty-state p { font-size: 13px; font-weight: 500; }
+
+/* ───── INFO STRIP ───── */
+.info-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #92400e;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* ───── MOBILE ───── */
+@media (max-width: 640px) {
+  body { padding: 12px 10px 36px; }
+
+  .header { padding: 16px; }
+  .header-badge { display: none; }
+
   .poktan {
-    display: grid;
-    grid-template-columns: 1fr 100px 165px 80px;
-    gap: 8px;
-    margin-top: 10px;
-    align-items: end;
-    background: #fff;
-    border: 1.5px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    padding: 10px;
-    transition: border-color var(--transition);
-  }
-  .poktan:hover { border-color: var(--green-200); }
-  .poktan label { margin-top: 0; font-size: 11px; }
-
-  .poktan-field { display: flex; flex-direction: column; }
-
-  @media (max-width: 600px) {
-    .poktan {
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
-    }
-    .poktan > *:last-child { grid-column: 1 / -1; }
-    .header { flex-wrap: wrap; gap: 10px; }
-    .header-badge { display: none; }
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 12px;
   }
 
-  /* ======= REKAP ======= */
-  .rekap {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 10px;
-    margin-top: 4px;
-  }
-  .rekap-item {
-    background: var(--gray-50);
-    border: 1.5px solid var(--gray-200);
-    border-radius: var(--radius-md);
-    padding: 12px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    transition: border-color var(--transition), background var(--transition);
-  }
-  .rekap-item:hover { border-color: var(--green-300); background: var(--green-50); }
-  .rekap-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--gray-500);
-    text-transform: uppercase;
-    letter-spacing: .05em;
-  }
-  .rekap-value {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--green-700);
-    line-height: 1.1;
-  }
-  .rekap-unit {
-    font-size: 11px;
-    color: var(--gray-400);
-    font-weight: 400;
+  .poktan-label { display: block; }
+
+  .poktan .btn-hapus {
+    width: 100% !important;
+    height: 38px !important;
+    padding: 0 12px !important;
   }
 
-  /* ======= SAVE BUTTON ======= */
-  #btnSimpan {
-    width: 100%;
-    justify-content: center;
-    padding: 13px;
-    font-size: 15px;
-    border-radius: var(--radius-md);
-    background: var(--green-600);
-    letter-spacing: .02em;
-  }
-  #btnSimpan:not(:disabled):hover {
-    background: var(--green-700);
-    box-shadow: 0 4px 14px rgba(15,118,110,.38);
-  }
-  #btnSimpan:disabled {
-    background: var(--gray-300);
-    color: var(--gray-500);
-    cursor: not-allowed;
-    box-shadow: none;
-  }
+  .rekap { grid-template-columns: repeat(2, 1fr); }
 
-  /* ======= DIVIDER ======= */
-  .poktan-container-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 12px;
-    margin-bottom: 4px;
-  }
-  .poktan-container-header span {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--gray-400);
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    white-space: nowrap;
-  }
-  .poktan-container-header::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--gray-200);
-  }
+  .desa-actions { width: 100%; }
+  .desa-actions button { flex: 1; }
+}
 
-  /* Poktan column labels */
-  .poktan-col-labels {
-    display: grid;
-    grid-template-columns: 1fr 100px 165px 80px;
-    gap: 8px;
-    padding: 0 10px;
-    margin-top: 10px;
-  }
-  .poktan-col-labels span {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--gray-400);
-    text-transform: uppercase;
-    letter-spacing: .05em;
-  }
-  @media (max-width: 600px) {
-    .poktan-col-labels { display: none; }
-    .rekap { grid-template-columns: 1fr 1fr; }
-  }
+@media (max-width: 380px) {
+  .rekap { grid-template-columns: 1fr 1fr; }
+}
 
-  h2, h3 { display: none; } /* replaced by section-title */
+/* ───── SCROLLBAR ───── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #99f6e4; border-radius: 10px; }
 </style>
 </head>
 
 <body>
 
+<!-- HEADER -->
 <div class="header">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Logo_kabupaten_indragiri_hilir.jpg" alt="Logo">
+  <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png">
   <div class="header-text">
-    <div class="title">Form Pelaporan LTT Kecamatan</div>
-    <div class="subtitle">Dinas Pertanian Kabupaten Indragiri Hilir</div>
+    <b>Form LTT Dinas</b>
+    <small><i class="fa-solid fa-wheat-awn" style="font-size:10px;"></i> Dinas Pertanian &mdash; Indragiri Hilir</small>
   </div>
-  <div class="header-badge">e-Laporan</div>
+  <div class="header-badge">
+    <i class="fa-regular fa-calendar-check" style="font-size:11px;"></i>
+    <span id="badgeDate"></span>
+  </div>
 </div>
 
+<!-- PELAPOR / KECAMATAN / TANGGAL -->
 <div class="box">
-  <div class="section-title"><span class="icon">👤</span> Identitas Pelapor</div>
+  <div class="section-label"><i class="fa-solid fa-id-card"></i> Identitas Pelapor</div>
 
-  <label>Nama Pelapor</label>
-  <input type="text" id="pelapor" placeholder="Masukkan nama lengkap..." oninput="formatKapital(this)">
+  <label><i class="fa-solid fa-user" style="color:var(--primary)"></i> Nama Pelapor</label>
+  <input id="pelapor" placeholder="Masukkan nama pelapor..." required>
 
-  <label>Kecamatan</label>
-  <select id="kecamatan">
-    <option>Batang Tuaka</option>
-    <option>Concong</option>
-    <option>Enok</option>
-    <option>Gaung</option>
-    <option>Gaung Anak Serka</option>
-    <option>Kateman</option>
-    <option>Kempas</option>
-    <option>Kemuning</option>
-    <option>Keritang</option>
-    <option>Kuala Indragiri</option>
-    <option>Mandah</option>
-    <option>Pelangiran</option>
-    <option>Pulau Burung</option>
-    <option>Reteh</option>
-    <option>Sungai Batang</option>
-    <option>Tanah Merah</option>
-    <option>Teluk Belengkong</option>
-    <option>Tembilahan</option>
-    <option>Tembilahan Hulu</option>
-    <option>Tempuling</option>
-  </select>
+  <label><i class="fa-solid fa-location-dot" style="color:var(--primary)"></i> Kecamatan</label>
+  <div class="select-wrap">
+    <select id="kecamatan"></select>
+  </div>
 
-  <label>Tanggal</label>
-  <input type="date" id="tanggal">
+  <label><i class="fa-solid fa-calendar-day" style="color:var(--primary)"></i> Tanggal</label>
+  <input type="date" id="tanggal" readonly style="cursor:default;">
 </div>
 
+<!-- DESA CONTAINER -->
 <div class="box">
-  <div class="section-title"><span class="icon">🌾</span> Data Desa &amp; Kelompok Tani</div>
-  <div id="desaContainer"></div>
-  <button type="button" onclick="tambahDesa()" style="margin-top:14px;">+ Tambah Desa / Kelurahan</button>
+  <div class="section-label"><i class="fa-solid fa-map-location-dot"></i> Data Desa & Kelompok Tani</div>
+  <div id="desaContainer">
+    <div class="empty-state">
+      <i class="fa-regular fa-folder-open"></i>
+      <p>Belum ada desa ditambahkan.<br>Klik tombol di bawah untuk mulai.</p>
+    </div>
+  </div>
+  <button onclick="tambahDesa()" style="margin-top:14px;">
+    <i class="fa-solid fa-plus"></i> Tambah Desa
+  </button>
 </div>
 
+<!-- REKAP -->
 <div class="box">
-  <div class="section-title"><span class="icon">📊</span> Rekap Otomatis LTT</div>
+  <div class="section-label"><i class="fa-solid fa-chart-bar"></i> Rekap Semua Jenis LTT</div>
   <div class="rekap">
-    <div class="rekap-item">
-      <span class="rekap-label">Reguler</span>
-      <span class="rekap-value" id="reguler">0</span>
-      <span class="rekap-unit">Hektare</span>
-    </div>
-    <div class="rekap-item">
-      <span class="rekap-label">OPLAH</span>
-      <span class="rekap-value" id="oplah">0</span>
-      <span class="rekap-unit">Hektare</span>
-    </div>
-    <div class="rekap-item">
-      <span class="rekap-label">CSR</span>
-      <span class="rekap-value" id="csr">0</span>
-      <span class="rekap-unit">Hektare</span>
-    </div>
-    <div class="rekap-item">
-      <span class="rekap-label">Pompa</span>
-      <span class="rekap-value" id="pompa">0</span>
-      <span class="rekap-unit">Hektare</span>
-    </div>
-    <div class="rekap-item">
-      <span class="rekap-label">DAS / Bendungan</span>
-      <span class="rekap-value" id="das">0</span>
-      <span class="rekap-unit">Hektare</span>
-    </div>
-    <div class="rekap-item">
-      <span class="rekap-label">Tusip Sawit/Kelapa</span>
-      <span class="rekap-value" id="padi">0</span>
-      <span class="rekap-unit">Hektare</span>
-    </div>
-    <div class="rekap-item">
-      <span class="rekap-label">GOGO</span>
-      <span class="rekap-value" id="gogo">0</span>
-      <span class="rekap-unit">Hektare</span>
-    </div>
-    <div class="rekap-item">
-      <span class="rekap-label">Jagung</span>
-      <span class="rekap-value" id="jagung">0</span>
-      <span class="rekap-unit">Hektare</span>
-    </div>
-    <div class="rekap-item">
-      <span class="rekap-label">Jagung Polri</span>
-      <span class="rekap-value" id="jagung_polri">0</span>
-      <span class="rekap-unit">Hektare</span>
-    </div>
-    <div class="rekap-item">
-      <span class="rekap-label">Kedelai</span>
-      <span class="rekap-value" id="kedelai">0</span>
-      <span class="rekap-unit">Hektare</span>
-    </div>
+    <div><span class="rekap-label">Reguler</span><span id="reguler">0</span></div>
+    <div><span class="rekap-label">OPLAH</span><span id="oplah">0</span></div>
+    <div><span class="rekap-label">CSR</span><span id="csr">0</span></div>
+    <div><span class="rekap-label">Pompa</span><span id="pompa">0</span></div>
+    <div><span class="rekap-label">DAS</span><span id="das">0</span></div>
+    <div><span class="rekap-label">Tusip</span><span id="tusip">0</span></div>
+    <div><span class="rekap-label">GOGO</span><span id="gogo">0</span></div>
+    <div><span class="rekap-label">Jagung</span><span id="jagung">0</span></div>
+    <div><span class="rekap-label">Jagung Polri</span><span id="jagung_polri">0</span></div>
+    <div><span class="rekap-label">Kedelai</span><span id="kedelai">0</span></div>
   </div>
 </div>
 
-<div class="box">
-  <button id="btnSimpan" onclick="simpan()">💾 Simpan Laporan</button>
+<!-- SAVE -->
+<div class="box" style="margin-bottom:4px;">
+  <button id="btnSimpan" class="btn-save" onclick="simpan()">
+    <i class="fa-solid fa-floppy-disk"></i> Simpan Data LTT
+  </button>
 </div>
 
 <script>
-// =============================
-// FORMAT
-// =============================
-function formatKapital(el) {
-  let text = el.value;
-  text = text.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-  el.value = text;
-}
+// ================= AUTO TANGGAL HARI INI
+(function(){
+  let today = new Date();
+  let yyyy = today.getFullYear();
+  let mm = String(today.getMonth()+1).padStart(2,'0');
+  let dd = String(today.getDate()).padStart(2,'0');
+  document.getElementById("tanggal").value = `${yyyy}-${mm}-${dd}`;
 
-// =============================
-// DATA WILAYAH
-// =============================
+  // badge date
+  const opt = {day:'numeric', month:'short', year:'numeric'};
+  document.getElementById("badgeDate").textContent = today.toLocaleDateString('id-ID', opt);
+})();
+
+// ================= DATA WILAYAH
 const dataWilayah = {
   "Batang Tuaka": {
     kelurahan: ["Sungai Piring"],
@@ -646,225 +753,225 @@ const dataWilayah = {
   }
 };
 
-// =============================
-// TANGGAL OTOMATIS & DIKUNCI
-// =============================
-(function(){
-  const t = document.getElementById("tanggal");
-  const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth()+1).padStart(2,'0');
-  const dd = String(now.getDate()).padStart(2,'0');
-  const today = `${yyyy}-${mm}-${dd}`;
-  t.value = today;
-  t.min = today;
-  t.max = today;
-  t.addEventListener("change", function(){ this.value = today; });
-})();
-
-// =============================
-// DROPDOWN DESA
-// =============================
-function tambahDesa() {
-  const desa = document.createElement("div");
-  desa.className = "desa";
-  desa.innerHTML = `
-    <div class="desa-header">
-      <span class="desa-label">📍 Desa / Kelurahan</span>
-    </div>
-    <select class="desaSelect"></select>
-    <div class="poktan-container-header"><span>Kelompok Tani</span></div>
-    <div class="poktan-col-labels">
-      <span>Nama Poktan</span><span>Luas (Ha)</span><span>Jenis LTT</span><span></span>
-    </div>
-    <div class="poktanContainer"></div>
-    <div class="poktan-actions">
-      <button type="button" onclick="tambahPoktan(this)">+ Tambah Poktan</button>
-      <button type="button" class="btn-hapus" onclick="this.closest('.desa').remove(); hitungRekap()">Hapus Desa</button>
-    </div>
-  `;
-  document.getElementById("desaContainer").appendChild(desa);
-  isiDropdownDesa(desa.querySelector(".desaSelect"));
+// isi kecamatan
+const kec = document.getElementById("kecamatan");
+for(let k in dataWilayah){
+  let o = document.createElement("option");
+  o.value = k;
+  o.textContent = k;
+  kec.appendChild(o);
 }
 
-function isiDropdownDesa(selectEl) {
-  const kec = document.getElementById("kecamatan").value;
-  selectEl.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
-  if (dataWilayah[kec]) {
+// isi desa
+function isiDesa(select){
+  let kec = document.getElementById("kecamatan").value;
+  select.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
+
+  if(dataWilayah[kec]){
+    // tampilkan kelurahan dulu
     dataWilayah[kec].kelurahan.forEach(k=>{
       let o = document.createElement("option");
       o.value = "Kelurahan " + k;
       o.textContent = k + " (Kelurahan)";
-      selectEl.appendChild(o);
+      select.appendChild(o);
     });
+
+    // lalu desa
     dataWilayah[kec].desa.forEach(d=>{
       let o = document.createElement("option");
       o.value = "Desa " + d;
       o.textContent = d + " (Desa)";
-      selectEl.appendChild(o);
+      select.appendChild(o);
     });
   }
 }
 
-document.getElementById("kecamatan").addEventListener("change", ()=>{
-  document.querySelectorAll(".desaSelect").forEach(s=>isiDropdownDesa(s));
-});
+kec.onchange = () => {
+  document.querySelectorAll(".desaSelect").forEach(s => isiDesa(s));
+};
 
-// =============================
-// POKTAN
-// =============================
-function tambahPoktan(btn){
-  const c = btn.closest(".desa").querySelector(".poktanContainer");
-  const p = document.createElement("div");
-  p.className = "poktan";
-  p.innerHTML = `
-    <input placeholder="Nama kelompok tani..." oninput="hitungRekap()">
-    <input placeholder="0" type="number" step="0.01" min="0" oninput="hitungRekap()">
-    <select onchange="hitungRekap()">
-      <option value="reguler">Reguler</option>
-      <option value="oplah">OPLAH</option>
-      <option value="csr">CSR</option>
-      <option value="pompa">Pompa</option>
-      <option value="das/bendungan">DAS/Bendungan</option>
-      <option value="padi tusip sawit/kelapa">Padi Tusip Sawit/Kelapa</option>
-      <option value="gogo">GOGO</option>
-      <option value="jagung">Jagung</option>
-      <option value="jagung_polri">Jagung Polri</option>
-      <option value="kedelai">Kedelai</option>
-    </select>
-    <button class="btn-hapus" onclick="this.parentElement.remove(); hitungRekap()" style="padding:8px 10px; font-size:12px;">Hapus</button>
+// ===== helper: hapus empty state
+function updateEmptyState(){
+  const container = document.getElementById("desaContainer");
+  const desaCards = container.querySelectorAll(".desa");
+  let es = container.querySelector(".empty-state");
+  if(desaCards.length === 0){
+    if(!es){
+      es = document.createElement("div");
+      es.className = "empty-state";
+      es.innerHTML = `<i class="fa-regular fa-folder-open"></i><p>Belum ada desa ditambahkan.<br>Klik tombol di bawah untuk mulai.</p>`;
+      container.appendChild(es);
+    }
+  } else {
+    if(es) es.remove();
+  }
+}
+
+// tambah desa
+let desaCounter = 0;
+function tambahDesa(){
+  desaCounter++;
+  const container = document.getElementById("desaContainer");
+  let es = container.querySelector(".empty-state");
+  if(es) es.remove();
+
+  let div = document.createElement("div");
+  div.className = "desa";
+  div.innerHTML = `
+    <div class="desa-header">
+      <span class="desa-title"><i class="fa-solid fa-map-pin"></i> Desa #${desaCounter}</span>
+      <div class="desa-actions">
+        <button class="btn-poktan" onclick="tambahPoktan(this)"><i class="fa-solid fa-plus"></i> Poktan</button>
+        <button class="btn-hapus" onclick="this.closest('.desa').remove();hitung();updateEmptyState()"><i class="fa-solid fa-trash"></i> Hapus</button>
+      </div>
+    </div>
+    <div class="select-wrap">
+      <select class="desaSelect"></select>
+    </div>
+    <div class="poktanContainer"></div>
   `;
-  c.appendChild(p);
+  container.appendChild(div);
+  isiDesa(div.querySelector(".desaSelect"));
 }
 
-function hitungRekap(){
-  let total = {
-    reguler:0, oplah:0, csr:0, pompa:0,
-    das:0, padi:0, gogo:0,
-    jagung:0, jagung_polri:0, kedelai:0
-  };
+// tambah poktan
+function tambahPoktan(btn){
+  let c = btn.closest('.desa').querySelector(".poktanContainer");
+
+  let div = document.createElement("div");
+  div.className = "poktan";
+  div.innerHTML = `
+    <div>
+      <div class="poktan-label">Nama Poktan</div>
+      <input placeholder="Nama Poktan">
+    </div>
+    <div>
+      <div class="poktan-label">LTT (Ha)</div>
+      <input type="number" placeholder="LTT" oninput="hitung()">
+    </div>
+    <div>
+      <div class="poktan-label">Jenis LTT</div>
+      <div class="select-wrap">
+        <select onchange="hitung()">
+          <option value="reguler">Reguler</option>
+          <option value="oplah">OPLAH</option>
+          <option value="csr">CSR</option>
+          <option value="pompa">Pompa</option>
+          <option value="das">DAS</option>
+          <option value="tusip">Tusip</option>
+          <option value="gogo">GOGO</option>
+          <option value="jagung">Jagung</option>
+          <option value="jagung_polri">Jagung Polri</option>
+          <option value="kedelai">Kedelai</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <div class="poktan-label">Olah Lahan Hari ini(Ha)</div>
+      <input type="number" placeholder="Olah Lahan">
+    </div>
+    <div>
+      <div class="poktan-label">Realisasi Luas Panen Hari ini (Ha)</div>
+      <input type="number" placeholder=" Luas Panen Hari Ini">
+    </div>
+    <div>
+      <div class="poktan-label">Keterangan</div>
+      <input placeholder="Keterangan">
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;padding-top:4px;">
+      <button class="btn-hapus" onclick="this.closest('.poktan').remove();hitung()" title="Hapus baris"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+  `;
+  c.appendChild(div);
+}
+
+// ================= REKAP
+function hitung(){
+  let total = {reguler:0,oplah:0,csr:0,pompa:0,das:0,tusip:0,gogo:0,jagung:0,jagung_polri:0,kedelai:0};
+
   document.querySelectorAll(".poktan").forEach(p=>{
-    let luas = parseFloat((p.children[1].value || "0").replace(",", ".")) || 0;
-    let jenis = p.children[2].value.toLowerCase();
-    if(jenis === "reguler") total.reguler += luas;
-    else if(jenis === "oplah") total.oplah += luas;
-    else if(jenis === "csr") total.csr += luas;
-    else if(jenis === "pompa") total.pompa += luas;
-    else if(jenis === "das/bendungan") total.das += luas;
-    else if(jenis.includes("padi")) total.padi += luas;
-    else if(jenis === "gogo") total.gogo += luas;
-    else if(jenis === "jagung") total.jagung += luas;
-    else if(jenis.includes("polri")) total.jagung_polri += luas;
-    else if(jenis === "kedelai") total.kedelai += luas;
+    // desktop: children layout; mobile: wrapped in divs
+    const inputs = p.querySelectorAll("input[type=number]");
+    const selects = p.querySelectorAll("select");
+    let luas = parseFloat(inputs[0]?.value) || 0;
+    let jenis = selects[0]?.value;
+    if(jenis && total[jenis] !== undefined) total[jenis] += luas;
   });
-  const fmt = v => Number.isInteger(v) ? v : parseFloat(v.toFixed(2));
-  document.getElementById("reguler").innerText = fmt(total.reguler);
-  document.getElementById("oplah").innerText = fmt(total.oplah);
-  document.getElementById("csr").innerText = fmt(total.csr);
-  document.getElementById("pompa").innerText = fmt(total.pompa);
-  document.getElementById("das").innerText = fmt(total.das);
-  document.getElementById("padi").innerText = fmt(total.padi);
-  document.getElementById("gogo").innerText = fmt(total.gogo);
-  document.getElementById("jagung").innerText = fmt(total.jagung);
-  document.getElementById("jagung_polri").innerText = fmt(total.jagung_polri);
-  document.getElementById("kedelai").innerText = fmt(total.kedelai);
+
+  for(let k in total){
+    const el = document.getElementById(k);
+    if(el) el.innerText = total[k] % 1 === 0 ? total[k] : total[k].toFixed(2);
+  }
 }
 
-// =============================
-// SIMPAN
-// =============================
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbVcYABQDZtLGkEHo7u1BKDMAHAw7Jrv_Z_Zm0ImRMs8Dnrhxj1mGylRNMrg2Dkg/exec";
+// ================= KIRIM
+const SCRIPT_URL = "PASTE_URL_SCRIPT_KAMU";
 
-function simpan() {
-  const btn = document.getElementById("btnSimpan");
-  if (btn.disabled) return;
-
-  const pelapor   = document.getElementById("pelapor").value.trim();
-  const kecamatan = document.getElementById("kecamatan").value;
-  const tanggal   = document.getElementById("tanggal").value;
-
-  if (!pelapor || !tanggal) {
-    alert("⚠️ Nama pelapor & tanggal wajib diisi");
+function simpan(){
+  if(!document.getElementById("pelapor").value){
+    alert("Nama pelapor wajib diisi");
     return;
   }
 
   let rows = [];
-  document.querySelectorAll(".desa").forEach(desaBox => {
-    const desa = desaBox.querySelector("select").value;
-    desaBox.querySelectorAll(".poktan").forEach(p => {
-      rows.push({
-        desa,
-        poktan: p.children[0].value,
-        luas: (p.children[1].value || "0").replace(/\./g, ","),
-        jenis: p.children[2].value
-      });
+  document.querySelectorAll(".desa").forEach(d=>{
+    let desa = d.querySelector("select.desaSelect")?.value;
+
+    d.querySelectorAll(".poktan").forEach(p=>{
+      const inputs = p.querySelectorAll("input");
+      const selects = p.querySelectorAll("select");
+      let luas = inputs[1]?.value;
+      if(luas){
+        rows.push({
+          desa: desa,
+          poktan: inputs[0]?.value,
+          luas: luas,
+          jenis: selects[0]?.value,
+          olah: inputs[2]?.value,
+          panen: inputs[3]?.value,
+          ket: inputs[4]?.value
+        });
+      }
     });
   });
 
-  if (rows.length === 0) {
-    alert("⚠️ Data belum diisi");
+  if(rows.length == 0){
+    alert("Isi minimal 1 data");
     return;
   }
 
-  btn.disabled = true;
-  btn.innerText = "⏳ Menyimpan...";
-
   const data = new URLSearchParams();
-  data.append("pelapor", pelapor);
-  data.append("kecamatan", kecamatan);
-  data.append("tanggal", tanggal);
+  data.append("pelapor", document.getElementById("pelapor").value);
+  data.append("kecamatan", document.getElementById("kecamatan").value);
+  data.append("tanggal", document.getElementById("tanggal").value);
   data.append("rows", JSON.stringify(rows));
 
-  fetch(SCRIPT_URL, { method: "POST", body: data })
-    .then(r => r.text())
-    .then(r => {
-      if (r.startsWith("OK")) {
-        alert("✅ Data berhasil disimpan");
-        location.reload();
-      } else {
-        btn.disabled = false;
-        btn.innerText = "💾 Simpan Laporan";
-        alert("❌ Server error:\n" + r);
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      btn.disabled = false;
-      btn.innerText = "💾 Simpan Laporan";
-      alert("❌ Gagal mengirim data");
-    });
-}
-</script>
+  const btnSimpan = document.getElementById("btnSimpan");
+  btnSimpan.disabled = true;
+  btnSimpan.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengirim...`;
 
-<script>
-/* Kunci tanggal hanya hari ini */
-(function(){
-  const t = document.getElementById("tanggal");
-  const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth()+1).padStart(2,'0');
-  const dd = String(now.getDate()).padStart(2,'0');
-  const today = `${yyyy}-${mm}-${dd}`;
-  t.value = today;
-  t.min = today;
-  t.max = today;
-  t.addEventListener("change", function(){ this.value = today; });
-})();
-
-/* Batas waktu laporan jam 15:00 */
-(function(){
-  const btn = document.getElementById("btnSimpan");
-  function cekBatasWaktu(){
-    const now = new Date();
-    const jam = now.getHours();
-    const menit = now.getMinutes();
-    if (jam > 15 || (jam === 15 && menit > 0)) {
-      btn.disabled = true;
-      btn.innerText = "⏰ Waktu Laporan Sudah Lewat";
-      alert("Waktu pelaporan hari ini sudah lewat. Silakan melaporkan besok hari.");
+  fetch(SCRIPT_URL, {method:"POST", body:data})
+  .then(r=>r.text())
+  .then(r=>{
+    if(r=="OK"){
+      alert("✅ Berhasil disimpan");
+      location.reload();
+    } else {
+      alert("❌ "+r);
+      btnSimpan.disabled = false;
+      btnSimpan.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Data LTT`;
     }
+  });
+}
+
+// ================= BATAS JAM 15:00
+(function(){
+  const now = new Date();
+  const btnSimpan = document.getElementById("btnSimpan");
+  if(now.getHours() >= 15){
+    btnSimpan.disabled = true;
+    btnSimpan.innerHTML = `<i class="fa-solid fa-clock"></i> Lewat Jam 15:00`;
   }
-  cekBatasWaktu();
 })();
 </script>
 
