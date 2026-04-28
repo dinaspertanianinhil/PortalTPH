@@ -4,144 +4,635 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Guest – Sistem Laporan Dinas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * {
+    :root {
+      --green-primary: #1db972;
+      --green-dark: #0f7a4a;
+      --green-glow: rgba(29, 185, 114, 0.35);
+      --green-soft: rgba(29, 185, 114, 0.12);
+      --red-primary: #ff4757;
+      --red-dark: #c0392b;
+      --red-glow: rgba(255, 71, 87, 0.3);
+      --glass-bg: rgba(255, 255, 255, 0.07);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --glass-hover: rgba(255, 255, 255, 0.12);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255,255,255,0.72);
+      --text-muted: rgba(255,255,255,0.45);
+      --shadow-card: 0 24px 60px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.3);
+      --shadow-btn: 0 8px 24px rgba(0,0,0,0.25);
+      --radius-card: 28px;
+      --radius-btn: 14px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    *, *::before, *::after {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: "Segoe UI", sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
-      background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.55)),
+      font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+      background: linear-gradient(
+          135deg,
+          rgba(0, 0, 0, 0.65) 0%,
+          rgba(5, 40, 22, 0.55) 40%,
+          rgba(0, 0, 0, 0.70) 100%
+        ),
         url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png")
-        no-repeat center / cover;
+        no-repeat center / cover fixed;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      color: #fff;
+      color: var(--text-primary);
+      overflow-x: hidden;
     }
 
+    /* Vignette overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(
+        ellipse at center,
+        transparent 40%,
+        rgba(0,0,0,0.45) 100%
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Noise grain texture */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.6;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== HEADER ===== */
     header {
-      background: rgba(0,0,0,0.45);
-      padding: 20px 10px;
-      text-align: center;
-      font-size: 1.15em;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(5, 20, 12, 0.55);
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 68px;
+      animation: slideDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--green-primary), #0f8a42);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 16px var(--green-glow);
+      flex-shrink: 0;
+    }
+
+    .header-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header-title {
+      font-size: 0.95em;
       font-weight: 700;
-      letter-spacing: 0.4px;
-      backdrop-filter: blur(6px);
+      letter-spacing: 0.8px;
+      color: var(--text-primary);
+      line-height: 1.2;
+      text-transform: uppercase;
     }
 
-    header small {
-      display: block;
-      font-size: 0.82em;
+    .header-sub {
+      font-size: 0.72em;
       font-weight: 400;
-      opacity: 0.9;
-      margin-top: 3px;
+      color: var(--text-secondary);
+      margin-top: 1px;
+      letter-spacing: 0.2px;
     }
 
+    .header-badge {
+      background: var(--green-soft);
+      border: 1px solid rgba(29, 185, 114, 0.3);
+      color: var(--green-primary);
+      font-size: 0.7em;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    /* ===== MAIN ===== */
     main {
       flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 40px 15px;
+      padding: 48px 16px;
+      position: relative;
+      z-index: 1;
     }
 
+    /* ===== CARD ===== */
     .card {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      backdrop-filter: blur(10px);
-      padding: 45px 40px;
-      border-radius: 22px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      padding: 48px 40px 44px;
+      border-radius: var(--radius-card);
       width: 100%;
-      max-width: 380px;
+      max-width: 420px;
       text-align: center;
-      animation: fade 0.6s ease;
+      box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.1);
+      animation: fadeUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.15s both;
+      position: relative;
+      overflow: hidden;
     }
 
-    @keyframes fade {
-      from { opacity: 0; transform: translateY(14px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* Card top accent line */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--green-primary), transparent);
+      border-radius: 0 0 2px 2px;
+    }
+
+    /* Card ambient glow */
+    .card::after {
+      content: '';
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 120px;
+      background: radial-gradient(ellipse, rgba(29,185,114,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Card icon */
+    .card-icon-wrap {
+      width: 62px;
+      height: 62px;
+      background: linear-gradient(135deg, rgba(29,185,114,0.2), rgba(29,185,114,0.08));
+      border: 1px solid rgba(29,185,114,0.3);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin: 0 auto 22px;
+      box-shadow: 0 8px 24px rgba(29,185,114,0.2);
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 8px 24px rgba(29,185,114,0.2); }
+      50% { box-shadow: 0 8px 32px rgba(29,185,114,0.4); }
     }
 
     h2 {
-      font-size: 1.55em;
-      margin-bottom: 12px;
-      font-weight: 700;
-      color: #fff;
+      font-size: 1.5em;
+      margin-bottom: 8px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+      line-height: 1.25;
     }
 
     p {
-      font-size: 0.95em;
-      margin-bottom: 28px;
-      opacity: 0.92;
+      font-size: 0.88em;
+      margin-bottom: 32px;
+      color: var(--text-muted);
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    p::before {
+      content: '●';
+      color: var(--green-primary);
+      font-size: 8px;
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      opacity: 0.5;
+    }
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.15);
+    }
+    .divider-text {
+      font-size: 0.7em;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     button {
       width: 100%;
-      padding: 13px;
-      background: #1c8a58;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, var(--green-dark) 0%, #1a9e5f 50%, var(--green-primary) 100%);
       color: #fff;
-      border: none;
-      border-radius: 10px;
+      border: 1px solid rgba(29,185,114,0.35);
+      border-radius: var(--radius-btn);
+      font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
       font-weight: 600;
-      font-size: 15px;
+      font-size: 14px;
       cursor: pointer;
-      transition: 0.25s ease;
-      margin-top: 10px;
+      transition: var(--transition);
+      box-shadow: var(--shadow-btn), 0 2px 8px var(--green-glow);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      letter-spacing: 0.2px;
+    }
+
+    /* Shimmer on hover */
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transition: left 0.45s ease;
+    }
+
+    button:hover::before {
+      left: 140%;
     }
 
     button:hover {
-      background: #23a76a;
-      transform: translateY(-2px);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 32px rgba(0,0,0,0.3), 0 4px 16px var(--green-glow);
+      border-color: rgba(29,185,114,0.5);
+    }
+
+    button:active {
+      transform: translateY(-1px);
+      transition: all 0.1s;
+    }
+
+    .btn-icon {
+      font-size: 15px;
+      flex-shrink: 0;
     }
 
     .logoutBtn {
-      background: #e12f2f;
+      background: linear-gradient(135deg, #8b1a1a 0%, #c0392b 50%, var(--red-primary) 100%);
+      border-color: rgba(255,71,87,0.35);
+      box-shadow: var(--shadow-btn), 0 2px 8px var(--red-glow);
+      margin-top: 8px;
     }
 
     .logoutBtn:hover {
-      background: #ff4b4b;
+      box-shadow: 0 14px 32px rgba(0,0,0,0.3), 0 4px 16px var(--red-glow);
+      border-color: rgba(255,71,87,0.5);
     }
 
+    /* ===== FOOTER ===== */
     footer {
+      position: relative;
+      z-index: 1;
       text-align: center;
-      font-size: 0.82em;
-      padding: 12px;
-      background: rgba(0,0,0,0.55);
-      backdrop-filter: blur(6px);
+      font-size: 0.78em;
+      padding: 16px 20px;
+      background: rgba(0, 0, 0, 0.35);
+      border-top: 1px solid rgba(255,255,255,0.07);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: var(--text-muted);
+      letter-spacing: 0.2px;
+      font-weight: 400;
+    }
+
+    footer span {
+      color: var(--green-primary);
+      font-weight: 600;
+    }
+
+    /* ===== AUDIO INDICATOR ===== */
+    .audio-indicator {
+      position: fixed;
+      bottom: 60px;
+      right: 18px;
+      z-index: 200;
+      background: rgba(5, 20, 12, 0.7);
+      border: 1px solid rgba(29,185,114,0.3);
+      backdrop-filter: blur(12px);
+      border-radius: 40px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .audio-indicator:hover {
+      background: rgba(5, 20, 12, 0.9);
+      border-color: rgba(29,185,114,0.5);
+    }
+
+    .audio-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 16px;
+    }
+
+    .audio-bar {
+      width: 3px;
+      background: var(--green-primary);
+      border-radius: 2px;
+      animation: audioBar 1.2s ease-in-out infinite;
+    }
+
+    .audio-bar:nth-child(1) { animation-delay: 0s; height: 6px; }
+    .audio-bar:nth-child(2) { animation-delay: 0.2s; height: 12px; }
+    .audio-bar:nth-child(3) { animation-delay: 0.4s; height: 8px; }
+    .audio-bar:nth-child(4) { animation-delay: 0.1s; height: 14px; }
+    .audio-bar:nth-child(5) { animation-delay: 0.3s; height: 6px; }
+
+    @keyframes audioBar {
+      0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+      50% { transform: scaleY(1.2); opacity: 1; }
+    }
+
+    .audio-indicator.paused .audio-bar {
+      animation: none;
+      transform: scaleY(0.4);
+      opacity: 0.4;
+    }
+
+    .audio-label {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 0.7em;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Staggered button animation */
+    .btn-group button:nth-child(1) { animation: fadeUp 0.5s ease 0.4s both; }
+    .btn-group button:nth-child(2) { animation: fadeUp 0.5s ease 0.5s both; }
+    .btn-group button:nth-child(3) { animation: fadeUp 0.5s ease 0.6s both; }
+    .btn-group button:nth-child(4) { animation: fadeUp 0.5s ease 0.7s both; }
+    .btn-group button:nth-child(5) { animation: fadeUp 0.5s ease 0.85s both; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 480px) {
+      header {
+        padding: 0 16px;
+        min-height: 60px;
+      }
+
+      .header-logo {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+      }
+
+      .header-title {
+        font-size: 0.82em;
+      }
+
+      .header-sub {
+        font-size: 0.65em;
+      }
+
+      .header-badge {
+        font-size: 0.62em;
+        padding: 3px 9px;
+      }
+
+      main {
+        padding: 32px 12px;
+        align-items: flex-start;
+        padding-top: 36px;
+      }
+
+      .card {
+        padding: 36px 24px 32px;
+        border-radius: 22px;
+      }
+
+      h2 {
+        font-size: 1.25em;
+      }
+
+      button {
+        font-size: 13px;
+        padding: 13px 16px;
+      }
+
+      .audio-indicator {
+        bottom: 52px;
+        right: 12px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .header-badge { display: none; }
+      .card { padding: 28px 18px 26px; }
     }
   </style>
 </head>
 <body>
+
+  <!-- Audio element -->
+  <audio id="bgAudio"preload="auto">
+    <source src="https://raw.githubusercontent.com/dinaspertanianinhil/PortalTPH/refs/heads/main/ElevenLabs_2026-04-09T08_28_50_Kanna%20-%20Warm%2C%20Calm%20and%20Clear_pvc_sp100_s50_sb75_se0_b_m2.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Audio indicator button -->
+  <div class="audio-indicator paused" id="audioToggle" title="Klik untuk memutar/pause audio">
+    <div class="audio-bars">
+      <div class="audio-bar"></div>
+      <div class="audio-bar"></div>
+      <div class="audio-bar"></div>
+      <div class="audio-bar"></div>
+      <div class="audio-bar"></div>
+    </div>
+    <span class="audio-label">AUDIO</span>
+  </div>
+
   <header>
-    DASHBOARD GUEST
-    <small>Akses Data Stok • Produksi • Harga</small>
+    <div class="header-brand">
+      <div class="header-logo">🌾</div>
+      <div class="header-text">
+        <div class="header-title">Dashboard Guest</div>
+        <div class="header-sub">Akses Data Stok • Produksi • Harga</div>
+      </div>
+    </div>
+    <div class="header-badge">● Online</div>
   </header>
 
   <main>
     <div class="card">
-      <h2>📊 Pilih Data yang Ingin Dilihat</h2>
+      <div class="card-icon-wrap">📊</div>
+      <h2>Pilih Data yang Ingin Dilihat</h2>
       <p>Anda login sebagai Guest</p>
 
-      <button onclick="location.href='tampil.html'">Lihat Produksi Beras</button>
-      <button onclick="location.href='Tampilhorti.html'">Lihat Data Hortikultura</button>
-      <button onclick="location.href='Tampilltt.html'">Lihat Data Luas Tambah Tanam (LTT)</button>
-      <button onclick="location.href='tampilopt.html'">Lihat Data Serangan Hama</button>
-      <button class="logoutBtn" onclick="logout()">Logout</button>
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">Menu Akses</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <div class="btn-group">
+        <button onclick="location.href='tampil.html'">
+          <span class="btn-icon">🌾</span>
+          Lihat Produksi Beras
+        </button>
+        <button onclick="location.href='Tampilhorti.html'">
+          <span class="btn-icon">🥬</span>
+          Lihat Data Hortikultura
+        </button>
+        <button onclick="location.href='Tampilltt.html'">
+          <span class="btn-icon">🗺️</span>
+          Lihat Data Luas Tambah Tanam (LTT)
+        </button>
+        <button onclick="location.href='tampilopt.html'">
+          <span class="btn-icon">🐛</span>
+          Lihat Data Serangan Hama
+        </button>
+        <button class="logoutBtn" onclick="logout()">
+          <span class="btn-icon">🚪</span>
+          Logout
+        </button>
+      </div>
     </div>
   </main>
 
   <footer>
-    © 2025 Dinas Pertanian – Kabupaten Indragiri Hilir
+    © 2025 <span>Dinas Pertanian</span> – Kabupaten Indragiri Hilir
   </footer>
 
   <script>
+    /* ===== LOGOUT ===== */
     function logout() {
       localStorage.removeItem("loginUser");
       window.location.href = "index.html";
     }
+
+    /* ===== AUDIO AUTOPLAY WITH FALLBACK ===== */
+    const audio = document.getElementById('bgAudio');
+    const toggle = document.getElementById('audioToggle');
+    let audioStarted = false;
+
+    audio.volume = 0.90;
+
+    function startAudio() {
+      if (!audioStarted) {
+        audio.play().then(() => {
+          audioStarted = true;
+          toggle.classList.remove('paused');
+        }).catch(() => {});
+      }
+    }
+
+    // Try autoplay immediately
+    audio.play().then(() => {
+      audioStarted = true;
+      toggle.classList.remove('paused');
+    }).catch(() => {
+      // Autoplay blocked — wait for first user interaction
+      const unlockAudio = () => {
+        startAudio();
+        document.removeEventListener('click', unlockAudio);
+        document.removeEventListener('touchstart', unlockAudio);
+      };
+      document.addEventListener('click', unlockAudio);
+      document.addEventListener('touchstart', unlockAudio);
+    });
+
+    // Toggle audio on indicator click
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (audio.paused) {
+        audio.play().then(() => {
+          toggle.classList.remove('paused');
+          audioStarted = true;
+        });
+      } else {
+        audio.pause();
+        toggle.classList.add('paused');
+      }
+    });
   </script>
 </body>
 </html>
