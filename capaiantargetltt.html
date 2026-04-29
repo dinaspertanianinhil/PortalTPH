@@ -9,9 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root {
-    --primary: #1b5e20;
-}
+:root { --primary: #1b5e20; }
 
 body {
     margin:0;
@@ -35,13 +33,9 @@ header {
 
 header img { width:45px; }
 
-.container {
-    padding:25px 5%;
-}
+.container { padding:25px 5%; }
 
-.filter-box {
-    margin-bottom:15px;
-}
+.filter-box { margin-bottom:15px; }
 
 .filter-box input {
     padding:10px;
@@ -66,7 +60,6 @@ header img { width:45px; }
 .card h3 {
     font-size:0.85rem;
     color:#64748b;
-    margin:0;
 }
 
 .card p {
@@ -105,7 +98,6 @@ header img { width:45px; }
     display:flex;
     justify-content:space-between;
     font-size:12px;
-    font-weight:500;
 }
 
 .bar{
@@ -120,7 +112,6 @@ header img { width:45px; }
 
 @media(max-width:768px){
     .capaian-area{ flex-direction:column; }
-    .chart-area{ height:280px; }
 }
 </style>
 </head>
@@ -130,52 +121,40 @@ header img { width:45px; }
 <div class="overlay">
 
 <header>
-    <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png">
-    <div>
-        <b>Bidang Tanaman Pangan dan Hortikultura</b><br>
-        <small>Dinas Pertanian Kabupaten Indragiri Hilir</small>
-    </div>
+<img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png">
+<div>
+<b>Bidang Tanaman Pangan dan Hortikultura</b><br>
+<small>Dinas Pertanian Kabupaten Indragiri Hilir</small>
+</div>
 </header>
 
 <div class="container">
 
 <div class="filter-box">
-    <input type="month" id="filterBulan" onchange="setMonth(this.value)">
+<input type="month" id="filterBulan" onchange="setMonth(this.value)">
 </div>
 
 <div class="cards">
-    <div class="card">
-        <h3>Total Target</h3>
-        <p id="totalTarget">0</p>
-    </div>
-    <div class="card">
-        <h3>Total Realisasi</h3>
-        <p id="totalRealisasi">0</p>
-    </div>
-    <div class="card">
-        <h3>Capaian (%)</h3>
-        <p id="persenCapaian">0%</p>
-    </div>
+<div class="card"><h3>Total Target</h3><p id="totalTarget">0</p></div>
+<div class="card"><h3>Total Realisasi</h3><p id="totalRealisasi">0</p></div>
+<div class="card"><h3>Capaian (%)</h3><p id="persenCapaian">0%</p></div>
 </div>
 
 <div class="capaian-area">
+<div class="list-area">
+<div class="list-frame" id="listCapaian"></div>
+</div>
 
-    <div class="list-area">
-        <div class="list-frame" id="listCapaian"></div>
-    </div>
-
-    <div class="chart-area">
-        <canvas id="chartBatang"></canvas>
-    </div>
-
+<div class="chart-area">
+<canvas id="chartBatang"></canvas>
+</div>
 </div>
 
 </div>
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbxbJi4xJw30r7iGXd9i9cq3HAdiotpTEuVE-0k00m5wYzm2OeSfy8-rjyh3_FoaI4WS/exec";
-const API_TARGET = API + "?type=target";
+const API = "https://script.google.com/macros/s/AKfycbxeBdznULEYyYf0DiokNjYaoG-VJURjT2QhKyiXat65TSSzpv1Dqu69gYgAXpluKsE/exec";
 
 let realisasi = [];
 let target = [];
@@ -183,16 +162,32 @@ let selectedMonth = "";
 let chart;
 
 // ===== HELPER =====
-function getMonth(tgl){
-    return tgl?.toString().slice(0,7) || "";
-}
-
 function safeNumber(val){
-    return Number(String(val).replace(",", ".")) || 0;
+    if(typeof val === "number") return val;
+
+    let str = String(val).trim();
+
+    // kalau ada koma → format indo
+    if(str.includes(",")){
+        str = str.replace(/\./g,"").replace(",",".");
+    }
+
+    return Number(str) || 0;
 }
 
-function format2(n){
-    return Number(n).toFixed(2);
+// 🔥 FIX TANGGAL SUPER AMAN
+function getMonth(tgl){
+    if(!tgl) return "";
+
+    // kalau sudah string yyyy-mm-dd
+    if(String(tgl).includes("-")){
+        return String(tgl).slice(0,7);
+    }
+
+    let d = new Date(tgl);
+    if(isNaN(d)) return "";
+
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
 }
 
 function namaBulanToNumber(nama){
@@ -206,33 +201,41 @@ function namaBulanToNumber(nama){
 
 // ===== LOAD =====
 async function load(){
+  try{
     const r1 = await fetch(API);
-    const r2 = await fetch(API_TARGET);
+    const r2 = await fetch(API+"?type=target");
+
+    if(!r1.ok || !r2.ok){
+      throw new Error("Fetch gagal");
+    }
 
     realisasi = await r1.json();
     target = await r2.json();
 
-    const now = new Date().toISOString().slice(0,7);
-    document.getElementById("filterBulan").value = now;
-    selectedMonth = now;
+    if(!Array.isArray(realisasi) || !Array.isArray(target)){
+      throw new Error("Format data salah");
+    }
+
+    const lastMonth = realisasi
+      .map(d => getMonth(d.TANGGAL))
+      .filter(x => x)
+      .sort()
+      .pop();
+
+    selectedMonth = lastMonth;
+    document.getElementById("filterBulan").value = lastMonth;
 
     render();
+
+  } catch(err){
+    alert("❌ Data gagal dimuat\n" + err.message);
+    console.error(err);
+  }
 }
 
 function setMonth(val){
     selectedMonth = val;
     render();
-}
-
-function filterData(data){
-    if(!selectedMonth){
-    // ambil bulan terakhir dari data
-    const lastMonth = data
-        .map(d => getMonth(d.TANGGAL))
-        .sort()
-        .pop();
-
-    return data.filter(d => getMonth(d.TANGGAL) === lastMonth);
 }
 
 // ===== RENDER =====
@@ -241,45 +244,59 @@ function render(){
     let realMap = {};
     let targetMap = {};
 
-    // REALISASI
-    filterData(realisasi).forEach(d=>{
-        const k = d.KECAMATAN.toUpperCase();
+    if(!selectedMonth){
+        document.getElementById("listCapaian").innerHTML = "Tidak ada data";
+        return;
+    }
+
+    // ===== REALISASI =====
+    realisasi
+    .filter(d => getMonth(d.TANGGAL) === selectedMonth)
+    .forEach(d=>{
+        let k = (d.KECAMATAN || "").toUpperCase();
         realMap[k] = (realMap[k]||0) + safeNumber(d["LUAS TAMBAH TANAM"]);
     });
 
-    // TARGET (SUDAH PER BULAN)
+    // ===== TARGET =====
+    if(selectedMonth){
+
     target.forEach(d=>{
-        const k = d.KECAMATAN.toUpperCase();
 
-        let bulanData = namaBulanToNumber(d.BULAN);
-        if(!bulanData) return;
+        let bulan = namaBulanToNumber(d.BULAN);
+        let gabung = d.TAHUN + "-" + bulan;
 
-        let tahunData = String(d.TAHUN);
-        let gabung = tahunData + "-" + bulanData;
+        if(gabung === selectedMonth){
 
-        if(!selectedMonth || selectedMonth === gabung){
+            let k = d.KECAMATAN.toUpperCase();
             targetMap[k] = (targetMap[k]||0) + safeNumber(d["TARGET"]);
         }
+
     });
+
+} else {
+
+    // tanpa filter = total setahun
+    target.forEach(d=>{
+        let k = d.KECAMATAN.toUpperCase();
+        targetMap[k] = (targetMap[k]||0) + safeNumber(d["TARGET"]);
+    });
+
+}
 
     let totalR = Object.values(realMap).reduce((a,b)=>a+b,0);
     let totalT = Object.values(targetMap).reduce((a,b)=>a+b,0);
     let persen = totalT ? totalR/totalT*100 : 0;
 
-    document.getElementById("totalTarget").innerText = format2(totalT)+" Ha";
-    document.getElementById("totalRealisasi").innerText = format2(totalR)+" Ha";
+    document.getElementById("totalTarget").innerText = totalT.toFixed(2)+" Ha";
+    document.getElementById("totalRealisasi").innerText = totalR.toFixed(2)+" Ha";
+    document.getElementById("persenCapaian").innerText = persen.toFixed(2)+" %";
 
-    const el = document.getElementById("persenCapaian");
-    el.innerText = persen.toFixed(2)+" %";
-    el.style.color = persen>=80?"#16a34a":persen>=50?"#f59e0b":"#ef4444";
-
-    const container = document.getElementById("listCapaian");
+    let container = document.getElementById("listCapaian");
     container.innerHTML = "";
 
     let labels=[], tData=[], rData=[];
 
     Object.keys(targetMap).forEach(k=>{
-
         let r = realMap[k]||0;
         let t = targetMap[k]||0;
         let p = t ? r/t*100 : 0;
@@ -288,16 +305,14 @@ function render(){
         tData.push(t);
         rData.push(r);
 
-        let warna = p>=80?"#16a34a":p>=50?"#f59e0b":"#ef4444";
-
         container.innerHTML += `
         <div class="item">
             <div class="item-top">
                 <span>${k}</span>
-                <span>${format2(r)} / ${format2(t)} Ha (${p.toFixed(2)}%)</span>
+                <span>${r.toFixed(2)} / ${t.toFixed(2)} Ha (${p.toFixed(1)}%)</span>
             </div>
             <div class="bar">
-                <div class="fill" style="width:${p}%; background:${warna}"></div>
+                <div class="fill" style="width:${p}%;background:#1b5e20"></div>
             </div>
         </div>`;
     });
@@ -313,11 +328,7 @@ function render(){
                 {label:'Realisasi', data:rData}
             ]
         },
-        options:{
-            responsive:true,
-            maintainAspectRatio:false,
-            scales:{y:{beginAtZero:true}}
-        }
+        options:{responsive:true, maintainAspectRatio:false}
     });
 }
 
