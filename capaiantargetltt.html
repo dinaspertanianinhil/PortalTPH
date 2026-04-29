@@ -225,8 +225,14 @@ function setMonth(val){
 }
 
 function filterData(data){
-    if(!selectedMonth) return data;
-    return data.filter(d => getMonth(d.TANGGAL) === selectedMonth);
+    if(!selectedMonth){
+    // ambil bulan terakhir dari data
+    const lastMonth = data
+        .map(d => getMonth(d.TANGGAL))
+        .sort()
+        .pop();
+
+    return data.filter(d => getMonth(d.TANGGAL) === lastMonth);
 }
 
 // ===== RENDER =====
