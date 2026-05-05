@@ -1,261 +1,838 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Maintenance - Dinas Pertanian</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard LTT - Dinas Pertanian Inhil</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<style>
-:root {
-    --primary: #1b5e20;
-    --accent: #ff9800;
-    --bg-glass: rgba(255,255,255,0.9);
-    --shadow: 0 8px 25px rgba(0,0,0,0.08);
-    --radius: 14px;
+    <style>
+        :root {
+            --primary: #1b5e20;
+            --primary-light: #2e7d32;
+            --primary-gradient: linear-gradient(135deg, #1b5e20 0%, #43a047 100%);
+            --accent: #ff9800;
+            --bg-glass: rgba(255, 255, 255, 0.9);
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --text-main: #1a1a1a;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-rice-fields-with-green-rice-with-dew-and-mountains-image_15860694.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+       
+        .overlay {
+            background: rgba(248, 250, 252, 0.80);
+            min-height: 100vh;
+            backdrop-filter: blur(0,1px);
+        }
+
+        /* Header Modern */
+        header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px 5%;
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        header img {
+            width: 50px;
+            height: auto;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        header .title-area h1 {
+            font-size: 1.1rem;
+            margin: 0;
+            color: var(--primary);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        header .title-area p {
+            margin: 2px 0 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .container {
+            padding: 25px 5%;
+            max-width: 1400px;
+            margin: auto;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Notification Alert */
+        .infoNotif {
+            background: #fffbeb;
+            border-left: 4px solid var(--accent);
+            padding: 16px 45px 16px 20px;
+            margin-bottom: 25px;
+            border-radius: var(--radius);
+            position: relative;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-sm);
+            color: #92400e;
+            line-height: 1.5;
+        }
+
+        .infoNotif b { color: #b45309; }
+        
+        .closeNotif {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+
+        .closeNotif:hover { background: rgba(0,0,0,0.1); }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+            background: rgba(0,0,0,0.03);
+            padding: 6px;
+            border-radius: 14px;
+            width: fit-content;
+        }
+
+        .nav-tabs button {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-tabs button.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-tabs button:hover:not(.active) {
+            background: rgba(255,255,255,0.5);
+            color: var(--primary-light);
+        }
+
+        /* Statistics Cards */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+       @media (max-width: 500px) {
+    .cards {
+        grid-template-columns: 1fr;
+    }
+}
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .card p {
+            font-size: 1.8rem;
+            margin: 12px 0 0;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 60px; height: 60px;
+            background: var(--primary);
+            opacity: 0.03;
+            border-radius: 0 0 0 100%;
+        }
+
+        /* Layout Grid for Charts & Rankings */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 25px;
+        }
+
+        .chart-container h3 {
+            margin: 0 0 20px;
+            font-size: 1.1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rankbox {
+            background: white;
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            height: fit-content;
+        }
+
+        .rankbox h3 {
+            margin: 0 0 20px;
+            font-size: 1.1rem;
+            color: var(--primary);
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+        }
+
+        /* Ranking List Modern */
+        ol {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .rank-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            background: #f8fafc;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .rank-item:hover {
+            background: white;
+            border-color: var(--primary-light);
+            transform: scale(1.02);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .rank-item .rank-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rank-badge {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .top-1 .rank-badge { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
+        .top-2 .rank-badge { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+        .top-3 .rank-badge { background: #ffedd5; color: #9a3412; border: 1px solid #fdba74; }
+
+        .rank-value {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .input-control {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-control label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        select, input[type="date"] {
+            padding: 10px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+            background: #f8fafc;
+            min-width: 180px;
+        }
+
+        select:focus, input[type="date"]:focus {
+            border-color: var(--primary-light);
+            background: white;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 12px rgba(27, 94, 32, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(27, 94, 32, 0.3);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: #f1f8e9;
+        }
+
+        /* Table Modern */
+        .table-wrapper {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+.table-wrapper {
+    overflow-x: auto;
 }
 
-body {
-    margin:0;
-    font-family:'Plus Jakarta Sans', sans-serif;
-    background:url('https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-rice-fields-with-green-rice-with-dew-and-mountains-image_15860694.jpg');
-    background-size:cover;
-    background-attachment:fixed;
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px; /* ini penting */
 }
 
-.overlay {
-    background: rgba(248,250,252,0.85);
-    min-height:100vh;
-}
+        th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            padding: 16px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #edf2f7;
+            position: sticky;
+            top: 0;
+        }
 
-/* HEADER */
-header {
-    display:flex;
-    align-items:center;
-    gap:15px;
-    padding:15px 5%;
-    background:var(--bg-glass);
-    backdrop-filter:blur(10px);
-}
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+            color: #334155;
+        }
 
-header img { width:50px; }
+        tr:last-child td { border-bottom: none; }
 
-.title-area h1 {
-    margin:0;
-    font-size:1.1rem;
-    color:var(--primary);
-}
-.title-area p {
-    margin:0;
-    font-size:0.85rem;
-    color:#64748b;
-}
+        tr:hover td {
+            background: #f1f8e9;
+        }
 
-/* CONTAINER */
-.container {
-    max-width:900px;
-    margin:auto;
-    padding:40px 5%;
-    text-align:center;
-}
+        .badge-jenis {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
 
-/* CARD MAINTENANCE */
-.maintenance-box {
-    background:white;
-    padding:40px 25px;
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    animation:fadeIn 0.6s ease;
-}
+        .badge-reguler { background: #dcfce7; color: #166534; }
+        .badge-oplah { background: #dbeafe; color: #1e40af; }
+        .badge-jagung { background: #fef3c7; color: #92400e; }
 
-@keyframes fadeIn {
-    from {opacity:0; transform:translateY(10px);}
-    to {opacity:1; transform:translateY(0);}
-}
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            header h1 { font-size: 1rem; }
+        }
 
-.icon {
-    font-size:50px;
-    margin-bottom:15px;
-}
-
-h2 {
-    color:var(--primary);
-    margin-bottom:10px;
-}
-
-.desc {
-    color:#475569;
-    font-size:0.95rem;
-    line-height:1.6;
-    margin-bottom:25px;
-}
-
-/* INFO BOX */
-.note-box {
-    background:#fffbeb;
-    border-left:4px solid var(--accent);
-    padding:15px;
-    border-radius:10px;
-    text-align:left;
-    font-size:0.9rem;
-    color:#92400e;
-}
-
-/* CARDS SCORE */
-.cards {
-    margin-top:30px;
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
-    gap:15px;
-}
-
-.card {
-    background:white;
-    padding:20px;
-    border-radius:12px;
-    box-shadow:var(--shadow);
-}
-
-.card h3 {
-    margin:0;
-    font-size:0.8rem;
-    color:#64748b;
-    text-transform:uppercase;
-}
-
-.card p {
-    margin:10px 0 0;
-    font-size:1.5rem;
-    font-weight:700;
-    color:var(--primary);
-}
-
-.footer {
-    margin-top:25px;
-    font-size:0.8rem;
-    color:#64748b;
-}
-</style>
+        @media (max-width: 768px) {
+            .filter-section { flex-direction: column; align-items: stretch; }
+            .btn-group { flex-direction: column; }
+            .nav-tabs { width: 100%; overflow-x: auto; }
+            .cards { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="overlay">
+    <header>
+        <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png" alt="Logo Inhil">
+        <div class="title-area">
+            <h1>Bidang Tanaman Pangan dan Hortikultura</h1>
+            <p>Dinas Pertanian Kabupaten Indragiri Hilir</p>
+        </div>
+    </header>
 
-<header>
-    <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png">
-    <div class="title-area">
-        <h1>Bidang Tanaman Pangan dan Hortikultura</h1>
-        <p>Dinas Pertanian Kabupaten Indragiri Hilir</p>
+    <div class="container">
+        <!-- Notifikasi -->
+        <div id="notifInfo" class="infoNotif">
+            <span class="closeNotif" onclick="tutupNotif()">✕</span>
+            ⚠ <b>Informasi Penting:</b><br>
+Data <b>Final Luas Tambah Tanam (Harian)</b> ditetapkan setiap hari setelah pukul <b>15.00 WIB</b>, karena hingga waktu tersebut proses pengumpulan dan verifikasi data dari lapangan masih berlangsung.
+Data yang masuk sebelum pukul tersebut masih bersifat <b>sementara</b> dan dapat berubah sewaktu-waktu mengikuti pembaruan laporan.
+Penetapan setelah pukul <b>15.00 WIB</b> merupakan hasil rekapitulasi akhir yang telah divalidasi dan menjadi <b>acuan resmi pelaporan</b>.
+
+        </div>
+
+        <!-- Navigasi Tab -->
+        <div class="nav-tabs">
+            <button id="btn-dash" class="active" onclick="switchTab('dashboard')">
+                🏠 Dashboard Utama
+            </button>
+            <button id="btn-table" onclick="switchTab('tabel')">
+                📋 Data LTT Perhari
+            </button>
+            <button onclick="window.location.href='capaiantargetltt.html'">
+                📊 Progres Capaian LTT
+            </button>
+            <button onclick="window.location.href='Laporanbulananltt.html'">
+                📊 Data LTT Perbulan
+            </button>
+        <button onclick="window.location.href='analisispanen.html'">
+                📊 Analisis LTT dan Panen
+            </button>
+        </div>
+
+        <!-- PAGE: DASHBOARD -->
+        <div id="dashboardPage">
+            <div class="cards">
+                <div class="card"><h3>Total LTT Keseluruhan</h3><p id="totalLtt">0</p></div>
+                <div class="card"><h3>Total LTT Reguler</h3><p id="totalReguler">0</p></div>
+                <div class="card"><h3>Total LTT Oplah</h3><p id="totalOplah">0</p></div>
+                <div class="card"><h3>LTT Hari Ini</h3><p id="todayLtt" style="color: var(--accent);">0</p></div>
+            </div>
+            
+            <div class="cards" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div class="card" style="padding: 15px 20px;"><h3>Reguler Hari Ini</h3><p id="todayReguler" style="font-size: 1.4rem;">0</p></div>
+                <div class="card" style="padding: 15px 20px;"><h3>Oplah Hari Ini</h3><p id="todayOplah" style="font-size: 1.4rem;">0</p></div>
+                <div class="card" style="padding: 15px 20px;"><h3>Kecamatan Aktif</h3><p id="totalKec" style="font-size: 1.4rem;">0</p></div>
+                <div class="card" style="padding: 15px 20px;"><h3>Total Laporan</h3><p id="totalData" style="font-size: 1.4rem;">0</p></div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="main-charts">
+                    <div class="chart-container">
+                        <h3>📈 Grafik LTT per Kecamatan (Ha)</h3>
+                        <canvas id="chartKecamatan" height="120"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>🌽 Grafik Produksi Jagung (Ha)</h3>
+                        <canvas id="chartJagung" height="120"></canvas>
+                    </div>
+                </div>
+
+                <div class="rankings">
+                    <div class="rankbox" style="margin-bottom: 25px;">
+                        <h3>🏆 Top 10 Kecamatan (LTT)</h3>
+                        <div id="ranking"></div>
+                    </div>
+                    <div class="rankbox">
+                        <h3>🏆 Top Kecamatan (Jagung)</h3>
+                        <div id="rankingJagung"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE: TABEL REKAP -->
+        <div id="tablePage" style="display:none">
+            <div class="cards" style="margin-bottom: 25px;">
+                <div class="card"><h3>Rekap Reguler</h3><p id="scoreReguler">0 Ha</p></div>
+                <div class="card"><h3>Rekap Oplah</h3><p id="scoreOplah">0 Ha</p></div>
+                <div class="card"><h3>Rekap Jagung</h3><p id="scoreJagung">0 Ha</p></div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-group">
+                    <div class="input-control">
+                        <label>Kecamatan</label>
+                        <select id="filterKecamatan"><option value="">Semua Kecamatan</option></select>
+                    </div>
+                    <div class="input-control">
+                        <label>Jenis LTT</label>
+                        <select id="filterJenis"><option value="">Semua Jenis</option></select>
+                    </div>
+                    <div class="input-control">
+                        <label>Tanggal</label>
+                        <input type="date" id="filterTanggal">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-outline" onclick="downloadExcel()">📗 Export Excel</button>
+                    <button class="btn btn-primary" onclick="downloadPDF()">📕 Export PDF</button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="tableData">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Kecamatan</th>
+                            <th>Desa/Kelurahan</th>
+                            <th>Kelompok Tani</th>
+                            <th>Jenis LTT</th>
+                            <th>Luas (Ha)</th>
+                            <th>Nama Pelapor</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</header>
-
-<div class="container">
-
-    <div class="maintenance-box">
-        <div class="icon">🛠️</div>
-
-        <h2>Dashboard Sedang Dalam Pemeliharaan</h2>
-
-        <div class="desc">
-            Dashboard saat ini sedang dalam proses <b>sinkronisasi dan penyesuaian data</b> antara sistem Kementan dengan laporan penyuluh di lapangan.
-            <br><br>
-            Proses ini dilakukan untuk memastikan bahwa data yang disajikan memiliki tingkat <b>akurasi, konsistensi, dan validitas yang lebih baik</b>, sehingga dapat digunakan sebagai <b>acuan resmi dalam penyusunan laporan akhir</b>.
-        </div>
-
-        <div class="note-box">
-    ⚠ <b>Catatan:</b><br>
-Sehubungan dengan data rekapitulasi yang belum tersedia secara lengkap, proses pemeliharaan dan sinkronisasi sistem diperpanjang hingga tanggal <b>6 Mei 2026</b>.<br><br>
-
-    Selama periode tersebut, <b>data harian tetap dapat dipantau</b> melalui indikator ringkasan yang tersedia.<br><br>
-
-    Perlu diperhatikan bahwa data yang ditampilkan <b>sebelum pukul 15.00 WIB</b> masih dalam proses pengumpulan dan verifikasi. 
-    Data <b>final harian</b> ditetapkan setelah pukul <b>15.00 WIB</b> dan menjadi <b>acuan resmi dalam pelaporan</b>.<br><br>
-
-    Dashboard akan kembali beroperasi secara penuh setelah proses sinkronisasi selesai.<br><br>
-
-    Atas perhatian dan kerja sama yang diberikan, terima kasih.
-</div>
-
-        <!-- SCORE HARIAN TETAP MUNCUL -->
-        <div class="cards">
-            <div class="card">
-                <h3>Total LTT Hari Ini</h3>
-                <p id="todayLtt">0 Ha</p>
-            </div>
-            <div class="card">
-                <h3>Reguler Hari Ini</h3>
-                <p id="todayReguler">0 Ha</p>
-            </div>
-            <div class="card">
-                <h3>Oplah Hari Ini</h3>
-                <p id="todayOplah">0 Ha</p>
-            </div>
-        </div>
-
-        <div class="footer">
-            Update terakhir: <span id="lastUpdate">-</span>
-        </div>
-
-    </div>
-
-</div>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbz9BbxHtegnOrlIdwMBjsRRfK1weywnjIXnbX4YgGY-F6egmvMFUO3pqZ5CAXg99ac/exec";
+    // --- KONFIGURASI & VARIABEL UTAMA (TIDAK DIUBAH) ---
+    const API_URL = "https://script.google.com/macros/s/AKfycbz9BbxHtegnOrlIdwMBjsRRfK1weywnjIXnbX4YgGY-F6egmvMFUO3pqZ5CAXg99ac/exec";
+    let rawData = [];
+    let chartMain;
+    let chartJagung;
 
-function safeNumber(val){
-    return parseFloat((val + "").replace(",", ".")) || 0;
-}
+    function tutupNotif() {
+        const notif = document.getElementById("notifInfo");
+        notif.style.opacity = "0";
+        setTimeout(() => notif.style.display = "none", 300);
+    }
 
-function formatDate(date){
-    return date.toISOString().slice(0,10);
-}
+    function switchTab(page) {
+        document.getElementById("dashboardPage").style.display = page === "dashboard" ? "block" : "none";
+        document.getElementById("tablePage").style.display = page === "tabel" ? "block" : "none";
+        
+        document.getElementById("btn-dash").classList.toggle("active", page === "dashboard");
+        document.getElementById("btn-table").classList.toggle("active", page === "tabel");
+    }
 
-async function loadData(){
-    try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
+    // Fungsi utilitas data
+    function safeNumber(val) {
+        return parseFloat((val + "").replace(",", ".")) || 0;
+    }
 
-        const today = formatDate(new Date());
+    function fix(n) {
+        return Math.round(n * 100) / 100;
+    }
 
-        let total = 0;
-        let reguler = 0;
-        let oplah = 0;
+    function formatDate(date) {
+        if (!date) return "";
+        return date.toString().slice(0, 10);
+    }
+
+    // --- LOGIKA DATA ---
+    async function loadData() {
+        try {
+            const res = await fetch(API_URL);
+            rawData = await res.json();
+            rawData.forEach(d => d.TANGGAL = formatDate(d.TANGGAL));
+            initFilter();
+            render();
+        } catch (e) {
+            console.error("Gagal memuat data:", e);
+        }
+    }
+
+    function initFilter() {
+        let kecSet = new Set();
+        let jenisSet = new Set();
+
+        rawData.forEach(d => {
+            if(d.KECAMATAN) kecSet.add(d.KECAMATAN);
+            if(d["JENIS LTT"]) jenisSet.add(d["JENIS LTT"]);
+        });
+
+        const selKec = document.getElementById("filterKecamatan");
+        const selJenis = document.getElementById("filterJenis");
+
+        kecSet.forEach(k => selKec.innerHTML += `<option value="${k}">${k}</option>`);
+        jenisSet.forEach(j => selJenis.innerHTML += `<option value="${j}">${j}</option>`);
+
+        selKec.onchange = render;
+        selJenis.onchange = render;
+        document.getElementById("filterTanggal").onchange = render;
+    }
+
+    function render() {
+        const kecFilter = document.getElementById("filterKecamatan").value;
+        const tglFilter = document.getElementById("filterTanggal").value;
+        const jenisFilter = document.getElementById("filterJenis").value;
+
+        const data = rawData.filter(d => {
+            let match = true;
+            if (kecFilter && d.KECAMATAN !== kecFilter) match = false;
+            if (tglFilter && d.TANGGAL !== tglFilter) match = false;
+            if (jenisFilter && d["JENIS LTT"] !== jenisFilter) match = false;
+            return match;
+        });
+
+        let stats = {
+            total: 0, today: 0,
+            reg: 0, oplah: 0, jagung: 0,
+            t_reg: 0, t_oplah: 0,
+            kecMap: {}, jagungMap: {}
+        };
+
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const tbody = document.querySelector("#tableData tbody");
+        tbody.innerHTML = "";
 
         data.forEach(d => {
-            let tgl = (d.TANGGAL || "").toString().slice(0,10);
-            let luas = safeNumber(d["LUAS TAMBAH TANAM"]);
-            let jenis = (d["JENIS LTT"] || "").toLowerCase();
+            const luas = safeNumber(d["LUAS TAMBAH TANAM"]);
+            const jenis = (d["JENIS LTT"] || "").toLowerCase();
+            
+            stats.total = fix(stats.total + luas);
+            if (d.TANGGAL === todayStr) stats.today = fix(stats.today + luas);
 
-            if(tgl === today){
-                total += luas;
+            // Mapping per jenis
+            if (jenis.includes("jagung")) {
+                stats.jagung = fix(stats.jagung + luas);
+                stats.jagungMap[d.KECAMATAN] = fix((stats.jagungMap[d.KECAMATAN] || 0) + luas);
+            } else if (jenis.includes("reguler")) {
+                stats.reg = fix(stats.reg + luas);
+                if (d.TANGGAL === todayStr) stats.t_reg = fix(stats.t_reg + luas);
+            } else if (jenis.includes("oplah")) {
+                stats.oplah = fix(stats.oplah + luas);
+                if (d.TANGGAL === todayStr) stats.t_oplah = fix(stats.t_oplah + luas);
+            }
 
-                if(jenis.includes("reguler")){
-                    reguler += luas;
-                }
-                else if(jenis.includes("oplah")){
-                    oplah += luas;
+            stats.kecMap[d.KECAMATAN] = fix((stats.kecMap[d.KECAMATAN] || 0) + luas);
+
+            // Table Row
+            const tr = document.createElement("tr");
+            const badgeClass = jenis.includes("reguler") ? "badge-reguler" : (jenis.includes("oplah") ? "badge-oplah" : "badge-jagung");
+            tr.innerHTML = `
+                <td>${d.TANGGAL}</td>
+                <td style="font-weight:600">${d.KECAMATAN}</td>
+                <td>${d["DESA/KELURAHAN"]}</td>
+                <td>${d["KELOMPOK TANI"]}</td>
+                <td><span class="badge-jenis ${badgeClass}">${d["JENIS LTT"]}</span></td>
+                <td style="font-weight:700; color:var(--primary)">${luas.toFixed(2)}</td>
+                <td style="font-size:0.8rem">${d["NAMA PELAPOR"]}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Update UI Cards
+        document.getElementById("totalLtt").innerText = stats.total.toFixed(2) + " Ha";
+        document.getElementById("totalReguler").innerText = stats.reg.toFixed(2) + " Ha";
+        document.getElementById("totalOplah").innerText = stats.oplah.toFixed(2) + " Ha";
+        document.getElementById("todayLtt").innerText = stats.today.toFixed(2) + " Ha";
+        document.getElementById("todayReguler").innerText = stats.t_reg.toFixed(2) + " Ha";
+        document.getElementById("todayOplah").innerText = stats.t_oplah.toFixed(2) + " Ha";
+        document.getElementById("totalKec").innerText = Object.keys(stats.kecMap).length;
+        document.getElementById("totalData").innerText = data.length;
+
+        document.getElementById("scoreJagung").innerText = stats.jagung.toFixed(2) + " Ha";
+        document.getElementById("scoreReguler").innerText = stats.reg.toFixed(2) + " Ha";
+        document.getElementById("scoreOplah").innerText = stats.oplah.toFixed(2) + " Ha";
+
+        updateCharts(stats.kecMap, stats.jagungMap);
+        updateRankings(stats.kecMap, "ranking", "top");
+        updateRankings(stats.jagungMap, "rankingJagung", "jagung");
+    }
+
+    function updateCharts(kecData, jagungData) {
+        const ctxMain = document.getElementById("chartKecamatan").getContext("2d");
+        const ctxJagung = document.getElementById("chartJagung").getContext("2d");
+
+        const chartConfig = (labels, data, label) => ({
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    backgroundColor: '#2e7d32',
+                    borderRadius: 6,
+                    hoverBackgroundColor: '#1b5e20'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
                 }
             }
         });
 
-        // tampilkan
-        document.getElementById("todayLtt").innerText = total.toFixed(2) + " Ha";
-        document.getElementById("todayReguler").innerText = reguler.toFixed(2) + " Ha";
-        document.getElementById("todayOplah").innerText = oplah.toFixed(2) + " Ha";
+        if (chartMain) chartMain.destroy();
+        chartMain = new Chart(ctxMain, chartConfig(Object.keys(kecData), Object.values(kecData), "Luas LTT (Ha)"));
 
-        document.getElementById("lastUpdate").innerText =
-            new Date().toLocaleString("id-ID");
-
-    } catch(err){
-        console.error("Gagal ambil data:", err);
+        if (chartJagung) chartJagung.destroy();
+        chartJagung = new Chart(ctxJagung, chartConfig(Object.keys(jagungData), Object.values(jagungData), "Luas Jagung (Ha)"));
     }
-}
 
-loadData();
+    function updateRankings(data, elementId, type) {
+        const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]).slice(0, 10);
+        const container = document.getElementById(elementId);
+        container.innerHTML = "";
+
+        sorted.forEach((item, i) => {
+            const div = document.createElement("div");
+            div.className = `rank-item ${i < 3 ? 'top-' + (i + 1) : ''}`;
+            div.innerHTML = `
+                <div class="rank-info">
+                    <div class="rank-badge">${i + 1}</div>
+                    <span style="font-size:0.9rem; font-weight:600">${item[0]}</span>
+                </div>
+                <div class="rank-value">${item[1].toFixed(2)} Ha</div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // Export Functions
+    function downloadExcel() {
+        const table = document.getElementById("tableData");
+        const ws = XLSX.utils.table_to_sheet(table);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Data LTT");
+        XLSX.writeFile(wb, `Laporan_LTT_Inhil_${new Date().toLocaleDateString()}.xlsx`);
+    }
+
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('l', 'mm', 'a4');
+        doc.text("Laporan Luas Tambah Tanam (LTT) - Kab. Indragiri Hilir", 14, 15);
+        doc.autoTable({ 
+            html: '#tableData',
+            startY: 20,
+            theme: 'grid',
+            headStyles: { fillColor: [27, 94, 32] }
+        });
+        doc.save(`Laporan_LTT_Inhil.pdf`);
+    }
+
+    // Start
+    loadData();
 </script>
 
 </body>
