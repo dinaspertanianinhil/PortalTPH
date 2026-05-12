@@ -1,655 +1,675 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login – Sistem Laporan Dinas</title>
-  <link rel="icon" href="Logo-TPH.png" type="image/png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --green-primary: #1db972;
-      --green-dark: #0f7a4a;
-      --green-glow: rgba(29, 185, 114, 0.3);
-      --green-soft: rgba(29, 185, 114, 0.12);
-      --blue-primary: #2e7cf6;
-      --blue-dark: #1a5fd4;
-      --blue-glow: rgba(46, 124, 246, 0.3);
-      --glass-bg: rgba(255, 255, 255, 0.06);
-      --glass-border: rgba(255, 255, 255, 0.12);
-      --input-bg: rgba(255, 255, 255, 0.08);
-      --input-border: rgba(255, 255, 255, 0.18);
-      --text-primary: #ffffff;
-      --text-secondary: rgba(255,255,255,0.7);
-      --text-muted: rgba(255,255,255,0.42);
-      --shadow-card: 0 32px 72px rgba(0,0,0,0.45), 0 8px 28px rgba(0,0,0,0.35);
-      --shadow-btn: 0 8px 24px rgba(0,0,0,0.25);
-      --radius-card: 26px;
-      --radius-input: 13px;
-      --radius-btn: 13px;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-    *, *::before, *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<title>Bidang Tanaman Pangan & Hortikultura</title>
 
-    body {
-      font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
-      background:
-        linear-gradient(
-          150deg,
-          rgba(0,0,0,0.72) 0%,
-          rgba(4,35,18,0.60) 45%,
-          rgba(0,0,0,0.78) 100%
-        ),
-        url("https://assets.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p3/155/2025/04/10/Screen-Shot-2025-04-10-at-224530-3222523999.png")
-        no-repeat center / cover fixed;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      color: var(--text-primary);
-      overflow-x: hidden;
-    }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    /* Vignette */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(0,0,0,0.5) 100%);
-      pointer-events: none;
-      z-index: 0;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    /* Grain */
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-    }
+<style>
 
-    /* ===== HEADER ===== */
-    header {
-      position: relative;
-      z-index: 10;
-      background: rgba(3, 14, 8, 0.52);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      backdrop-filter: blur(22px) saturate(160%);
-      -webkit-backdrop-filter: blur(22px) saturate(160%);
-      padding: 20px 24px;
-      text-align: center;
-      animation: slideDown 0.65s cubic-bezier(0.4,0,0.2,1) both;
-    }
+:root{
+  --green:#2ed573;
+  --green2:#1db954;
+  --dark:#08140d;
+  --glass:rgba(255,255,255,0.08);
+  --border:rgba(255,255,255,0.12);
+  --text:#ffffff;
+  --soft:rgba(255,255,255,0.72);
+}
 
-    .header-inner {
-      max-width: 700px;
-      margin: 0 auto;
-    }
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
 
-    .header-logo-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 6px;
-    }
+body{
+  background:#08140d;
+  color:white;
+  overflow-x:hidden;
+}
 
-    .header-emblem {
-      width: 42px;
-      height: 42px;
-      background: linear-gradient(135deg, var(--green-primary), #0a6e3a);
-      border-radius: 11px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 4px 18px var(--green-glow);
-      flex-shrink: 0;
-    }
+/* BACKGROUND */
 
-    .header-title-block {
-      text-align: left;
-    }
+.hero{
+  position:relative;
+  min-height:100vh;
+  overflow:hidden;
+}
 
-    .header-title-top {
-      font-size: 0.78em;
-      font-weight: 700;
-      letter-spacing: 0.9px;
-      text-transform: uppercase;
-      color: var(--text-primary);
-      line-height: 1.3;
-    }
+.hero::before{
+  content:'';
+  position:absolute;
+  inset:0;
 
-    .header-title-bot {
-      font-size: 0.72em;
-      font-weight: 500;
-      color: var(--text-secondary);
-      letter-spacing: 0.3px;
-      margin-top: 1px;
-    }
+  background:
+  linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.55),
+    rgba(4,30,15,0.72)
+  ),
 
-    header small {
-      display: block;
-      font-size: 0.72em;
-      font-weight: 400;
-      color: var(--text-muted);
-      margin-top: 4px;
-      letter-spacing: 0.5px;
-    }
+  url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1920&auto=format&fit=crop')
+  center/cover no-repeat;
 
-    /* ===== MAIN ===== */
-    main {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 44px 16px;
-      position: relative;
-      z-index: 1;
-    }
+  animation:zoomBg 20s ease-in-out infinite alternate;
+}
 
-    /* ===== CARD ===== */
-    .card {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
-      padding: 48px 40px 44px;
-      border-radius: var(--radius-card);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.09);
-      animation: fadeUp 0.7s cubic-bezier(0.4,0,0.2,1) 0.12s both;
-      position: relative;
-      overflow: hidden;
-    }
+@keyframes zoomBg{
+  from{
+    transform:scale(1);
+  }
+  to{
+    transform:scale(1.08);
+  }
+}
 
-    /* Top accent */
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 18%;
-      right: 18%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--green-primary), transparent);
-    }
+/* GLOW */
 
-    /* Ambient glow */
-    .card::after {
-      content: '';
-      position: absolute;
-      top: -70px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 220px;
-      height: 130px;
-      background: radial-gradient(ellipse, rgba(29,185,114,0.13) 0%, transparent 70%);
-      pointer-events: none;
-    }
+.glow{
+  position:absolute;
+  width:500px;
+  height:500px;
+  border-radius:50%;
+  background:radial-gradient(circle,var(--green),transparent 70%);
+  filter:blur(120px);
+  opacity:0.18;
+}
 
-    /* Card icon */
-    .card-icon {
-      width: 58px;
-      height: 58px;
-      background: linear-gradient(135deg, rgba(29,185,114,0.18), rgba(29,185,114,0.07));
-      border: 1px solid rgba(29,185,114,0.28);
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      margin: 0 auto 20px;
-      box-shadow: 0 6px 20px rgba(29,185,114,0.18);
-      animation: softPulse 3.5s ease-in-out infinite;
-    }
+.glow1{
+  top:-120px;
+  right:-120px;
+}
 
-    @keyframes softPulse {
-      0%,100% { box-shadow: 0 6px 20px rgba(29,185,114,0.18); }
-      50% { box-shadow: 0 6px 28px rgba(29,185,114,0.36); }
-    }
+.glow2{
+  bottom:-160px;
+  left:-120px;
+}
 
-    h2 {
-      font-size: 1.45em;
-      margin-bottom: 7px;
-      font-weight: 800;
-      color: var(--text-primary);
-      letter-spacing: -0.3px;
-    }
+/* NAVBAR */
 
-    p {
-      font-size: 0.87em;
-      margin-bottom: 28px;
-      color: var(--text-muted);
-      font-weight: 400;
-    }
+.navbar{
+  position:fixed;
+  top:0;
+  width:100%;
+  z-index:100;
+  padding:20px 40px;
+}
 
-    /* ===== INPUTS ===== */
-    .inputBox {
-      margin-bottom: 13px;
-      position: relative;
-    }
+.navWrap{
+  backdrop-filter:blur(20px);
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:24px;
 
-    .icon {
-      position: absolute;
-      top: 50%;
-      left: 13px;
-      transform: translateY(-50%);
-      font-size: 15px;
-      pointer-events: none;
-      z-index: 1;
-      opacity: 0.75;
-    }
+  padding:18px 24px;
 
-    input {
-      width: 100%;
-      padding: 13px 16px 13px 42px;
-      border-radius: var(--radius-input);
-      border: 1px solid var(--input-border);
-      background: var(--input-bg);
-      color: var(--text-primary);
-      font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
-      font-size: 14px;
-      font-weight: 400;
-      outline: none;
-      transition: var(--transition);
-      caret-color: var(--green-primary);
-    }
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
 
-    input::placeholder {
-      color: var(--text-muted);
-      font-weight: 400;
-    }
+.logoArea{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
 
-    input:hover {
-      border-color: rgba(255,255,255,0.28);
-      background: rgba(255,255,255,0.11);
-    }
+.logo{
+  width:54px;
+  height:54px;
+  border-radius:16px;
 
-    input:focus {
-      border-color: rgba(29,185,114,0.7);
-      background: rgba(29,185,114,0.06);
-      box-shadow: 0 0 0 3px rgba(29,185,114,0.14), 0 4px 16px rgba(0,0,0,0.2);
-    }
+  background:linear-gradient(135deg,#44ff99,#1db954);
 
-    /* ===== BUTTONS ===== */
-    button {
-      width: 100%;
-      padding: 14px 20px;
-      background: linear-gradient(135deg, var(--green-dark) 0%, #17a35c 50%, var(--green-primary) 100%);
-      color: #fff;
-      border: 1px solid rgba(29,185,114,0.35);
-      border-radius: var(--radius-btn);
-      font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: var(--transition);
-      box-shadow: var(--shadow-btn), 0 2px 10px var(--green-glow);
-      position: relative;
-      overflow: hidden;
-      margin-top: 10px;
-      letter-spacing: 0.2px;
-    }
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
-    /* Shimmer sweep */
-    button::before {
-      content: '';
-      position: absolute;
-      top: 0; left: -100%;
-      width: 55%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
-      transition: left 0.5s ease;
-    }
+  font-size:26px;
 
-    button:hover::before { left: 145%; }
+  box-shadow:0 0 30px rgba(46,213,115,0.4);
+}
 
-    button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 16px 36px rgba(0,0,0,0.32), 0 4px 16px var(--green-glow);
-      border-color: rgba(29,185,114,0.55);
-    }
+.logoText h2{
+  font-size:16px;
+  font-weight:800;
+}
 
-    button:active {
-      transform: translateY(-1px);
-      transition: all 0.08s;
-    }
+.logoText p{
+  font-size:12px;
+  color:rgba(255,255,255,0.7);
+}
 
-    button:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-      transform: none;
-    }
+/* HERO CONTENT */
 
-    .guestBtn {
-      background: linear-gradient(135deg, #1450b0 0%, #1e6ae0 50%, var(--blue-primary) 100%);
-      border-color: rgba(46,124,246,0.35);
-      box-shadow: var(--shadow-btn), 0 2px 10px var(--blue-glow);
-      margin-top: 9px;
-    }
+.heroContent{
+  position:relative;
+  z-index:5;
 
-    .guestBtn:hover {
-      box-shadow: 0 16px 36px rgba(0,0,0,0.32), 0 4px 16px var(--blue-glow);
-      border-color: rgba(46,124,246,0.55);
-    }
+  min-height:100vh;
 
-    /* Divider */
-    .or-divider {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 4px 0 0;
-      opacity: 0.45;
-    }
-    .or-line { flex: 1; height: 1px; background: rgba(255,255,255,0.2); }
-    .or-text { font-size: 0.68em; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); }
+  display:flex;
+  align-items:center;
 
-    /* ===== ERROR ===== */
-    .error {
-      margin-top: 14px;
-      font-size: 0.84em;
-      min-height: 22px;
-      color: #ff8080;
-      font-weight: 500;
-      transition: opacity 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
+  padding:140px 60px 80px;
+}
 
-    .error:not(:empty)::before {
-      content: '⚠';
-      font-size: 13px;
-    }
+.heroGrid{
+  width:100%;
 
-    /* ===== FOOTER ===== */
-    footer {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      font-size: 0.76em;
-      padding: 15px 20px;
-      background: rgba(0, 0, 0, 0.32);
-      border-top: 1px solid rgba(255,255,255,0.07);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      color: var(--text-muted);
-      letter-spacing: 0.2px;
-      font-weight: 400;
-    }
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  gap:60px;
 
-    footer strong {
-      color: var(--green-primary);
-      font-weight: 600;
-    }
+  align-items:center;
+}
 
-    /* ===== AUDIO INDICATOR ===== */
-    .audio-pill {
-      position: fixed;
-      bottom: 56px;
-      right: 16px;
-      z-index: 200;
-      background: rgba(3, 14, 8, 0.72);
-      border: 1px solid rgba(29,185,114,0.28);
-      backdrop-filter: blur(14px);
-      border-radius: 40px;
-      padding: 7px 13px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      cursor: pointer;
-      transition: var(--transition);
-      box-shadow: 0 4px 18px rgba(0,0,0,0.3);
-    }
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
 
-    .audio-pill:hover {
-      background: rgba(3, 14, 8, 0.9);
-      border-color: rgba(29,185,114,0.48);
-    }
+  padding:12px 20px;
 
-    .audio-bars { display: flex; align-items: flex-end; gap: 2px; height: 14px; }
-    .ab { width: 3px; background: var(--green-primary); border-radius: 2px; animation: ab 1.3s ease-in-out infinite; }
-    .ab:nth-child(1){animation-delay:0s;height:5px}
-    .ab:nth-child(2){animation-delay:.2s;height:11px}
-    .ab:nth-child(3){animation-delay:.4s;height:7px}
-    .ab:nth-child(4){animation-delay:.1s;height:13px}
-    .ab:nth-child(5){animation-delay:.3s;height:5px}
+  background:rgba(255,255,255,0.08);
 
-    @keyframes ab {
-      0%,100%{transform:scaleY(.35);opacity:.45}
-      50%{transform:scaleY(1.2);opacity:1}
-    }
+  border:1px solid rgba(255,255,255,0.12);
 
-    .audio-pill.paused .ab { animation: none; transform: scaleY(.35); opacity:.35; }
-    .audio-pill-label { font-family:"Plus Jakarta Sans",sans-serif; font-size:.68em; font-weight:600; color:var(--text-secondary); letter-spacing:.5px; }
+  border-radius:999px;
 
-    /* ===== ANIMATIONS ===== */
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-14px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+  margin-bottom:28px;
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(22px) scale(0.985); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+  backdrop-filter:blur(18px);
 
-    /* Stagger inputs & buttons */
-    .inputBox:nth-child(1) { animation: fadeUp 0.45s ease 0.38s both; }
-    .inputBox:nth-child(2) { animation: fadeUp 0.45s ease 0.48s both; }
-    #btnLogin { animation: fadeUp 0.45s ease 0.56s both; }
-    .guestBtn { animation: fadeUp 0.45s ease 0.64s both; }
+  animation:float 4s ease-in-out infinite;
+}
 
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 480px) {
-      header { padding: 16px; }
+.badgeDot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#44ff99;
 
-      .header-logo-row { gap: 10px; }
-      .header-emblem { width: 36px; height: 36px; font-size: 17px; }
-      .header-title-top { font-size: 0.70em; }
-      .header-title-bot { font-size: 0.65em; }
+  box-shadow:0 0 15px #44ff99;
+}
 
-      main { padding: 32px 12px; }
+@keyframes float{
+  0%,100%{
+    transform:translateY(0);
+  }
+  50%{
+    transform:translateY(-8px);
+  }
+}
 
-      .card {
-        padding: 36px 22px 32px;
-        border-radius: 20px;
-      }
+.heroTitle{
+  font-size:72px;
+  line-height:1.05;
+  font-weight:900;
+  margin-bottom:26px;
+}
 
-      h2 { font-size: 1.25em; }
+.heroTitle span{
+  background:linear-gradient(to right,#8dffb5,#ffffff);
 
-      input, button {
-        font-size: 13px;
-      }
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
 
-      .audio-pill { bottom: 50px; right: 12px; }
-    }
+.heroDesc{
+  font-size:18px;
+  line-height:1.8;
+  color:rgba(255,255,255,0.78);
 
-    @media (max-width: 360px) {
-      .header-emblem { display: none; }
-      .header-title-block { text-align: center; }
-      .card { padding: 28px 16px 26px; }
-    }
-  </style>
+  max-width:720px;
+}
+
+/* BUTTON */
+
+.heroButtons{
+  display:flex;
+  gap:18px;
+  margin-top:40px;
+}
+
+.btn{
+  padding:16px 30px;
+  border-radius:16px;
+  border:none;
+
+  font-weight:700;
+  cursor:pointer;
+
+  transition:0.35s;
+}
+
+.btnPrimary{
+  background:linear-gradient(135deg,#1db954,#44ff99);
+  color:#082011;
+
+  box-shadow:0 10px 30px rgba(29,185,84,0.35);
+}
+
+.btnPrimary:hover{
+  transform:translateY(-4px);
+}
+
+.btnGlass{
+  background:rgba(255,255,255,0.08);
+  color:white;
+  border:1px solid rgba(255,255,255,0.12);
+  backdrop-filter:blur(20px);
+}
+
+/* CARD */
+
+.sideCards{
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+}
+
+.infoCard{
+  background:rgba(255,255,255,0.08);
+
+  border:1px solid rgba(255,255,255,0.12);
+
+  backdrop-filter:blur(18px);
+
+  border-radius:28px;
+
+  padding:24px;
+
+  display:flex;
+  gap:18px;
+
+  align-items:center;
+
+  transition:0.35s;
+}
+
+.infoCard:hover{
+  transform:translateY(-8px);
+  box-shadow:0 20px 50px rgba(0,0,0,0.35);
+}
+
+.infoCard img{
+  width:120px;
+  height:100px;
+  object-fit:cover;
+  border-radius:20px;
+}
+
+.infoCard h3{
+  font-size:24px;
+  margin-bottom:8px;
+}
+
+.infoCard p{
+  color:rgba(255,255,255,0.7);
+  line-height:1.6;
+}
+
+/* MODAL LOGIN */
+
+.modal{
+  position:fixed;
+  inset:0;
+
+  background:rgba(0,0,0,0.6);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  opacity:0;
+  visibility:hidden;
+
+  transition:0.35s;
+
+  z-index:999;
+}
+
+.modal.active{
+  opacity:1;
+  visibility:visible;
+}
+
+.loginCard{
+  width:100%;
+  max-width:420px;
+
+  background:rgba(255,255,255,0.08);
+
+  border:1px solid rgba(255,255,255,0.12);
+
+  backdrop-filter:blur(30px);
+
+  border-radius:30px;
+
+  padding:40px;
+
+  transform:translateY(20px);
+  transition:0.35s;
+}
+
+.modal.active .loginCard{
+  transform:translateY(0);
+}
+
+.loginCard h2{
+  font-size:32px;
+  margin-bottom:10px;
+}
+
+.loginCard p{
+  color:rgba(255,255,255,0.7);
+  margin-bottom:28px;
+}
+
+.inputBox{
+  margin-bottom:16px;
+}
+
+.inputBox input{
+  width:100%;
+
+  padding:16px;
+
+  border-radius:16px;
+
+  border:1px solid rgba(255,255,255,0.12);
+
+  background:rgba(255,255,255,0.06);
+
+  color:white;
+
+  outline:none;
+}
+
+.inputBox input::placeholder{
+  color:rgba(255,255,255,0.45);
+}
+
+.loginBtn{
+  width:100%;
+  padding:16px;
+
+  border:none;
+
+  border-radius:16px;
+
+  background:linear-gradient(135deg,#1db954,#44ff99);
+
+  color:#082011;
+
+  font-weight:800;
+
+  cursor:pointer;
+
+  margin-top:8px;
+}
+
+.closeBtn{
+  position:absolute;
+  top:20px;
+  right:20px;
+
+  width:42px;
+  height:42px;
+
+  border-radius:50%;
+  border:none;
+
+  background:rgba(255,255,255,0.08);
+
+  color:white;
+
+  cursor:pointer;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:980px){
+
+.heroGrid{
+  grid-template-columns:1fr;
+}
+
+.heroTitle{
+  font-size:52px;
+}
+
+.heroContent{
+  padding:140px 24px 80px;
+}
+
+.navbar{
+  padding:16px;
+}
+
+}
+
+@media(max-width:600px){
+
+.heroTitle{
+  font-size:40px;
+}
+
+.heroButtons{
+  flex-direction:column;
+}
+
+.infoCard{
+  flex-direction:column;
+}
+
+.infoCard img{
+  width:100%;
+  height:180px;
+}
+
+.loginCard{
+  margin:20px;
+  padding:32px 24px;
+}
+
+}
+
+</style>
 </head>
 
 <body>
 
-<!-- Audio -->
-<audio id="bgAudio" preload="auto">
-  <source src="https://raw.githubusercontent.com/dinaspertanianinhil/PortalTPH/refs/heads/main/ElevenLabs_2026-04-09T08_28_50_Kanna%20-%20Warm%2C%20Calm%20and%20Clear_pvc_sp100_s50_sb75_se0_b_m2.mp3" type="audio/mpeg">
-</audio>
+<div class="hero">
 
-<!-- Audio indicator -->
-<div class="audio-pill paused" id="audioPill" title="Play / Pause audio">
-  <div class="audio-bars">
-    <div class="ab"></div><div class="ab"></div><div class="ab"></div>
-    <div class="ab"></div><div class="ab"></div>
+  <div class="glow glow1"></div>
+  <div class="glow glow2"></div>
+
+  <!-- NAVBAR -->
+
+  <div class="navbar">
+    <div class="navWrap">
+
+      <div class="logoArea">
+        <div class="logo">🌾</div>
+
+        <div class="logoText">
+          <h2>Tanaman Pangan & Hortikultura</h2>
+          <p>Dinas Pertanian Kabupaten</p>
+        </div>
+      </div>
+
+      <button class="btn btnGlass" onclick="openLogin()">
+        Login Sistem
+      </button>
+
+    </div>
   </div>
-  <span class="audio-pill-label">AUDIO</span>
+
+  <!-- HERO -->
+
+  <div class="heroContent">
+
+    <div class="heroGrid">
+
+      <!-- LEFT -->
+
+      <div>
+
+        <div class="badge">
+          <div class="badgeDot"></div>
+          Smart Agriculture Information System
+        </div>
+
+        <h1 class="heroTitle">
+          Sistem Informasi
+          <span>
+            Tanaman Pangan
+          </span>
+          dan Hortikultura
+        </h1>
+
+        <p class="heroDesc">
+          Portal digital modern untuk monitoring produksi,
+          stok, harga gabah dan beras, serta pelaporan
+          pertanian berbasis teknologi yang profesional,
+          modern, dan terintegrasi.
+        </p>
+
+        <div class="heroButtons">
+
+          <button class="btn btnPrimary" onclick="openLogin()">
+            Masuk Sistem
+          </button>
+
+          <button class="btn btnGlass">
+            Informasi Publik
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- RIGHT -->
+
+      <div class="sideCards">
+
+        <div class="infoCard">
+
+          <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=1200&auto=format&fit=crop">
+
+          <div>
+            <h3>🌾 Produksi Padi</h3>
+
+            <p>
+              Monitoring luas tambah tanam dan produksi
+              pertanian secara realtime.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="infoCard">
+
+          <img src="https://images.unsplash.com/photo-1592982537447-6f2a6a0b7a3d?q=80&w=1200&auto=format&fit=crop">
+
+          <div>
+            <h3>🌶 Hortikultura</h3>
+
+            <p>
+              Informasi komoditas hortikultura dan
+              perkembangan harga pasar.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="infoCard">
+
+          <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop">
+
+          <div>
+            <h3>📊 Dashboard Digital</h3>
+
+            <p>
+              Sistem pelaporan modern untuk mendukung
+              ketahanan pangan daerah.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </div>
 
-<header>
-  <div class="header-inner">
-    <div class="header-logo-row">
-      <div class="header-emblem">🌾</div>
-      <div class="header-title-block">
-        <div class="header-title-top">Bidang Tanaman Pangan dan Hortikultura</div>
-        <div class="header-title-bot">Dinas Pertanian Kabupaten Indragiri Hilir</div>
-      </div>
-    </div>
-    <small>Sistem Laporan Stok • Produksi • Harga Gabah & Beras</small>
-  </div>
-</header>
+<!-- LOGIN MODAL -->
 
-<main>
-  <div class="card">
-    <div class="card-icon">🔐</div>
+<div class="modal" id="loginModal">
+
+  <div class="loginCard">
+
+    <button class="closeBtn" onclick="closeLogin()">
+      ✕
+    </button>
+
     <h2>Login Sistem</h2>
-    <p>Masukkan username dan password Anda</p>
+
+    <p>
+      Masukkan username dan password Anda
+    </p>
 
     <div class="inputBox">
-      <span class="icon">👤</span>
-      <input type="text" id="username" placeholder="Username" autocomplete="username">
+      <input type="text" placeholder="Username">
     </div>
 
     <div class="inputBox">
-      <span class="icon">🔑</span>
-      <input type="password" id="password" placeholder="Password" autocomplete="current-password">
+      <input type="password" placeholder="Password">
     </div>
 
-    <button id="btnLogin" onclick="login()">Masuk</button>
+    <button class="loginBtn">
+      Masuk Sistem
+    </button>
 
-    <div class="or-divider">
-      <div class="or-line"></div>
-      <span class="or-text">atau</span>
-      <div class="or-line"></div>
-    </div>
-
-    <button class="guestBtn" onclick="guestLogin()">👁 Masuk sebagai Tamu</button>
-
-    <div class="error" id="errorMsg"></div>
   </div>
-</main>
 
-<footer>
-  © 2025 <strong>Dinas Pertanian</strong> – Kabupaten Indragiri Hilir
-</footer>
+</div>
 
 <script>
-const API_LOGIN = "https://script.google.com/macros/s/AKfycbxx7xTTXYdKMHyarBoj3638vcVhzRfN002q__ey-_QH-QRn1ZiJO95UdFts_O22a0dSnw/exec";
 
-function login() {
-  const btn = document.getElementById("btnLogin");
-  const msg = document.getElementById("errorMsg");
-
-  const user = document.getElementById("username").value.trim();
-  const pass = document.getElementById("password").value.trim();
-
-  if (!user || !pass) {
-    msg.textContent = "Harap isi username dan password.";
-    return;
-  }
-
-  btn.disabled = true;
-  btn.innerText = "Memproses...";
-  msg.textContent = "";
-
-  fetch(API_LOGIN, {
-    method: "POST",
-    body: JSON.stringify({
-      username: user,
-      password: pass
-    })
-  })
-  .then(res => res.json())
-  .then(res => {
-
-    if (res.status === "ok") {
-
-      // simpan session
-      localStorage.setItem("loginUser", user);
-      localStorage.setItem("role", res.role);
-      localStorage.setItem("token", res.token);
-
-      // redirect
-      if (res.role === "admin" || res.role === "kadis") {
-        window.location.href = "dashboad.html";
-      } else if (res.role === "sekre") {
-        window.location.href = "dashboad.html";
-      } else {
-        window.location.href = "dashboard2.html";
-      }
-
-    } else {
-      msg.textContent = "Username atau password salah.";
-      btn.disabled = false;
-      btn.innerText = "Masuk";
-    }
-
-  })
-  .catch(() => {
-    msg.textContent = "Koneksi ke server gagal!";
-    btn.disabled = false;
-    btn.innerText = "Masuk";
-  });
+function openLogin(){
+  document.getElementById('loginModal')
+  .classList.add('active');
 }
 
-function guestLogin() {
-  localStorage.setItem("loginUser", "guest");
-  window.location.href = "dashboard2.html";
+function closeLogin(){
+  document.getElementById('loginModal')
+  .classList.remove('active');
 }
 
-// enter = login
-document.addEventListener("keypress", e => {
-  if (e.key === "Enter") login();
-});
+window.addEventListener('click',function(e){
 
-/* ===== AUDIO ===== */
-const audio = document.getElementById('bgAudio');
-const pill  = document.getElementById('audioPill');
-let started = false;
+  const modal = document.getElementById('loginModal');
 
-audio.volume = 0.22;
-
-audio.play().then(() => {
-  started = true;
-  pill.classList.remove('paused');
-}).catch(() => {
-  const unlock = () => {
-    if (!started) {
-      audio.play().then(() => {
-        started = true;
-        pill.classList.remove('paused');
-      }).catch(() => {});
-    }
-    document.removeEventListener('click', unlock);
-    document.removeEventListener('touchstart', unlock);
-  };
-  document.addEventListener('click', unlock);
-  document.addEventListener('touchstart', unlock);
-});
-
-pill.addEventListener('click', e => {
-  e.stopPropagation();
-  if (audio.paused) {
-    audio.play().then(() => { started = true; pill.classList.remove('paused'); });
-  } else {
-    audio.pause();
-    pill.classList.add('paused');
+  if(e.target === modal){
+    closeLogin();
   }
+
 });
+
 </script>
 
 </body>
