@@ -910,27 +910,28 @@ function simpan(){
     return;
   }
 
-  let rows = [];
-  document.querySelectorAll(".desa").forEach(d=>{
-    let desa = d.querySelector("select.desaSelect")?.value;
+let rows = [];
+document.querySelectorAll(".desa").forEach(d=>{
+  let desa = d.querySelector("select.desaSelect")?.value;
 
-    d.querySelectorAll(".poktan").forEach(p=>{
-      const inputs = p.querySelectorAll("input");
-      const selects = p.querySelectorAll("select");
-      let luas = inputs[1]?.value;
-      if(luas){
-        rows.push({
-          desa: desa,
-          poktan: inputs[0]?.value,
-          luas: luas,
-          jenis: selects[0]?.value,
-          olah: inputs[2]?.value,
-          panen: inputs[3]?.value,
-          ket: inputs[4]?.value
-        });
-      }
-    });
+  d.querySelectorAll(".poktan").forEach(p=>{
+    const inputs = p.querySelectorAll("input");
+    const selects = p.querySelectorAll("select");
+
+    let luas = inputs[0]?.value;
+
+    if(luas){
+      rows.push({
+        desa: desa,
+        luas: luas,
+        jenis: selects[0]?.value,
+        olah: inputs[1]?.value,
+        panen: inputs[2]?.value,
+        ket: inputs[3]?.value
+      });
+    }
   });
+});
 
   if(rows.length == 0){
     alert("Isi minimal 1 data");
