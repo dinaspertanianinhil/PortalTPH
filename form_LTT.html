@@ -821,7 +821,7 @@ function tambahDesa(){
     <div class="desa-header">
       <span class="desa-title"><i class="fa-solid fa-map-pin"></i> Desa #${desaCounter}</span>
       <div class="desa-actions">
-        <button class="btn-poktan" onclick="tambahPoktan(this)"><i class="fa-solid fa-plus"></i> Poktan</button>
+        <button class="btn-poktan" onclick="tambahPoktan(this)"><i class="fa-solid fa-plus"></i> isi data </button>
         <button class="btn-hapus" onclick="this.closest('.desa').remove();hitung();updateEmptyState()"><i class="fa-solid fa-trash"></i> Hapus</button>
       </div>
     </div>
@@ -841,13 +841,10 @@ function tambahPoktan(btn){
   let div = document.createElement("div");
   div.className = "poktan";
   div.innerHTML = `
-    <div>
-      <div class="poktan-label">Nama Poktan</div>
-      <input placeholder="Nama Poktan">
     </div>
     <div>
       <div class="poktan-label">LTT (Ha)</div>
-      <input type="number" placeholder="LTT" oninput="hitung()">
+      <input type="number" placeholder="Luas Tambah Tanam" oninput="hitung()">
     </div>
     <div>
       <div class="poktan-label">Jenis LTT</div>
