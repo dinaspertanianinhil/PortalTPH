@@ -53,7 +53,7 @@ body{
   linear-gradient(
     to bottom,
     rgba(0,0,0,0.55),
-    rgba(4,30,15,0.72)
+    rgba(4,30,15,0.75)
   ),
 
   url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1920&auto=format&fit=crop')
@@ -69,6 +69,18 @@ body{
   to{
     transform:scale(1.08);
   }
+}
+
+/* OVERLAY */
+
+.hero::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+  radial-gradient(circle at top right,
+  rgba(46,213,115,0.18),
+  transparent 30%);
 }
 
 /* GLOW */
@@ -344,6 +356,8 @@ body{
 }
 
 .loginCard{
+  position:relative;
+
   width:100%;
   max-width:420px;
 
@@ -356,13 +370,6 @@ body{
   border-radius:30px;
 
   padding:40px;
-
-  transform:translateY(20px);
-  transition:0.35s;
-}
-
-.modal.active .loginCard{
-  transform:translateY(0);
 }
 
 .loginCard h2{
@@ -436,6 +443,15 @@ body{
   cursor:pointer;
 }
 
+/* ERROR */
+
+#errorMsg{
+  margin-top:14px;
+  color:#ff9b9b;
+  font-size:14px;
+  min-height:20px;
+}
+
 /* RESPONSIVE */
 
 @media(max-width:980px){
@@ -504,7 +520,7 @@ body{
 
         <div class="logoText">
           <h2>Tanaman Pangan & Hortikultura</h2>
-          <p>Dinas Pertanian Kabupaten</p>
+          <p>Dinas Pertanian Kabupaten Indragiri Hilir</p>
         </div>
       </div>
 
@@ -633,16 +649,40 @@ body{
     </p>
 
     <div class="inputBox">
-      <input type="text" placeholder="Username">
+      <input
+        type="text"
+        id="username"
+        placeholder="Username"
+        autocomplete="username"
+      >
     </div>
 
     <div class="inputBox">
-      <input type="password" placeholder="Password">
+      <input
+        type="password"
+        id="password"
+        placeholder="Password"
+        autocomplete="current-password"
+      >
     </div>
 
-    <button class="loginBtn">
+    <button
+      class="loginBtn"
+      id="btnLogin"
+      onclick="login()"
+    >
       Masuk Sistem
     </button>
+
+    <button
+      class="btn btnGlass"
+      style="width:100%;margin-top:12px;"
+      onclick="guestLogin()"
+    >
+      👁 Masuk sebagai Tamu
+    </button>
+
+    <div id="errorMsg"></div>
 
   </div>
 
@@ -650,48 +690,170 @@ body{
 
 <script>
 
-const API_LOGIN = "LINK_API_KAMU";
+const API_LOGIN =
+"https://script.google.com/macros/s/AKfycbxx7xTTXYdKMHyarBoj3638vcVhzRfN002q__ey-_QH-QRn1ZiJO95UdFts_O22a0dSnw/exec";
+
+/* OPEN MODAL */
+
+function openLogin(){
+
+  document
+    .getElementById('loginModal')
+    .classList.add('active');
+
+}
+
+/* CLOSE MODAL */
+
+function closeLogin(){
+
+  document
+    .getElementById('loginModal')
+    .classList.remove('active');
+
+}
+
+/* CLICK OUTSIDE */
+
+window.addEventListener('click', function(e){
+
+  const modal =
+    document.getElementById('loginModal');
+
+  if(e.target === modal){
+    closeLogin();
+  }
+
+});
+
+/* LOGIN */
 
 function login() {
 
-  const user = document.getElementById("username").value.trim();
-  const pass = document.getElementById("password").value.trim();
+  const btn =
+    document.getElementById("btnLogin");
 
-  fetch(API_LOGIN,{
-    method:"POST",
-    body:JSON.stringify({
-      username:user,
-      password:pass
+  const msg =
+    document.getElementById("errorMsg");
+
+  const user =
+    document.getElementById("username")
+    .value.trim();
+
+  const pass =
+    document.getElementById("password")
+    .value.trim();
+
+  if (!user || !pass) {
+
+    msg.textContent =
+      "Harap isi username dan password.";
+
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerText = "Memproses...";
+  msg.textContent = "";
+
+  fetch(API_LOGIN, {
+
+    method: "POST",
+
+    body: JSON.stringify({
+      username: user,
+      password: pass
     })
+
   })
 
-  .then(res=>res.json())
+  .then(res => res.json())
 
-  .then(res=>{
+  .then(res => {
 
-    if(res.status === "ok"){
+    if (res.status === "ok") {
 
-      localStorage.setItem("loginUser", user);
-      localStorage.setItem("role", res.role);
-      localStorage.setItem("token", res.token);
+      localStorage.setItem(
+        "loginUser",
+        user
+      );
 
-      if(res.role === "admin"){
-        window.location.href="dashboard.html";
-      }else{
-        window.location.href="dashboard2.html";
+      localStorage.setItem(
+        "role",
+        res.role
+      );
+
+      localStorage.setItem(
+        "token",
+        res.token
+      );
+
+      if (
+        res.role === "admin" ||
+        res.role === "kadis" ||
+        res.role === "sekre"
+      ) {
+
+        window.location.href =
+          "dashboad.html";
+
+      } else {
+
+        window.location.href =
+          "dashboard2.html";
+
       }
 
-    }else{
-      alert("Username atau password salah");
+    } else {
+
+      msg.textContent =
+        "Username atau password salah.";
+
+      btn.disabled = false;
+      btn.innerText = "Masuk Sistem";
+
     }
 
   })
 
-  .catch(()=>{
-    alert("Koneksi gagal");
+  .catch(() => {
+
+    msg.textContent =
+      "Koneksi ke server gagal!";
+
+    btn.disabled = false;
+    btn.innerText = "Masuk Sistem";
+
   });
 
 }
+
+/* GUEST LOGIN */
+
+function guestLogin(){
+
+  localStorage.setItem(
+    "loginUser",
+    "guest"
+  );
+
+  window.location.href =
+    "dashboard2.html";
+
+}
+
+/* ENTER KEY */
+
+document.addEventListener(
+  "keypress",
+  e => {
+
+    if (e.key === "Enter") {
+      login();
+    }
+
+  }
+);
 
 </script>
 
