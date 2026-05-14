@@ -531,12 +531,54 @@ Penetapan setelah pukul <b>18.00 WIB</b> merupakan hasil rekapitulasi akhir yang
                 <div class="card"><h3>LTT Hari Ini</h3><p id="todayLtt" style="color: var(--accent);">0</p></div>
             </div>
             
-            <div class="cards" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-                <div class="card" style="padding: 15px 20px;"><h3>Reguler Hari Ini</h3><p id="todayReguler" style="font-size: 1.4rem;">0</p></div>
-                <div class="card" style="padding: 15px 20px;"><h3>Oplah Hari Ini</h3><p id="todayOplah" style="font-size: 1.4rem;">0</p></div>
-                <div class="card" style="padding: 15px 20px;"><h3>Kecamatan Aktif</h3><p id="totalKec" style="font-size: 1.4rem;">0</p></div>
-                <div class="card" style="padding: 15px 20px;"><h3>Total Laporan</h3><p id="totalData" style="font-size: 1.4rem;">0</p></div>
-            </div>
+            <!-- GANTI BAGIAN INI -->
+<div class="cards" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+    <div class="card" style="padding: 15px 20px;">
+        <h3>Reguler Hari Ini</h3>
+        <p id="todayReguler" style="font-size: 1.4rem;">0</p>
+    </div>
+
+    <div class="card" style="padding: 15px 20px;">
+        <h3>Oplah Hari Ini</h3>
+        <p id="todayOplah" style="font-size: 1.4rem;">0</p>
+    </div>
+
+    <div class="card" style="padding: 15px 20px;">
+        <h3>Kecamatan Aktif</h3>
+        <p id="totalKec" style="font-size: 1.4rem;">0</p>
+    </div>
+
+    <div class="card" style="padding: 15px 20px;">
+        <h3>Total Laporan</h3>
+        <p id="totalData" style="font-size: 1.4rem;">0</p>
+    </div>
+
+    <!-- TAMBAHAN BARU -->
+    <div class="card" style="padding: 15px 20px;">
+        <h3>Kecamatan Belum Input Hari Ini</h3>
+
+        <div id="belumInputJumlah"
+             style="
+                font-size:1.5rem;
+                font-weight:800;
+                color:#d32f2f;
+                margin-bottom:10px;
+             ">
+            0 Kecamatan
+        </div>
+
+        <div id="belumInput"
+             style="
+                font-size:0.82rem;
+                line-height:1.6;
+                color:#475569;
+                max-height:160px;
+                overflow:auto;
+             ">
+            -
+        </div>
+    </div>
+</div>
 
             <div class="dashboard-grid">
                 <div class="main-charts">
@@ -613,29 +655,57 @@ Penetapan setelah pukul <b>18.00 WIB</b> merupakan hasil rekapitulasi akhir yang
 </div>
 
 <script>
-    // --- KONFIGURASI & VARIABEL UTAMA (TIDAK DIUBAH) ---
+    // =========================
+    // KONFIGURASI
+    // =========================
     const API_URL = "https://script.google.com/macros/s/AKfycbz9BbxHtegnOrlIdwMBjsRRfK1weywnjIXnbX4YgGY-F6egmvMFUO3pqZ5CAXg99ac/exec";
-    let rawData = [];
-    let chartMain;
-    let chartJagung;
 
+    let rawData = [];
+    let chartMain = null;
+    let chartJagung = null;
+
+    // =========================
+    // TUTUP NOTIF
+    // =========================
     function tutupNotif() {
         const notif = document.getElementById("notifInfo");
         notif.style.opacity = "0";
-        setTimeout(() => notif.style.display = "none", 300);
+
+        setTimeout(() => {
+            notif.style.display = "none";
+        }, 300);
     }
 
+    // =========================
+    // SWITCH TAB
+    // =========================
     function switchTab(page) {
-        document.getElementById("dashboardPage").style.display = page === "dashboard" ? "block" : "none";
-        document.getElementById("tablePage").style.display = page === "tabel" ? "block" : "none";
-        
-        document.getElementById("btn-dash").classList.toggle("active", page === "dashboard");
-        document.getElementById("btn-table").classList.toggle("active", page === "tabel");
+
+        document.getElementById("dashboardPage").style.display =
+            page === "dashboard" ? "block" : "none";
+
+        document.getElementById("tablePage").style.display =
+            page === "tabel" ? "block" : "none";
+
+        document.getElementById("btn-dash")
+            .classList.toggle("active", page === "dashboard");
+
+        document.getElementById("btn-table")
+            .classList.toggle("active", page === "tabel");
     }
 
-    // Fungsi utilitas data
+    // =========================
+    // UTILITAS
+    // =========================
     function safeNumber(val) {
-        return parseFloat((val + "").replace(",", ".")) || 0;
+
+        if (val === null || val === undefined) return 0;
+
+        return parseFloat(
+            String(val)
+                .replace(",", ".")
+                .replace(/[^\d.-]/g, "")
+        ) || 0;
     }
 
     function fix(n) {
@@ -643,197 +713,622 @@ Penetapan setelah pukul <b>18.00 WIB</b> merupakan hasil rekapitulasi akhir yang
     }
 
     function formatDate(date) {
-        if (!date) return "";
-        return date.toString().slice(0, 10);
-    }
 
-    // --- LOGIKA DATA ---
-    async function loadData() {
+        if (!date) return "";
+
         try {
-            const res = await fetch(API_URL);
-            rawData = await res.json();
-            rawData.forEach(d => d.TANGGAL = formatDate(d.TANGGAL));
-            initFilter();
-            render();
-        } catch (e) {
-            console.error("Gagal memuat data:", e);
+
+            const d = new Date(date);
+
+            if (isNaN(d)) {
+                return String(date).slice(0, 10);
+            }
+
+            return (
+                d.getFullYear() + "-" +
+                String(d.getMonth() + 1).padStart(2, "0") + "-" +
+                String(d.getDate()).padStart(2, "0")
+            );
+
+        } catch {
+
+            return String(date).slice(0, 10);
         }
     }
 
+    // =========================
+    // LOAD DATA
+    // =========================
+    async function loadData() {
+
+        try {
+
+            const res = await fetch(API_URL);
+
+            const result = await res.json();
+
+            rawData = Array.isArray(result)
+                ? result
+                : (result.data || []);
+
+            rawData.forEach(d => {
+                d.TANGGAL = formatDate(d.TANGGAL);
+            });
+
+            initFilter();
+
+            render();
+
+        } catch (e) {
+
+            console.error("Gagal memuat data:", e);
+
+            alert("Data gagal dimuat.");
+        }
+    }
+
+    // =========================
+    // INIT FILTER
+    // =========================
     function initFilter() {
-        let kecSet = new Set();
-        let jenisSet = new Set();
+
+        const kecSet = new Set();
+        const jenisSet = new Set();
 
         rawData.forEach(d => {
-            if(d.KECAMATAN) kecSet.add(d.KECAMATAN);
-            if(d["JENIS LTT"]) jenisSet.add(d["JENIS LTT"]);
+
+            if (d.KECAMATAN) {
+                kecSet.add(d.KECAMATAN);
+            }
+
+            if (d["JENIS LTT"]) {
+                jenisSet.add(d["JENIS LTT"]);
+            }
         });
 
         const selKec = document.getElementById("filterKecamatan");
         const selJenis = document.getElementById("filterJenis");
 
-        kecSet.forEach(k => selKec.innerHTML += `<option value="${k}">${k}</option>`);
-        jenisSet.forEach(j => selJenis.innerHTML += `<option value="${j}">${j}</option>`);
+        selKec.innerHTML =
+            `<option value="">Semua Kecamatan</option>`;
+
+        selJenis.innerHTML =
+            `<option value="">Semua Jenis</option>`;
+
+        [...kecSet].sort().forEach(k => {
+
+            selKec.innerHTML += `
+                <option value="${k}">
+                    ${k}
+                </option>
+            `;
+        });
+
+        [...jenisSet].sort().forEach(j => {
+
+            selJenis.innerHTML += `
+                <option value="${j}">
+                    ${j}
+                </option>
+            `;
+        });
 
         selKec.onchange = render;
         selJenis.onchange = render;
-        document.getElementById("filterTanggal").onchange = render;
+
+        document.getElementById("filterTanggal")
+            .onchange = render;
     }
 
+    // =========================
+    // RENDER DATA
+    // =========================
     function render() {
-        const kecFilter = document.getElementById("filterKecamatan").value;
-        const tglFilter = document.getElementById("filterTanggal").value;
-        const jenisFilter = document.getElementById("filterJenis").value;
 
+        const tbody =
+            document.querySelector("#tableData tbody");
+
+        tbody.innerHTML = "";
+
+        const kecFilter =
+            document.getElementById("filterKecamatan").value;
+
+        const jenisFilter =
+            document.getElementById("filterJenis").value;
+
+        const tglFilter =
+            document.getElementById("filterTanggal").value;
+
+        // =========================
+        // FILTER DATA
+        // =========================
         const data = rawData.filter(d => {
+
             let match = true;
-            if (kecFilter && d.KECAMATAN !== kecFilter) match = false;
-            if (tglFilter && d.TANGGAL !== tglFilter) match = false;
-            if (jenisFilter && d["JENIS LTT"] !== jenisFilter) match = false;
+
+            if (
+                kecFilter &&
+                d.KECAMATAN !== kecFilter
+            ) {
+                match = false;
+            }
+
+            if (
+                jenisFilter &&
+                d["JENIS LTT"] !== jenisFilter
+            ) {
+                match = false;
+            }
+
+            if (
+                tglFilter &&
+                d.TANGGAL !== tglFilter
+            ) {
+                match = false;
+            }
+
             return match;
         });
 
+        // =========================
+        // LIST KECAMATAN
+        // =========================
+        const semuaKecamatan = [
+            "Batang Tuaka",
+            "Concong",
+            "Enok",
+            "Gaung",
+            "Gaung Anak Serka",
+            "Kateman",
+            "Kemuning",
+            "Kempas",
+            "Keritang",
+            "Kuala Indragiri",
+            "Mandah",
+            "Pelangiran",
+            "Pulau Burung",
+            "Reteh",
+            "Sungai Batang",
+            "Tanah Merah",
+            "Teluk Belengkong",
+            "Tembilahan",
+            "Tembilahan Hulu",
+            "Tempuling"
+        ];
+
+        // =========================
+        // TODAY
+        // =========================
+        const now = new Date();
+
+        const todayStr =
+            now.getFullYear() + "-" +
+            String(now.getMonth() + 1).padStart(2, "0") + "-" +
+            String(now.getDate()).padStart(2, "0");
+
+        // =========================
+        // STATS
+        // =========================
         let stats = {
-            total: 0, today: 0,
-            reg: 0, oplah: 0, jagung: 0,
-            t_reg: 0, t_oplah: 0,
-            kecMap: {}, jagungMap: {}
+
+            total: 0,
+            today: 0,
+
+            reg: 0,
+            oplah: 0,
+            jagung: 0,
+
+            t_reg: 0,
+            t_oplah: 0,
+
+            kecMap: {},
+            jagungMap: {}
         };
 
-        const todayStr = new Date().toISOString().slice(0, 10);
-        const tbody = document.querySelector("#tableData tbody");
-        tbody.innerHTML = "";
+        const kecSudahInput = new Set();
 
+        // =========================
+        // LOOP DATA
+        // =========================
         data.forEach(d => {
-            const luas = safeNumber(d["LUAS TAMBAH TANAM"]);
-            const jenis = (d["JENIS LTT"] || "").toLowerCase();
-            
-            stats.total = fix(stats.total + luas);
-            if (d.TANGGAL === todayStr) stats.today = fix(stats.today + luas);
 
-            // Mapping per jenis
-            if (jenis.includes("jagung")) {
-                stats.jagung = fix(stats.jagung + luas);
-                stats.jagungMap[d.KECAMATAN] = fix((stats.jagungMap[d.KECAMATAN] || 0) + luas);
-            } else if (jenis.includes("reguler")) {
-                stats.reg = fix(stats.reg + luas);
-                if (d.TANGGAL === todayStr) stats.t_reg = fix(stats.t_reg + luas);
-            } else if (jenis.includes("oplah")) {
-                stats.oplah = fix(stats.oplah + luas);
-                if (d.TANGGAL === todayStr) stats.t_oplah = fix(stats.t_oplah + luas);
+            const luas =
+                safeNumber(d["LUAS TAMBAH TANAM"]);
+
+            const jenis =
+                String(d["JENIS LTT"] || "")
+                    .toLowerCase();
+
+            // TOTAL
+            stats.total =
+                fix(stats.total + luas);
+
+            // HARI INI
+            if (d.TANGGAL === todayStr) {
+
+                stats.today =
+                    fix(stats.today + luas);
+
+                if (d.KECAMATAN) {
+                    kecSudahInput.add(d.KECAMATAN);
+                }
             }
 
-            stats.kecMap[d.KECAMATAN] = fix((stats.kecMap[d.KECAMATAN] || 0) + luas);
+            // REGULER
+            if (jenis.includes("reguler")) {
 
-            // Table Row
+                stats.reg =
+                    fix(stats.reg + luas);
+
+                if (d.TANGGAL === todayStr) {
+
+                    stats.t_reg =
+                        fix(stats.t_reg + luas);
+                }
+            }
+
+            // OPLAH
+            else if (jenis.includes("oplah")) {
+
+                stats.oplah =
+                    fix(stats.oplah + luas);
+
+                if (d.TANGGAL === todayStr) {
+
+                    stats.t_oplah =
+                        fix(stats.t_oplah + luas);
+                }
+            }
+
+            // JAGUNG
+            else if (jenis.includes("jagung")) {
+
+                stats.jagung =
+                    fix(stats.jagung + luas);
+
+                stats.jagungMap[d.KECAMATAN] =
+                    fix(
+                        (stats.jagungMap[d.KECAMATAN] || 0)
+                        + luas
+                    );
+            }
+
+            // TOTAL KEC
+            stats.kecMap[d.KECAMATAN] =
+                fix(
+                    (stats.kecMap[d.KECAMATAN] || 0)
+                    + luas
+                );
+
+            // =========================
+            // BADGE
+            // =========================
+            let badgeClass = "badge-jagung";
+
+            if (jenis.includes("reguler")) {
+                badgeClass = "badge-reguler";
+            }
+
+            if (jenis.includes("oplah")) {
+                badgeClass = "badge-oplah";
+            }
+
+            // =========================
+            // TABLE
+            // =========================
             const tr = document.createElement("tr");
-            const badgeClass = jenis.includes("reguler") ? "badge-reguler" : (jenis.includes("oplah") ? "badge-oplah" : "badge-jagung");
+
             tr.innerHTML = `
-                <td>${d.TANGGAL}</td>
-                <td style="font-weight:600">${d.KECAMATAN}</td>
-                <td>${d["DESA/KELURAHAN"]}</td>
-                <td>${d["KELOMPOK TANI"]}</td>
-                <td><span class="badge-jenis ${badgeClass}">${d["JENIS LTT"]}</span></td>
-                <td style="font-weight:700; color:var(--primary)">${luas.toFixed(2)}</td>
-                <td style="font-size:0.8rem">${d["NAMA PELAPOR"]}</td>
+                <td>${d.TANGGAL || "-"}</td>
+
+                <td style="font-weight:600">
+                    ${d.KECAMATAN || "-"}
+                </td>
+
+                <td>
+                    ${d["DESA/KELURAHAN"] || "-"}
+                </td>
+
+                <td>
+                    ${d["KELOMPOK TANI"] || "-"}
+                </td>
+
+                <td>
+                    <span class="badge-jenis ${badgeClass}">
+                        ${d["JENIS LTT"] || "-"}
+                    </span>
+                </td>
+
+                <td style="
+                    font-weight:700;
+                    color:var(--primary)
+                ">
+                    ${luas.toFixed(2)}
+                </td>
+
+                <td style="font-size:0.8rem">
+                    ${d["NAMA PELAPOR"] || "-"}
+                </td>
             `;
+
             tbody.appendChild(tr);
         });
 
-        // Update UI Cards
-        document.getElementById("totalLtt").innerText = stats.total.toFixed(2) + " Ha";
-        document.getElementById("totalReguler").innerText = stats.reg.toFixed(2) + " Ha";
-        document.getElementById("totalOplah").innerText = stats.oplah.toFixed(2) + " Ha";
-        document.getElementById("todayLtt").innerText = stats.today.toFixed(2) + " Ha";
-        document.getElementById("todayReguler").innerText = stats.t_reg.toFixed(2) + " Ha";
-        document.getElementById("todayOplah").innerText = stats.t_oplah.toFixed(2) + " Ha";
-        document.getElementById("totalKec").innerText = Object.keys(stats.kecMap).length;
-        document.getElementById("totalData").innerText = data.length;
+        // =========================
+        // BELUM INPUT
+        // =========================
+        const belumInput =
+            semuaKecamatan.filter(
+                k => !kecSudahInput.has(k)
+            );
 
-        document.getElementById("scoreJagung").innerText = stats.jagung.toFixed(2) + " Ha";
-        document.getElementById("scoreReguler").innerText = stats.reg.toFixed(2) + " Ha";
-        document.getElementById("scoreOplah").innerText = stats.oplah.toFixed(2) + " Ha";
+        // =========================
+        // UPDATE CARD
+        // =========================
+        document.getElementById("totalLtt")
+            .innerText =
+            stats.total.toFixed(2) + " Ha";
 
-        updateCharts(stats.kecMap, stats.jagungMap);
-        updateRankings(stats.kecMap, "ranking", "top");
-        updateRankings(stats.jagungMap, "rankingJagung", "jagung");
+        document.getElementById("totalReguler")
+            .innerText =
+            stats.reg.toFixed(2) + " Ha";
+
+        document.getElementById("totalOplah")
+            .innerText =
+            stats.oplah.toFixed(2) + " Ha";
+
+        document.getElementById("todayLtt")
+            .innerText =
+            stats.today.toFixed(2) + " Ha";
+
+        document.getElementById("todayReguler")
+            .innerText =
+            stats.t_reg.toFixed(2) + " Ha";
+
+        document.getElementById("todayOplah")
+            .innerText =
+            stats.t_oplah.toFixed(2) + " Ha";
+
+        document.getElementById("totalKec")
+            .innerText =
+            Object.keys(stats.kecMap).length;
+
+        document.getElementById("totalData")
+            .innerText =
+            data.length;
+
+        document.getElementById("scoreReguler")
+            .innerText =
+            stats.reg.toFixed(2) + " Ha";
+
+        document.getElementById("scoreOplah")
+            .innerText =
+            stats.oplah.toFixed(2) + " Ha";
+
+        document.getElementById("scoreJagung")
+            .innerText =
+            stats.jagung.toFixed(2) + " Ha";
+
+        // =========================
+        // BELUM INPUT VIEW
+        // =========================
+        document.getElementById("belumInputJumlah")
+            .innerHTML =
+            `${belumInput.length} Kecamatan`;
+
+        document.getElementById("belumInput")
+            .innerHTML =
+            belumInput.length > 0
+                ? belumInput.map(k =>
+                    `• ${k}`
+                  ).join("<br>")
+                : `
+                    <span style="
+                        color:#16a34a;
+                        font-weight:700;
+                    ">
+                        Semua Kecamatan Sudah Input
+                    </span>
+                `;
+
+        // =========================
+        // UPDATE CHART
+        // =========================
+        updateCharts(
+            stats.kecMap,
+            stats.jagungMap
+        );
+
+        // =========================
+        // UPDATE RANKING
+        // =========================
+        updateRankings(
+            stats.kecMap,
+            "ranking"
+        );
+
+        updateRankings(
+            stats.jagungMap,
+            "rankingJagung"
+        );
     }
 
-    function updateCharts(kecData, jagungData) {
-        const ctxMain = document.getElementById("chartKecamatan").getContext("2d");
-        const ctxJagung = document.getElementById("chartJagung").getContext("2d");
+    // =========================
+    // UPDATE CHARTS
+    // =========================
+    function updateCharts(kecMap, jagungMap) {
 
-        const chartConfig = (labels, data, label) => ({
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: label,
-                    data: data,
-                    backgroundColor: '#2e7d32',
-                    borderRadius: 6,
-                    hoverBackgroundColor: '#1b5e20'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { display: false } },
-                    x: { grid: { display: false } }
+        const labels =
+            Object.keys(kecMap);
+
+        const values =
+            Object.values(kecMap);
+
+        // DESTROY OLD
+        if (chartMain) {
+            chartMain.destroy();
+        }
+
+        chartMain = new Chart(
+            document.getElementById("chartKecamatan"),
+            {
+                type: "bar",
+
+                data: {
+                    labels: labels,
+
+                    datasets: [{
+                        label: "LTT (Ha)",
+                        data: values,
+                        borderWidth: 1
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true
                 }
             }
-        });
+        );
 
-        if (chartMain) chartMain.destroy();
-        chartMain = new Chart(ctxMain, chartConfig(Object.keys(kecData), Object.values(kecData), "Luas LTT (Ha)"));
+        // =========================
+        // JAGUNG
+        // =========================
+        const jLabels =
+            Object.keys(jagungMap);
 
-        if (chartJagung) chartJagung.destroy();
-        chartJagung = new Chart(ctxJagung, chartConfig(Object.keys(jagungData), Object.values(jagungData), "Luas Jagung (Ha)"));
+        const jValues =
+            Object.values(jagungMap);
+
+        if (chartJagung) {
+            chartJagung.destroy();
+        }
+
+        chartJagung = new Chart(
+            document.getElementById("chartJagung"),
+            {
+                type: "bar",
+
+                data: {
+                    labels: jLabels,
+
+                    datasets: [{
+                        label: "Jagung (Ha)",
+                        data: jValues,
+                        borderWidth: 1
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true
+                }
+            }
+        );
     }
 
-    function updateRankings(data, elementId, type) {
-        const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]).slice(0, 10);
-        const container = document.getElementById(elementId);
+    // =========================
+    // UPDATE RANKING
+    // =========================
+    function updateRankings(mapData, elementId) {
+
+        const container =
+            document.getElementById(elementId);
+
         container.innerHTML = "";
 
+        const sorted =
+            Object.entries(mapData)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10);
+
         sorted.forEach((item, i) => {
-            const div = document.createElement("div");
-            div.className = `rank-item ${i < 3 ? 'top-' + (i + 1) : ''}`;
+
+            const div =
+                document.createElement("div");
+
+            div.className =
+                `rank-item top-${i + 1}`;
+
             div.innerHTML = `
                 <div class="rank-info">
-                    <div class="rank-badge">${i + 1}</div>
-                    <span style="font-size:0.9rem; font-weight:600">${item[0]}</span>
+
+                    <div class="rank-badge">
+                        ${i + 1}
+                    </div>
+
+                    <div>
+                        ${item[0]}
+                    </div>
+
                 </div>
-                <div class="rank-value">${item[1].toFixed(2)} Ha</div>
+
+                <div class="rank-value">
+                    ${item[1].toFixed(2)} Ha
+                </div>
             `;
+
             container.appendChild(div);
         });
     }
 
-    // Export Functions
+    // =========================
+    // EXPORT EXCEL
+    // =========================
     function downloadExcel() {
-        const table = document.getElementById("tableData");
-        const ws = XLSX.utils.table_to_sheet(table);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Data LTT");
-        XLSX.writeFile(wb, `Laporan_LTT_Inhil_${new Date().toLocaleDateString()}.xlsx`);
+
+        const table =
+            document.getElementById("tableData");
+
+        const ws =
+            XLSX.utils.table_to_sheet(table);
+
+        const wb =
+            XLSX.utils.book_new();
+
+        XLSX.utils.book_append_sheet(
+            wb,
+            ws,
+            "Data LTT"
+        );
+
+        XLSX.writeFile(
+            wb,
+            `Laporan_LTT_Inhil.xlsx`
+        );
     }
 
+    // =========================
+    // EXPORT PDF
+    // =========================
     function downloadPDF() {
+
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('l', 'mm', 'a4');
-        doc.text("Laporan Luas Tambah Tanam (LTT) - Kab. Indragiri Hilir", 14, 15);
-        doc.autoTable({ 
-            html: '#tableData',
+
+        const doc =
+            new jsPDF("l", "mm", "a4");
+
+        doc.text(
+            "Laporan Luas Tambah Tanam (LTT)",
+            14,
+            15
+        );
+
+        doc.autoTable({
+            html: "#tableData",
             startY: 20,
-            theme: 'grid',
-            headStyles: { fillColor: [27, 94, 32] }
+            theme: "grid",
+            headStyles: {
+                fillColor: [27, 94, 32]
+            }
         });
-        doc.save(`Laporan_LTT_Inhil.pdf`);
+
+        doc.save("Laporan_LTT_Inhil.pdf");
     }
 
-    // Start
+    // =========================
+    // START
+    // =========================
     loadData();
 </script>
 
