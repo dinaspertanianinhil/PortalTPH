@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Form Statistik Pertanian</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+:root{
+  --primary:#0f766e;
+  --primary2:#14b8a6;
+  --soft:#ecfeff;
+  --border:#dbe4ea;
+  --text:#0f172a;
+  --muted:#64748b;
+  --danger:#ef4444;
+  --bg:#eef7f6;
+  --card:#ffffff;
+  --shadow:0 10px 30px rgba(0,0,0,.07);
+  --radius:22px;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  background:
+  radial-gradient(circle at top left, rgba(20,184,166,.12), transparent 25%),
+  radial-gradient(circle at bottom right, rgba(15,118,110,.10), transparent 30%),
+  var(--bg);
+  min-height:100vh;
+  padding:20px;
+  color:var(--text);
+}
+
+/* HEADER */
+
+.header{
+  background:linear-gradient(135deg,#0f766e,#14b8a6);
+  border-radius:30px;
+  padding:26px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  color:white;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 15px 40px rgba(15,118,110,.35);
+}
+
+.header::before{
+  content:'';
+  position:absolute;
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  background:rgba(255,255,255,.08);
+  right:-50px;
+  top:-60px;
+}
+
+.header::after{
+  content:'';
+  position:absolute;
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  background:rgba(255,255,255,.05);
+  bottom:-40px;
+  left:40px;
+}
+
+.header img{
+  width:65px;
+  height:65px;
+  object-fit:contain;
+  background:rgba(255,255,255,.14);
+  padding:8px;
+  border-radius:18px;
+  z-index:2;
+}
+
+.header-content{
+  z-index:2;
+}
+
+.header-content h1{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:25px;
+  font-weight:800;
+}
+
+.header-content p{
+  margin-top:5px;
+  font-size:13px;
+  opacity:.92;
+}
+
+.badge{
+  margin-left:auto;
+  background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.2);
+  padding:10px 16px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  z-index:2;
+  backdrop-filter:blur(10px);
+}
+
+/* CARD */
+
+.card{
+  background:var(--card);
+  border-radius:24px;
+  padding:24px;
+  margin-top:18px;
+  box-shadow:var(--shadow);
+  border:1px solid #edf2f7;
+  animation:fade .3s ease;
+}
+
+@keyframes fade{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.section-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:14px;
+  font-weight:800;
+  color:var(--primary);
+  text-transform:uppercase;
+  letter-spacing:.8px;
+}
+
+/* GRID */
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+}
+
+.input-group{
+  display:flex;
+  flex-direction:column;
+}
+
+.input-group label{
+  margin-bottom:8px;
+  font-size:13px;
+  font-weight:700;
+  color:var(--muted);
+}
+
+.input-group input,
+.input-group select{
+  width:100%;
+  padding:14px 15px;
+  border-radius:16px;
+  border:1.5px solid var(--border);
+  background:#f8fafc;
+  font-size:14px;
+  transition:.2s;
+  outline:none;
+}
+
+.input-group input:focus,
+.input-group select:focus{
+  border-color:var(--primary2);
+  background:white;
+  box-shadow:0 0 0 4px rgba(20,184,166,.12);
+}
+
+/* TABLE */
+
+.table-container{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+}
+
+th{
+  background:linear-gradient(135deg,#0f766e,#14b8a6);
+  color:white;
+  padding:15px;
+  font-size:13px;
+  text-align:left;
+  white-space:nowrap;
+}
+
+th:first-child{
+  border-top-left-radius:14px;
+}
+
+th:last-child{
+  border-top-right-radius:14px;
+}
+
+td{
+  padding:10px;
+  border-bottom:1px solid #edf2f7;
+  background:white;
+}
+
+td input,
+td select{
+  width:100%;
+  padding:11px 12px;
+  border-radius:13px;
+  border:1px solid #dbe4ea;
+  background:#f8fafc;
+  outline:none;
+  transition:.2s;
+}
+
+td input:focus,
+td select:focus{
+  border-color:var(--primary2);
+  background:white;
+}
+
+/* BUTTON */
+
+.btn{
+  border:none;
+  border-radius:15px;
+  padding:13px 18px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+.btn-add{
+  background:linear-gradient(135deg,#0f766e,#14b8a6);
+  color:white;
+  margin-top:18px;
+  box-shadow:0 10px 25px rgba(20,184,166,.25);
+}
+
+.btn-add:hover{
+  transform:translateY(-2px);
+}
+
+.btn-delete{
+  background:linear-gradient(135deg,#dc2626,#ef4444);
+  color:white;
+  width:42px;
+  height:42px;
+}
+
+.btn-delete:hover{
+  transform:scale(1.05);
+}
+
+.btn-save{
+  width:100%;
+  background:linear-gradient(135deg,#0f766e,#14b8a6);
+  color:white;
+  padding:17px;
+  font-size:15px;
+  margin-top:5px;
+  box-shadow:0 15px 35px rgba(15,118,110,.25);
+}
+
+.btn-save:hover{
+  transform:translateY(-2px);
+}
+
+/* REVIEW */
+
+.review-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+}
+
+.review-card{
+  background:linear-gradient(135deg,#f0fdfa,#ecfeff);
+  border:1px solid #b2f5ea;
+  border-radius:22px;
+  padding:20px;
+}
+
+.review-card small{
+  color:var(--muted);
+  font-weight:700;
+}
+
+.review-card h2{
+  margin-top:7px;
+  font-size:32px;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  color:var(--primary);
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+  body{
+    padding:14px;
+  }
+
+  .header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .badge{
+    margin-left:0;
+  }
+
+  .header-content h1{
+    font-size:22px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+
+  <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png">
+
+  <div class="header-content">
+    <h1>Form Statistik Pertanian</h1>
+    <p>Input Produksi, Luas Panen & Luas Tanaman Hortikultura</p>
+  </div>
+
+  <div class="badge">
+    <i class="fa-solid fa-calendar-days"></i>
+    <span id="tanggalHari"></span>
+  </div>
+
+</div>
+
+<!-- IDENTITAS -->
+<div class="card">
+
+  <div class="section-title">
+    <i class="fa-solid fa-user-pen"></i>
+    Identitas Input
+  </div>
+
+  <div class="grid">
+
+    <div class="input-group">
+      <label>Nama Petugas</label>
+      <input type="text" placeholder="Masukkan nama petugas">
+    </div>
+
+    <div class="input-group">
+      <label>Bulan</label>
+      <select>
+        <option>Januari</option>
+        <option>Februari</option>
+        <option>Maret</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <label>Tahun</label>
+      <select>
+        <option>2026</option>
+        <option>2025</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <label>Komoditas</label>
+      <select>
+        <option>Cabai Rawit</option>
+        <option>Cabai Keriting</option>
+        <option>Cabai Besar</option>
+        <option>Tomat</option>
+        <option>Terung</option>
+      </select>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- DATA -->
+<div class="card">
+
+  <div class="section-title">
+    <i class="fa-solid fa-chart-column"></i>
+    Data Kecamatan
+  </div>
+
+  <div class="table-container">
+
+    <table id="tableData">
+
+      <thead>
+        <tr>
+          <th>Kecamatan</th>
+          <th>Produksi (Kw)</th>
+          <th>Luas Panen (Ha)</th>
+          <th>Luas Tanaman (Ha)</th>
+          <th>Keterangan</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr>
+
+          <td>
+            <select onchange="hitungTotal()">
+              <option value="">Pilih Kecamatan</option>
+              <option>Kemuning</option>
+              <option>Keritang</option>
+              <option>Enok</option>
+              <option>Tempuling</option>
+              <option>Gaung</option>
+            </select>
+          </td>
+
+          <td>
+            <input type="number" placeholder="0" oninput="hitungTotal()">
+          </td>
+
+          <td>
+            <input type="number" placeholder="0" oninput="hitungTotal()">
+          </td>
+
+          <td>
+            <input type="number" placeholder="0" oninput="hitungTotal()">
+          </td>
+
+          <td>
+            <input type="text" placeholder="Keterangan">
+          </td>
+
+          <td>
+            <button class="btn btn-delete" onclick="deleteRow(this)">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <button class="btn btn-add" onclick="addRow()">
+    <i class="fa-solid fa-plus"></i>
+    Tambah Kecamatan
+  </button>
+
+</div>
+
+<!-- REVIEW -->
+<div class="card">
+
+  <div class="section-title">
+    <i class="fa-solid fa-chart-pie"></i>
+    Review Input
+  </div>
+
+  <div class="review-grid">
+
+    <div class="review-card">
+      <small>Total Kecamatan Diinput</small>
+      <h2 id="totalKecamatan">0</h2>
+    </div>
+
+    <div class="review-card">
+      <small>Total Produksi (Kw)</small>
+      <h2 id="totalProduksi">0</h2>
+    </div>
+
+    <div class="review-card">
+      <small>Total Luas Panen (Ha)</small>
+      <h2 id="totalPanen">0</h2>
+    </div>
+
+    <div class="review-card">
+      <small>Total Luas Tanaman (Ha)</small>
+      <h2 id="totalTanaman">0</h2>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- SAVE -->
+<div class="card">
+
+  <button class="btn btn-save">
+    <i class="fa-solid fa-floppy-disk"></i>
+    Simpan Data Statistik Pertanian
+  </button>
+
+</div>
+
+<script>
+
+// TANGGAL
+const today = new Date();
+
+document.getElementById("tanggalHari").innerHTML =
+today.toLocaleDateString('id-ID',{
+  day:'numeric',
+  month:'short',
+  year:'numeric'
+});
+
+// TAMBAH ROW
+function addRow(){
+
+  const tbody = document.querySelector("#tableData tbody");
+
+  const row = `
+  
+  <tr>
+
+    <td>
+      <select onchange="hitungTotal()">
+        <option value="">Pilih Kecamatan</option>
+        <option>Kemuning</option>
+        <option>Keritang</option>
+        <option>Enok</option>
+        <option>Tempuling</option>
+        <option>Gaung</option>
+      </select>
+    </td>
+
+    <td>
+      <input type="number" placeholder="0" oninput="hitungTotal()">
+    </td>
+
+    <td>
+      <input type="number" placeholder="0" oninput="hitungTotal()">
+    </td>
+
+    <td>
+      <input type="number" placeholder="0" oninput="hitungTotal()">
+    </td>
+
+    <td>
+      <input type="text" placeholder="Keterangan">
+    </td>
+
+    <td>
+      <button class="btn btn-delete" onclick="deleteRow(this)">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </td>
+
+  </tr>
+
+  `;
+
+  tbody.insertAdjacentHTML("beforeend",row);
+
+  hitungTotal();
+}
+
+// HAPUS ROW
+function deleteRow(btn){
+  btn.closest("tr").remove();
+  hitungTotal();
+}
+
+// HITUNG REVIEW
+function hitungTotal(){
+
+  let totalProduksi = 0;
+  let totalPanen = 0;
+  let totalTanaman = 0;
+  let totalKecamatan = 0;
+
+  document.querySelectorAll("#tableData tbody tr").forEach(row => {
+
+    const select = row.querySelector("select");
+
+    const produksi = parseFloat(row.cells[1].querySelector("input").value) || 0;
+    const panen = parseFloat(row.cells[2].querySelector("input").value) || 0;
+    const tanaman = parseFloat(row.cells[3].querySelector("input").value) || 0;
+
+    totalProduksi += produksi;
+    totalPanen += panen;
+    totalTanaman += tanaman;
+
+    if(select.value !== ""){
+      totalKecamatan++;
+    }
+
+  });
+
+  document.getElementById("totalProduksi").innerText = totalProduksi;
+  document.getElementById("totalPanen").innerText = totalPanen;
+  document.getElementById("totalTanaman").innerText = totalTanaman;
+  document.getElementById("totalKecamatan").innerText = totalKecamatan;
+}
+
+// AUTO LOAD
+hitungTotal();
+
+</script>
+
+</body>
+</html>
