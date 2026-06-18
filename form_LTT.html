@@ -961,11 +961,11 @@ document.querySelectorAll(".desa").forEach(d=>{
     }
   });
 }
-  // ================= BATAS JAM 17:00
+  // ================= BATAS JAM 16:00
 (function(){
   const now = new Date();
   const btnSimpan = document.getElementById("btnSimpan");
-  if(now.getHours() >= 17){
+  if(now.getHours() >= 16){
     btnSimpan.disabled = true;
     btnSimpan.innerHTML = `<i class="fa-solid fa-clock"></i> Lewat Jam 16:00`;
   }
