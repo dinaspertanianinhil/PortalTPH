@@ -17,44 +17,96 @@
   --accent:       #f59e0b;
   --danger:       #ef4444;
   --danger-dark:  #dc2626;
-  --surface:      #ffffff;
-  --surface-2:    #f8fafc;
+  --surface:      rgba(255,255,255,0.88);
+  --surface-solid: #ffffff;
+  --surface-2:    rgba(248,250,252,0.85);
   --border:       #e2e8f0;
   --border-focus: #0d9488;
   --text:         #0f172a;
   --text-muted:   #64748b;
   --text-light:   #94a3b8;
   --shadow-sm:    0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
-  --shadow-md:    0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
-  --shadow-lg:    0 10px 32px rgba(0,0,0,.10), 0 4px 12px rgba(0,0,0,.06);
-  --radius:       14px;
+  --shadow-md:    0 4px 16px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.07);
+  --shadow-lg:    0 10px 32px rgba(0,0,0,.14), 0 4px 12px rgba(0,0,0,.08);
+  --radius:       16px;
   --radius-sm:    9px;
   --transition:   all .22s cubic-bezier(.4,0,.2,1);
+
+  /* Rekap color themes */
+  --rekap-ltt-bg:   linear-gradient(135deg, #f0fdf9, #ecfdf5);
+  --rekap-ltt-bdr:  #a7f3d0;
+  --rekap-ltt-num:  #0f766e;
+
+  --rekap-olah-bg:  linear-gradient(135deg, #eff6ff, #dbeafe);
+  --rekap-olah-bdr: #93c5fd;
+  --rekap-olah-num: #1d4ed8;
+
+  --rekap-panen-bg: linear-gradient(135deg, #fefce8, #fef9c3);
+  --rekap-panen-bdr:#fde047;
+  --rekap-panen-num: #a16207;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ───── BACKGROUND: sawah premium ───── */
 body {
   font-family: 'DM Sans', sans-serif;
-  background: #eef6f5;
-  background-image:
-    radial-gradient(ellipse at 0% 0%, rgba(13,148,136,.12) 0%, transparent 55%),
-    radial-gradient(ellipse at 100% 100%, rgba(13,148,136,.08) 0%, transparent 55%);
   min-height: 100vh;
   padding: 18px 14px 40px;
   color: var(--text);
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* ───── HEADER ───── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-green-rice-fields-with-morning-dew-and-mountains-with-image_15859864.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  z-index: -2;
+}
+
+/* layered overlay: nuansa emas-hijau pertanian */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(
+      160deg,
+      rgba(2, 44, 34, 0.62) 0%,
+      rgba(6, 78, 59, 0.45) 30%,
+      rgba(0, 0, 0, 0.28) 60%,
+      rgba(15, 118, 110, 0.38) 100%
+    );
+  z-index: -1;
+}
+
+/* ───── HEADER: glassmorphism pertanian ───── */
 .header {
-  background: linear-gradient(135deg, #0f766e 0%, #0d9488 60%, #14b8a6 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(4, 60, 45, 0.82) 0%,
+    rgba(13, 148, 136, 0.78) 60%,
+    rgba(5, 150, 105, 0.75) 100%
+  );
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
   padding: 20px 22px;
   border-radius: var(--radius);
   display: flex;
   align-items: center;
   gap: 14px;
   margin-bottom: 18px;
-  box-shadow: 0 6px 24px rgba(13,148,136,.35), 0 2px 6px rgba(0,0,0,.08);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.28),
+    0 2px 8px rgba(0,0,0,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -1px 0 rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
   position: relative;
   overflow: hidden;
 }
@@ -62,29 +114,43 @@ body {
 .header::before {
   content: '';
   position: absolute;
-  top: -40px; right: -40px;
-  width: 140px; height: 140px;
+  top: -50px; right: -30px;
+  width: 160px; height: 160px;
   border-radius: 50%;
-  background: rgba(255,255,255,.08);
+  background: rgba(255,255,255,0.07);
+  pointer-events: none;
 }
 
 .header::after {
   content: '';
   position: absolute;
-  bottom: -30px; left: 60px;
-  width: 100px; height: 100px;
+  bottom: -35px; left: 50px;
+  width: 120px; height: 120px;
   border-radius: 50%;
-  background: rgba(255,255,255,.06);
+  background: rgba(255,255,255,0.05);
+  pointer-events: none;
+}
+
+/* padi deco element */
+.header-deco {
+  position: absolute;
+  right: 80px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 52px;
+  opacity: 0.06;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
 }
 
 .header img {
-  width: 50px;
-  height: 50px;
+  width: 52px;
+  height: 52px;
   object-fit: contain;
-  border-radius: 10px;
-  background: rgba(255,255,255,.15);
-  padding: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  border-radius: 11px;
+  background: rgba(255,255,255,0.15);
+  padding: 5px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.25);
   flex-shrink: 0;
   position: relative;
   z-index: 1;
@@ -102,11 +168,12 @@ body {
   font-weight: 800;
   color: #fff;
   letter-spacing: -.2px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.25);
 }
 
 .header-text small {
   font-size: 12px;
-  color: rgba(255,255,255,.78);
+  color: rgba(255,255,255,0.82);
   font-weight: 500;
   letter-spacing: .3px;
 }
@@ -115,10 +182,10 @@ body {
   margin-left: auto;
   position: relative;
   z-index: 1;
-  background: rgba(255,255,255,.18);
-  border: 1px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
   border-radius: 20px;
-  padding: 5px 11px;
+  padding: 5px 12px;
   font-size: 11px;
   color: #fff;
   font-weight: 600;
@@ -126,6 +193,8 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 /* ───── SECTION LABEL ───── */
@@ -149,19 +218,23 @@ body {
   background: linear-gradient(to right, var(--primary-light), transparent);
 }
 
-/* ───── BOX / CARD ───── */
+/* ───── BOX / CARD (glassmorphism) ───── */
 .box {
   background: var(--surface);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
   padding: 20px;
   border-radius: var(--radius);
   margin-bottom: 16px;
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.55);
   transition: var(--transition);
   animation: fadeUp .4s ease both;
 }
 
-.box:hover { box-shadow: var(--shadow-lg); }
+.box:hover {
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.7);
+}
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }
@@ -171,6 +244,8 @@ body {
 .box:nth-child(2) { animation-delay: .07s; }
 .box:nth-child(3) { animation-delay: .14s; }
 .box:nth-child(4) { animation-delay: .21s; }
+.box:nth-child(5) { animation-delay: .28s; }
+.box:nth-child(6) { animation-delay: .35s; }
 
 /* ───── LABEL ───── */
 label {
@@ -192,7 +267,7 @@ input, select {
   font-family: 'DM Sans', sans-serif;
   font-size: 14px;
   color: var(--text);
-  background: var(--surface-2);
+  background: rgba(248,250,252,0.90);
   transition: var(--transition);
   appearance: none;
   -webkit-appearance: none;
@@ -201,16 +276,13 @@ input, select {
 
 input:focus, select:focus {
   border-color: var(--border-focus);
-  background: #fff;
+  background: rgba(255,255,255,0.98);
   box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
 input::placeholder { color: var(--text-light); }
 
-/* Custom arrow for select */
-.select-wrap {
-  position: relative;
-}
+.select-wrap { position: relative; }
 
 .select-wrap::after {
   content: '\f107';
@@ -245,7 +317,6 @@ button {
   letter-spacing: .1px;
 }
 
-/* Primary green button */
 .btn-primary, button:not(.btn-hapus):not(.btn-poktan):not(.btn-save) {
   background: linear-gradient(135deg, #0f766e, #0d9488);
   color: #fff;
@@ -265,7 +336,6 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
   box-shadow: 0 2px 6px rgba(13,148,136,.25);
 }
 
-/* Hapus button */
 .btn-hapus {
   background: linear-gradient(135deg, #dc2626, #ef4444) !important;
   color: #fff !important;
@@ -281,7 +351,6 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
   transform: translateY(-1px) !important;
 }
 
-/* Poktan button */
 .btn-poktan {
   background: linear-gradient(135deg, #0369a1, #0284c7) !important;
   color: #fff !important;
@@ -297,7 +366,6 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
   transform: translateY(-1px) !important;
 }
 
-/* Save button */
 .btn-save {
   background: linear-gradient(135deg, #0f766e, #0d9488, #14b8a6) !important;
   color: #fff !important;
@@ -335,7 +403,7 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
 
 /* ───── DESA CARD ───── */
 .desa {
-  background: var(--surface-2);
+  background: rgba(248,250,252,0.88);
   border: 1.5px solid var(--border);
   padding: 16px;
   margin-top: 14px;
@@ -385,7 +453,7 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
   display: grid;
   grid-template-columns: 1fr 90px 150px 75px 75px 1fr 42px;
   gap: 7px;
-  background: #fff;
+  background: rgba(255,255,255,0.92);
   padding: 10px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
@@ -399,7 +467,7 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
 .poktan input, .poktan select {
   font-size: 13px;
   padding: 8px 10px;
-  background: var(--surface-2);
+  background: rgba(248,250,252,0.92);
 }
 
 .poktan .btn-hapus {
@@ -418,7 +486,7 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
   display: none;
 }
 
-/* ───── REKAP GRID ───── */
+/* ───── REKAP GRIDS ───── */
 .rekap {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -426,9 +494,8 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
   margin-top: 4px;
 }
 
+/* Base rekap card */
 .rekap div {
-  background: linear-gradient(135deg, #f0fdf9, #ecfdf5);
-  border: 1px solid #a7f3d0;
   padding: 12px 14px;
   border-radius: var(--radius-sm);
   font-weight: 600;
@@ -442,13 +509,10 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
   gap: 2px;
 }
 
-.rekap div:hover { border-color: var(--primary); transform: scale(1.02); }
-
 .rekap div span {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 22px;
   font-weight: 800;
-  color: var(--primary-dark);
   line-height: 1.1;
 }
 
@@ -457,6 +521,43 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
   font-weight: 700;
   letter-spacing: .3px;
 }
+
+/* LTT rekap (green) */
+.rekap-ltt div {
+  background: var(--rekap-ltt-bg);
+  border: 1px solid var(--rekap-ltt-bdr);
+}
+
+.rekap-ltt div:hover { border-color: var(--primary); transform: scale(1.02); }
+
+.rekap-ltt div span { color: var(--rekap-ltt-num); }
+
+/* Olah Lahan rekap (blue) */
+.rekap-olah div {
+  background: var(--rekap-olah-bg);
+  border: 1px solid var(--rekap-olah-bdr);
+}
+
+.rekap-olah div:hover { border-color: #3b82f6; transform: scale(1.02); }
+
+.rekap-olah div span { color: var(--rekap-olah-num); }
+
+/* Luas Panen rekap (amber) */
+.rekap-panen div {
+  background: var(--rekap-panen-bg);
+  border: 1px solid var(--rekap-panen-bdr);
+}
+
+.rekap-panen div:hover { border-color: #eab308; transform: scale(1.02); }
+
+.rekap-panen div span { color: var(--rekap-panen-num); }
+
+/* ───── REKAP SECTION ICON ───── */
+.section-label.blue { color: #1d4ed8; }
+.section-label.blue::after { background: linear-gradient(to right, #bfdbfe, transparent); }
+
+.section-label.amber { color: #b45309; }
+.section-label.amber::after { background: linear-gradient(to right, #fef08a, transparent); }
 
 /* ───── EMPTY STATE ───── */
 .empty-state {
@@ -472,20 +573,10 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
 .empty-state i { font-size: 32px; color: #a7f3d0; }
 .empty-state p { font-size: 13px; font-weight: 500; }
 
-/* ───── INFO STRIP ───── */
-.info-strip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  font-size: 12px;
-  color: #92400e;
-  font-weight: 600;
-  margin-bottom: 14px;
-}
+/* ───── SCROLLBAR ───── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #99f6e4; border-radius: 10px; }
 
 /* ───── MOBILE ───── */
 @media (max-width: 640px) {
@@ -514,14 +605,18 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
   .desa-actions button { flex: 1; }
 }
 
+@media (min-width: 768px) {
+  body { padding: 24px 20px 50px; max-width: 880px; margin: 0 auto; }
+  .rekap { grid-template-columns: repeat(5, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  body { max-width: 960px; }
+}
+
 @media (max-width: 380px) {
   .rekap { grid-template-columns: 1fr 1fr; }
 }
-
-/* ───── SCROLLBAR ───── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #99f6e4; border-radius: 10px; }
 </style>
 </head>
 
@@ -529,7 +624,8 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
 
 <!-- HEADER -->
 <div class="header">
-  <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png">
+  <div class="header-deco">🌾</div>
+  <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png" alt="Logo Inhil">
   <div class="header-text">
     <b>Form LTT Dinas</b>
     <small><i class="fa-solid fa-wheat-awn" style="font-size:10px;"></i> Dinas Pertanian &mdash; Indragiri Hilir</small>
@@ -540,7 +636,7 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
   </div>
 </div>
 
-<!-- PELAPOR / KECAMATAN / TANGGAL -->
+<!-- IDENTITAS PELAPOR -->
 <div class="box">
   <div class="section-label"><i class="fa-solid fa-id-card"></i> Identitas Pelapor</div>
 
@@ -570,10 +666,10 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
   </button>
 </div>
 
-<!-- REKAP -->
+<!-- REKAP LTT -->
 <div class="box">
   <div class="section-label"><i class="fa-solid fa-chart-bar"></i> Rekap Semua Jenis LTT</div>
-  <div class="rekap">
+  <div class="rekap rekap-ltt">
     <div><span class="rekap-label">Reguler</span><span id="reguler">0</span></div>
     <div><span class="rekap-label">OPLAH</span><span id="oplah">0</span></div>
     <div><span class="rekap-label">CSR</span><span id="csr">0</span></div>
@@ -587,6 +683,40 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
   </div>
 </div>
 
+<!-- REKAP OLAH LAHAN -->
+<div class="box">
+  <div class="section-label blue"><i class="fa-solid fa-tractor"></i> Rekap Olah Lahan</div>
+  <div class="rekap rekap-olah">
+    <div><span class="rekap-label">Reguler</span><span id="olah_reguler">0</span></div>
+    <div><span class="rekap-label">OPLAH</span><span id="olah_oplah">0</span></div>
+    <div><span class="rekap-label">CSR</span><span id="olah_csr">0</span></div>
+    <div><span class="rekap-label">Pompa</span><span id="olah_pompa">0</span></div>
+    <div><span class="rekap-label">DAS</span><span id="olah_das">0</span></div>
+    <div><span class="rekap-label">Tusip</span><span id="olah_tusip">0</span></div>
+    <div><span class="rekap-label">GOGO</span><span id="olah_gogo">0</span></div>
+    <div><span class="rekap-label">Jagung</span><span id="olah_jagung">0</span></div>
+    <div><span class="rekap-label">Jagung Polri</span><span id="olah_jagung_polri">0</span></div>
+    <div><span class="rekap-label">Kedelai</span><span id="olah_kedelai">0</span></div>
+  </div>
+</div>
+
+<!-- REKAP LUAS PANEN -->
+<div class="box">
+  <div class="section-label amber"><i class="fa-solid fa-wheat-awn"></i> Rekap Luas Panen</div>
+  <div class="rekap rekap-panen">
+    <div><span class="rekap-label">Reguler</span><span id="panen_reguler">0</span></div>
+    <div><span class="rekap-label">OPLAH</span><span id="panen_oplah">0</span></div>
+    <div><span class="rekap-label">CSR</span><span id="panen_csr">0</span></div>
+    <div><span class="rekap-label">Pompa</span><span id="panen_pompa">0</span></div>
+    <div><span class="rekap-label">DAS</span><span id="panen_das">0</span></div>
+    <div><span class="rekap-label">Tusip</span><span id="panen_tusip">0</span></div>
+    <div><span class="rekap-label">GOGO</span><span id="panen_gogo">0</span></div>
+    <div><span class="rekap-label">Jagung</span><span id="panen_jagung">0</span></div>
+    <div><span class="rekap-label">Jagung Polri</span><span id="panen_jagung_polri">0</span></div>
+    <div><span class="rekap-label">Kedelai</span><span id="panen_kedelai">0</span></div>
+  </div>
+</div>
+
 <!-- SAVE -->
 <div class="box" style="margin-bottom:4px;">
   <button id="btnSimpan" class="btn-save" onclick="simpan()">
@@ -595,15 +725,13 @@ button:not(.btn-hapus):not(.btn-poktan):not(.btn-save):active {
 </div>
 
 <script>
-// ================= AUTO TANGGAL HARI INI
+// ================= AUTO TANGGAL
 (function(){
   let today = new Date();
   let yyyy = today.getFullYear();
   let mm = String(today.getMonth()+1).padStart(2,'0');
   let dd = String(today.getDate()).padStart(2,'0');
   document.getElementById("tanggal").value = `${yyyy}-${mm}-${dd}`;
-
-  // badge date
   const opt = {day:'numeric', month:'short', year:'numeric'};
   document.getElementById("badgeDate").textContent = today.toLocaleDateString('id-ID', opt);
 })();
@@ -762,22 +890,17 @@ for(let k in dataWilayah){
   kec.appendChild(o);
 }
 
-// isi desa
 function isiDesa(select){
-  let kec = document.getElementById("kecamatan").value;
+  let kecVal = document.getElementById("kecamatan").value;
   select.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
-
-  if(dataWilayah[kec]){
-    // tampilkan kelurahan dulu
-    dataWilayah[kec].kelurahan.forEach(k=>{
+  if(dataWilayah[kecVal]){
+    dataWilayah[kecVal].kelurahan.forEach(k=>{
       let o = document.createElement("option");
       o.value = "Kelurahan " + k;
       o.textContent = k + " (Kelurahan)";
       select.appendChild(o);
     });
-
-    // lalu desa
-    dataWilayah[kec].desa.forEach(d=>{
+    dataWilayah[kecVal].desa.forEach(d=>{
       let o = document.createElement("option");
       o.value = "Desa " + d;
       o.textContent = d + " (Desa)";
@@ -790,7 +913,6 @@ kec.onchange = () => {
   document.querySelectorAll(".desaSelect").forEach(s => isiDesa(s));
 };
 
-// ===== helper: hapus empty state
 function updateEmptyState(){
   const container = document.getElementById("desaContainer");
   const desaCards = container.querySelectorAll(".desa");
@@ -807,7 +929,6 @@ function updateEmptyState(){
   }
 }
 
-// tambah desa
 let desaCounter = 0;
 function tambahDesa(){
   desaCounter++;
@@ -821,7 +942,7 @@ function tambahDesa(){
     <div class="desa-header">
       <span class="desa-title"><i class="fa-solid fa-map-pin"></i> Desa #${desaCounter}</span>
       <div class="desa-actions">
-        <button class="btn-poktan" onclick="tambahPoktan(this)"><i class="fa-solid fa-plus"></i> isi data </button>
+        <button class="btn-poktan" onclick="tambahPoktan(this)"><i class="fa-solid fa-plus"></i> isi data</button>
         <button class="btn-hapus" onclick="this.closest('.desa').remove();hitung();updateEmptyState()"><i class="fa-solid fa-trash"></i> Hapus</button>
       </div>
     </div>
@@ -834,14 +955,11 @@ function tambahDesa(){
   isiDesa(div.querySelector(".desaSelect"));
 }
 
-// tambah poktan
 function tambahPoktan(btn){
   let c = btn.closest('.desa').querySelector(".poktanContainer");
-
   let div = document.createElement("div");
   div.className = "poktan";
   div.innerHTML = `
-    </div>
     <div>
       <div class="poktan-label">LTT (Ha)</div>
       <input type="number" placeholder="Luas Tambah Tanam" oninput="hitung()">
@@ -864,12 +982,12 @@ function tambahPoktan(btn){
       </div>
     </div>
     <div>
-      <div class="poktan-label">Olah Lahan Hari ini(Ha)</div>
-      <input type="number" placeholder="Olah Lahan">
+      <div class="poktan-label">Olah Lahan Hari Ini (Ha)</div>
+      <input type="number" placeholder="Olah Lahan" oninput="hitung()">
     </div>
     <div>
-      <div class="poktan-label">Realisasi Luas Panen Hari ini (Ha)</div>
-      <input type="number" placeholder=" Luas Panen Hari Ini">
+      <div class="poktan-label">Realisasi Luas Panen Hari Ini (Ha)</div>
+      <input type="number" placeholder="Luas Panen Hari Ini" oninput="hitung()">
     </div>
     <div>
       <div class="poktan-label">Keterangan</div>
@@ -882,23 +1000,51 @@ function tambahPoktan(btn){
   c.appendChild(div);
 }
 
-// ================= REKAP
+// ================= REKAP (diperbarui: LTT + Olah Lahan + Luas Panen)
 function hitung(){
-  let total = {reguler:0,oplah:0,csr:0,pompa:0,das:0,tusip:0,gogo:0,jagung:0,jagung_polri:0,kedelai:0};
+  const jenis_list = ['reguler','oplah','csr','pompa','das','tusip','gogo','jagung','jagung_polri','kedelai'];
 
-  document.querySelectorAll(".poktan").forEach(p=>{
-    // desktop: children layout; mobile: wrapped in divs
-    const inputs = p.querySelectorAll("input[type=number]");
-    const selects = p.querySelectorAll("select");
-    let luas = parseFloat(inputs[0]?.value) || 0;
-    let jenis = selects[0]?.value;
-    if(jenis && total[jenis] !== undefined) total[jenis] += luas;
+  let totalLTT   = {};
+  let totalOlah  = {};
+  let totalPanen = {};
+
+  jenis_list.forEach(j => {
+    totalLTT[j]   = 0;
+    totalOlah[j]  = 0;
+    totalPanen[j] = 0;
   });
 
-  for(let k in total){
-    const el = document.getElementById(k);
-    if(el) el.innerText = total[k] % 1 === 0 ? total[k] : total[k].toFixed(2);
-  }
+  document.querySelectorAll(".poktan").forEach(p => {
+    const inputs  = p.querySelectorAll("input[type=number]");
+    const selects = p.querySelectorAll("select");
+
+    let luas  = parseFloat(inputs[0]?.value) || 0;
+    let olah  = parseFloat(inputs[1]?.value) || 0;
+    let panen = parseFloat(inputs[2]?.value) || 0;
+    let jenis = selects[0]?.value;
+
+    if(jenis && totalLTT[jenis] !== undefined){
+      totalLTT[jenis]   += luas;
+      totalOlah[jenis]  += olah;
+      totalPanen[jenis] += panen;
+    }
+  });
+
+  function fmt(v){ return v % 1 === 0 ? v : v.toFixed(2); }
+
+  jenis_list.forEach(j => {
+    // LTT
+    const elLTT = document.getElementById(j);
+    if(elLTT) elLTT.innerText = fmt(totalLTT[j]);
+
+    // Olah Lahan
+    const elOlah = document.getElementById('olah_' + j);
+    if(elOlah) elOlah.innerText = fmt(totalOlah[j]);
+
+    // Luas Panen
+    const elPanen = document.getElementById('panen_' + j);
+    if(elPanen) elPanen.innerText = fmt(totalPanen[j]);
+  });
 }
 
 // ================= KIRIM
@@ -910,28 +1056,28 @@ function simpan(){
     return;
   }
 
-let rows = [];
-document.querySelectorAll(".desa").forEach(d=>{
-  let desa = d.querySelector("select.desaSelect")?.value;
+  let rows = [];
+  document.querySelectorAll(".desa").forEach(d => {
+    let desa = d.querySelector("select.desaSelect")?.value;
 
-  d.querySelectorAll(".poktan").forEach(p=>{
-    const inputs = p.querySelectorAll("input");
-    const selects = p.querySelectorAll("select");
+    d.querySelectorAll(".poktan").forEach(p => {
+      const inputs  = p.querySelectorAll("input");
+      const selects = p.querySelectorAll("select");
 
-    let luas = inputs[0]?.value;
+      let luas = inputs[0]?.value;
 
-    if(luas){
-      rows.push({
-        desa: desa,
-        luas: luas,
-        jenis: selects[0]?.value,
-        olah: inputs[1]?.value,
-        panen: inputs[2]?.value,
-        ket: inputs[3]?.value
-      });
-    }
+      if(luas){
+        rows.push({
+          desa:  desa,
+          luas:  luas,
+          jenis: selects[0]?.value,
+          olah:  inputs[1]?.value,
+          panen: inputs[2]?.value,
+          ket:   inputs[3]?.value
+        });
+      }
+    });
   });
-});
 
   if(rows.length == 0){
     alert("Isi minimal 1 data");
@@ -939,29 +1085,30 @@ document.querySelectorAll(".desa").forEach(d=>{
   }
 
   const data = new URLSearchParams();
-  data.append("pelapor", document.getElementById("pelapor").value);
+  data.append("pelapor",   document.getElementById("pelapor").value);
   data.append("kecamatan", document.getElementById("kecamatan").value);
-  data.append("tanggal", document.getElementById("tanggal").value);
-  data.append("rows", JSON.stringify(rows));
+  data.append("tanggal",   document.getElementById("tanggal").value);
+  data.append("rows",      JSON.stringify(rows));
 
   const btnSimpan = document.getElementById("btnSimpan");
   btnSimpan.disabled = true;
   btnSimpan.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengirim...`;
 
   fetch(SCRIPT_URL, {method:"POST", body:data})
-  .then(r=>r.text())
-  .then(r=>{
-    if(r=="OK"){
+  .then(r => r.text())
+  .then(r => {
+    if(r == "OK"){
       alert("✅ Berhasil disimpan");
       location.reload();
     } else {
-      alert("❌ "+r);
+      alert("❌ " + r);
       btnSimpan.disabled = false;
       btnSimpan.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Data LTT`;
     }
   });
 }
-  // ================= BATAS JAM 17:00
+
+// ================= BATAS JAM 17:00
 (function(){
   const now = new Date();
   const btnSimpan = document.getElementById("btnSimpan");
