@@ -259,6 +259,10 @@ footer.report-footer{text-align:center;color:#fff;font-size:.78rem;opacity:.85;p
         <select id="fDesa"><option value="">Semua Desa</option></select>
       </div>
       <div class="filter-group">
+        <label for="fJenis">Jenis LTT</label>
+        <select id="fJenis"><option value="">Semua Jenis</option></select>
+      </div>
+      <div class="filter-group">
         <label for="fAwal">Tanggal Awal</label>
         <input type="date" id="fAwal">
       </div>
@@ -336,13 +340,14 @@ footer.report-footer{text-align:center;color:#fff;font-size:.78rem;opacity:.85;p
             <th onclick="sortBy('no')">No</th>
             <th onclick="sortBy('kecamatan')">Kecamatan <span class="sort-ic">↕</span></th>
             <th id="thDesa" onclick="sortBy('desa')">Desa/Kelurahan <span class="sort-ic">↕</span></th>
+            <th onclick="sortBy('jenis')">Jenis LTT <span class="sort-ic">↕</span></th>
             <th onclick="sortBy('ltt')">Luas Tambah Tanam (Ha) <span class="sort-ic">↕</span></th>
             <th onclick="sortBy('olah')">Olah Lahan (Ha) <span class="sort-ic">↕</span></th>
             <th onclick="sortBy('panen')">Luas Panen (Ha) <span class="sort-ic">↕</span></th>
           </tr>
         </thead>
         <tbody id="tableBody">
-          <tr><td colspan="6"><div class="skel" style="width:100%;"></div></td></tr>
+          <tr><td colspan="7"><div class="skel" style="width:100%;"></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -384,12 +389,9 @@ function findField(row, candidates){
   return undefined;
 }
 
-function classifyJenis(jenisStr){
-  const s = (jenisStr||'').toString().toLowerCase();
-  if(s.includes('panen')) return 'panen';
-  if(s.includes('olah') || s.includes('oplah')) return 'olah';
-  return 'ltt';
-}
+// catatan: klasifikasi otomatis "olah/panen" dari teks JENIS LTT SUDAH DIHAPUS
+// karena menyebabkan sebagian baris LTT tersedot keliru ke bucket lain.
+// Sekarang Olah Lahan & Luas Panen hanya diambil dari kolom eksplisit jika tersedia.
 
 // ================= FETCH (JANGAN DIUBAH LOGIKANYA) =================
 async function load(){
@@ -401,7 +403,7 @@ async function load(){
   }catch(e){
     console.error("Gagal memuat data:", e);
     document.getElementById('tableBody').innerHTML =
-      `<tr class="empty-row"><td colspan="6"><i data-lucide="wifi-off" class="empty-ic" size="34"></i>Gagal mengambil data dari server. Periksa koneksi atau coba lagi nanti.</td></tr>`;
+      `<tr class="empty-row"><td colspan="7"><i data-lucide="wifi-off" class="empty-ic" size="34"></i>Gagal mengambil data dari server. Periksa koneksi atau coba lagi nanti.</td></tr>`;
     lucide.createIcons();
   }finally{
     document.getElementById('loadingOverlay').classList.add('hidden');
@@ -409,18 +411,22 @@ async function load(){
 }
 
 function populateFilters(data){
-  const tahunSet=new Set(), kecSet=new Set(), desaSet=new Set();
+  const tahunSet=new Set(), kecSet=new Set(), desaSet=new Set(), jenisSet=new Set();
   data.forEach(d=>{
     const tgl = d.TANGGAL || findField(d,['TANGGAL','TGL']);
     if(tgl){ const y = (tgl+"").slice(0,4); if(/^\d{4}$/.test(y)) tahunSet.add(y); }
     if(d.KECAMATAN) kecSet.add(d.KECAMATAN);
     if(d["DESA/KELURAHAN"]) desaSet.add(d["DESA/KELURAHAN"]);
+    if(d["JENIS LTT"]) jenisSet.add(d["JENIS LTT"]);
   });
   const tahunSel = document.getElementById('fTahun');
   [...tahunSet].sort().reverse().forEach(y=> tahunSel.innerHTML += `<option value="${y}">${y}</option>`);
 
   const kecSel = document.getElementById('fKecamatan');
   [...kecSet].sort().forEach(k=> kecSel.innerHTML += `<option value="${k}">${k}</option>`);
+
+  const jenisSel = document.getElementById('fJenis');
+  [...jenisSet].sort().forEach(j=> jenisSel.innerHTML += `<option value="${j}">${j}</option>`);
 
   refreshDesaOptions();
 }
@@ -445,6 +451,7 @@ function resetFilters(){
   document.getElementById('fKecamatan').value='';
   refreshDesaOptions();
   document.getElementById('fDesa').value='';
+  document.getElementById('fJenis').value='';
   document.getElementById('fAwal').value='';
   document.getElementById('fAkhir').value='';
   document.getElementById('quickSearch').value='';
@@ -457,6 +464,7 @@ function getFilteredData(){
   const bulan = document.getElementById('fBulan').value;
   const kec = document.getElementById('fKecamatan').value;
   const desa = document.getElementById('fDesa').value;
+  const jenis = document.getElementById('fJenis').value;
   const awal = document.getElementById('fAwal').value;
   const akhir = document.getElementById('fAkhir').value;
 
@@ -466,6 +474,7 @@ function getFilteredData(){
     if(bulan && tgl.slice(5,7) !== bulan) return false;
     if(kec && x.KECAMATAN !== kec) return false;
     if(desa && x["DESA/KELURAHAN"] !== desa) return false;
+    if(jenis && x["JENIS LTT"] !== jenis) return false;
     if(awal && tgl && tgl < awal) return false;
     if(akhir && tgl && tgl > akhir) return false;
     return true;
@@ -474,30 +483,31 @@ function getFilteredData(){
 
 function computeGrouped(data){
   const map = {};
-  let hasExplicitPanen = false;
+  let hasExplicitOlah = false, hasExplicitPanen = false;
   data.forEach(row=>{
     const kec = row.KECAMATAN || '(Tanpa Kecamatan)';
     const desa = row["DESA/KELURAHAN"] || '(Tanpa Desa)';
-    const key = currentView === 'desa' ? (kec+'|||'+desa) : kec;
-    if(!map[key]) map[key] = { kecamatan:kec, desa: currentView==='desa'?desa:'', ltt:0, olah:0, panen:0 };
+    const jenis = row["JENIS LTT"] || '(Tanpa Jenis)';
+    const key = (currentView === 'desa' ? (kec+'|||'+desa) : kec) + '|||' + jenis;
+    if(!map[key]) map[key] = { kecamatan:kec, desa: currentView==='desa'?desa:'', jenis:jenis, ltt:0, olah:0, panen:0 };
 
-    const type = classifyJenis(row["JENIS LTT"]);
+    // LTT: dijumlahkan APA ADANYA dari kolom LUAS TAMBAH TANAM, tanpa menebak kategori
     const amount = num(findField(row, ['LUAS TAMBAH TANAM','LUAS','NILAI']));
+    map[key].ltt += amount;
+
+    // Olah Lahan & Luas Panen: HANYA dari kolom eksplisit (kalau memang ada di data sheet)
     const explicitOlah = findField(row, ['LUAS OLAH LAHAN','OLAH LAHAN']);
     const explicitPanen = findField(row, ['LUAS PANEN','PANEN']);
-    if(explicitPanen !== undefined) hasExplicitPanen = true;
-
-    map[key].ltt   += (type==='ltt')   ? amount : 0;
-    map[key].olah  += (type==='olah')  ? amount : (explicitOlah!==undefined ? num(explicitOlah) : 0);
-    map[key].panen += (type==='panen') ? amount : (explicitPanen!==undefined ? num(explicitPanen) : 0);
+    if(explicitOlah !== undefined){ hasExplicitOlah = true; map[key].olah += num(explicitOlah); }
+    if(explicitPanen !== undefined){ hasExplicitPanen = true; map[key].panen += num(explicitPanen); }
   });
-  return { rows: Object.values(map), hasExplicitPanen };
+  return { rows: Object.values(map), hasExplicitOlah, hasExplicitPanen };
 }
 
 // ================= RENDER =================
 function render(){
   const data = getFilteredData();
-  const { rows, hasExplicitPanen } = computeGrouped(data);
+  const { rows, hasExplicitOlah, hasExplicitPanen } = computeGrouped(data);
   grouped = rows;
 
   // periode text
@@ -525,9 +535,12 @@ function render(){
   document.getElementById('statKec').innerText = kecSet.size;
   document.getElementById('statDesa').innerText = desaSet.size;
 
+  const missing = [];
+  if(!hasExplicitOlah) missing.push('Olah Lahan');
+  if(!hasExplicitPanen) missing.push('Luas Panen');
   const noticeBox = document.getElementById('panenNotice');
-  if(!hasExplicitPanen && totalPanen===0){
-    noticeBox.innerHTML = `<div class="notice"><i data-lucide="info" size="16"></i> Data "Luas Panen" belum tersedia pada sumber data saat ini. Kolom akan otomatis terisi jika data ditambahkan pada Google Sheet.</div>`;
+  if(missing.length){
+    noticeBox.innerHTML = `<div class="notice"><i data-lucide="info" size="16"></i> Data "${missing.join(' & ')}" belum tersedia sebagai kolom terpisah pada sumber data saat ini, sehingga tampil 0,00. Kolom akan otomatis terisi begitu kolomnya ditambahkan pada Google Sheet.</div>`;
   } else {
     noticeBox.innerHTML = '';
   }
@@ -555,7 +568,7 @@ function renderTable(){
   const q = (document.getElementById('quickSearch').value||'').toLowerCase().trim();
   let rows = grouped.filter(r=>{
     if(!q) return true;
-    return (r.kecamatan||'').toLowerCase().includes(q) || (r.desa||'').toLowerCase().includes(q);
+    return (r.kecamatan||'').toLowerCase().includes(q) || (r.desa||'').toLowerCase().includes(q) || (r.jenis||'').toLowerCase().includes(q);
   });
 
   rows.sort((a,b)=>{
@@ -571,7 +584,7 @@ function renderTable(){
 
   const tbody = document.getElementById('tableBody');
   if(rows.length===0){
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="6"><i data-lucide="search-x" class="empty-ic" size="34"></i>Tidak ada data yang cocok dengan filter/pencarian saat ini.</td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="7"><i data-lucide="search-x" class="empty-ic" size="34"></i>Tidak ada data yang cocok dengan filter/pencarian saat ini.</td></tr>`;
     lucide.createIcons();
     return;
   }
@@ -584,13 +597,14 @@ function renderTable(){
       <td>${i+1}</td>
       <td>${r.kecamatan}</td>
       <td style="${currentView==='desa'?'':'display:none;'}">${r.desa}</td>
+      <td>${r.jenis}</td>
       <td>${r.ltt.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
       <td>${r.olah.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
       <td>${r.panen.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
     </tr>`;
   });
   body += `<tr class="total-row">
-    <td colspan="${currentView==='desa'?3:2}">TOTAL KESELURUHAN</td>
+    <td colspan="${currentView==='desa'?4:3}">TOTAL KESELURUHAN</td>
     <td>${totLTT.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
     <td>${totOlah.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
     <td>${totPanen.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
