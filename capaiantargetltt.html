@@ -293,35 +293,38 @@ header img.logo{
 .chart-area{ height:380px; }
 
 /* ===== Kecamatan cards ===== */
-#listCapaian{ display:flex; flex-direction:column; gap:12px; max-height:420px; overflow-y:auto; padding-right:4px; }
-#listCapaian::-webkit-scrollbar{ width:6px; }
-#listCapaian::-webkit-scrollbar-thumb{ background:rgba(27,94,32,0.25); border-radius:10px; }
+#listCapaian{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
+    gap:9px;
+}
 
 .kec-card{
-    background:rgba(255,255,255,0.75);
+    background:rgba(255,255,255,0.78);
     border:1px solid rgba(27,94,32,0.08);
-    border-radius:14px;
-    padding:13px 15px;
+    border-radius:12px;
+    padding:9px 12px;
     transition:transform .25s ease, box-shadow .25s ease;
     animation:fadeSlideUp .5s ease both;
 }
-.kec-card:hover{ transform:translateX(4px); box-shadow:0 8px 18px rgba(15,61,19,0.12); }
+.kec-card:hover{ transform:translateY(-2px); box-shadow:0 8px 18px rgba(15,61,19,0.12); }
 
-.kec-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; gap:8px; }
-.kec-name{ font-weight:700; font-size:.86rem; color:var(--ink); }
-.kec-stat{ font-size:.74rem; color:var(--muted); font-weight:600; white-space:nowrap; }
+.kec-top{ display:flex; flex-direction:column; gap:2px; margin-bottom:6px; }
+.kec-name{ font-weight:700; font-size:.8rem; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.kec-stat{ font-size:.72rem; color:var(--muted); font-weight:600; white-space:nowrap; }
 .kec-stat b{ color:var(--forest-deep); }
 
 .bar{
-    height:9px; background:rgba(27,94,32,0.09);
+    height:8px; background:rgba(27,94,32,0.09);
     border-radius:10px; overflow:hidden; position:relative;
+    flex:1;
 }
 .fill{
     height:100%; border-radius:10px; width:0;
     animation:growBar 1.1s cubic-bezier(.4,0,.2,1) forwards;
     position:relative;
 }
-.kec-pct{ font-size:.7rem; font-weight:700; margin-top:5px; display:block; text-align:right; }
+.kec-pct{ display:block; font-size:.72rem; font-weight:700; text-align:right; margin-top:4px; }
 
 /* ===== Footer print info ===== */
 .print-footer{ display:none; }
@@ -450,6 +453,8 @@ let realisasi = [];
 let target = [];
 let selectedMonth = "";
 let chart;
+let lastLabels = [], lastRealMap = {}, lastTargetMap = {};
+let lastTotalT = 0, lastTotalR = 0, lastPersen = 0;
 
 // ===== HELPER (tidak diubah) =====
 function safeNumber(val){
@@ -623,12 +628,19 @@ function render(){
     document.getElementById("persenCapaian").innerText = persen.toFixed(1)+"%";
     updateGauge(persen);
 
+    lastTotalT = totalT;
+    lastTotalR = totalR;
+    lastPersen = persen;
+    lastRealMap = realMap;
+    lastTargetMap = targetMap;
+
     let container = document.getElementById("listCapaian");
     container.innerHTML = "";
 
     let labels=[], tData=[], rData=[];
     let keys = Object.keys(targetMap);
     document.getElementById("jumlahKec").innerText = keys.length + " kecamatan";
+    lastLabels = keys;
 
     keys.forEach((k, i)=>{
         let r = realMap[k]||0;
@@ -665,6 +677,8 @@ function render(){
     gradReal.addColorStop(0,"rgba(16,185,129,0.9)");
     gradReal.addColorStop(1,"rgba(16,185,129,0.28)");
 
+    const maxVal = Math.max(1, ...tData, ...rData);
+
     chart = new Chart(ctx,{
         type:'bar',
         data:{
@@ -677,6 +691,7 @@ function render(){
         options:{
             responsive:true,
             maintainAspectRatio:false,
+            layout:{ padding:{ top:26 } },
             animation:{ duration:900, easing:'easeOutQuart' },
             plugins:{
                 legend:{
@@ -696,7 +711,7 @@ function render(){
             },
             scales:{
                 x:{ grid:{ display:false }, ticks:{ font:{ family:"'Plus Jakarta Sans'", size:10, weight:'600' }, color:'#5b6f63' } },
-                y:{ grid:{ color:'rgba(27,94,32,0.08)' }, ticks:{ font:{ family:"'Space Grotesk'", size:10 }, color:'#5b6f63' } }
+                y:{ suggestedMax: maxVal * 1.22, grid:{ color:'rgba(27,94,32,0.08)' }, ticks:{ font:{ family:"'Space Grotesk'", size:10 }, color:'#5b6f63' } }
             }
         },
         plugins:[{
@@ -711,7 +726,7 @@ function render(){
                     const meta = c.getDatasetMeta(di);
                     meta.data.forEach((bar, i)=>{
                         const val = ds.data[i];
-                        if(val > 0) ctx.fillText(val.toFixed(1), bar.x, bar.y - 6);
+                        if(val > 0) ctx.fillText(val.toFixed(1), bar.x, bar.y - 10);
                     });
                 });
                 ctx.restore();
@@ -723,7 +738,6 @@ function render(){
 // ===== DOWNLOAD PDF (fitur baru, tidak menyentuh logika data) =====
 async function downloadPDF(){
     const btn = document.getElementById("btnDownloadPdf");
-    const footer = document.getElementById("printFooter");
     btn.classList.add("loading");
 
     const bulanLabel = selectedMonth ?
@@ -731,15 +745,67 @@ async function downloadPDF(){
         "Semua Periode";
     const tanggalCetak = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'});
 
-    footer.style.display = "block";
-    footer.innerHTML = `
-        <div style="margin-top:20px;padding:16px 20px;background:rgba(255,255,255,0.9);border-radius:14px;font-size:.75rem;color:#5b6f63;border:1px solid rgba(27,94,32,0.1);">
-            <b>Laporan Capaian Tanam</b> — Periode: ${bulanLabel} · Dicetak: ${tanggalCetak}
+    // Bangun ulang baris kecamatan dalam versi flat/plain (tanpa glass & animasi) agar hasil render tajam
+    let rowsHtml = "";
+    lastLabels.forEach(k=>{
+        const r = lastRealMap[k] || 0;
+        const t = lastTargetMap[k] || 0;
+        const p = t ? r/t*100 : 0;
+        const status = getStatusColor(p);
+        const pctDisplay = Math.min(p, 100);
+        rowsHtml += `
+        <div style="border:1px solid #dfe9e2;border-radius:10px;padding:9px 12px;background:#ffffff;">
+            <div style="font-weight:700;font-size:11.5px;color:#12241a;margin-bottom:2px;">${k}</div>
+            <div style="font-size:10px;color:#5b6f63;font-weight:600;margin-bottom:6px;">${r.toFixed(2)} / ${t.toFixed(2)} Ha</div>
+            <div style="height:7px;border-radius:8px;background:#e7efe9;overflow:hidden;">
+                <div style="height:100%;width:${pctDisplay}%;background:${status.solid};border-radius:8px;"></div>
+            </div>
+            <div style="text-align:right;font-size:10px;font-weight:700;color:${status.solid};margin-top:3px;">${p.toFixed(1)}%</div>
         </div>`;
+    });
+
+    const chartImg = chart ? chart.toBase64Image('image/png', 1.0) : "";
+
+    // Kontainer capture tersembunyi, background solid putih (tanpa efek blur/glass) supaya hasil PDF tajam
+    const capture = document.createElement("div");
+    capture.style.cssText = "position:fixed;left:-9999px;top:0;width:820px;background:#ffffff;padding:28px;font-family:'Plus Jakarta Sans',sans-serif;color:#12241a;";
+    capture.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #1b5e20;padding-bottom:12px;margin-bottom:16px;">
+            <div>
+                <div style="font-family:'Sora',sans-serif;font-size:17px;font-weight:800;color:#0f3d13;">Laporan Capaian Tanam</div>
+                <div style="font-size:11px;color:#5b6f63;margin-top:2px;">Dinas Pertanian Kabupaten Indragiri Hilir</div>
+            </div>
+            <div style="text-align:right;font-size:10.5px;color:#5b6f63;">
+                <div>Periode: <b style="color:#12241a;">${bulanLabel}</b></div>
+                <div>Dicetak: ${tanggalCetak}</div>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-bottom:20px;">
+            <div style="flex:1;border-radius:10px;background:#f3faf5;padding:12px 14px;">
+                <div style="font-size:10px;color:#5b6f63;font-weight:700;text-transform:uppercase;">Total Target</div>
+                <div style="font-family:'Space Grotesk',monospace;font-size:16px;font-weight:700;color:#0f3d13;margin-top:4px;">${lastTotalT.toFixed(2)} Ha</div>
+            </div>
+            <div style="flex:1;border-radius:10px;background:#f3faf5;padding:12px 14px;">
+                <div style="font-size:10px;color:#5b6f63;font-weight:700;text-transform:uppercase;">Total Realisasi</div>
+                <div style="font-family:'Space Grotesk',monospace;font-size:16px;font-weight:700;color:#0f3d13;margin-top:4px;">${lastTotalR.toFixed(2)} Ha</div>
+            </div>
+            <div style="flex:1;border-radius:10px;background:#f3faf5;padding:12px 14px;">
+                <div style="font-size:10px;color:#5b6f63;font-weight:700;text-transform:uppercase;">Persentase Capaian</div>
+                <div style="font-family:'Space Grotesk',monospace;font-size:16px;font-weight:700;color:#0f3d13;margin-top:4px;">${lastPersen.toFixed(1)} %</div>
+            </div>
+        </div>
+
+        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#0f3d13;margin-bottom:10px;">Capaian per Kecamatan</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:22px;">${rowsHtml}</div>
+
+        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#0f3d13;margin-bottom:10px;">Grafik Target vs Realisasi</div>
+        ${chartImg ? `<img src="${chartImg}" style="width:100%;border-radius:10px;border:1px solid #e5efe8;" />` : ""}
+    `;
+    document.body.appendChild(capture);
 
     try{
-        const target = document.getElementById("pdfArea");
-        const canvas = await html2canvas(target, { scale:2, useCORS:true, backgroundColor:"#f7faf8" });
+        const canvas = await html2canvas(capture, { scale:2, useCORS:true, backgroundColor:"#ffffff" });
         const imgData = canvas.toDataURL("image/png");
 
         const { jsPDF } = window.jspdf;
@@ -767,7 +833,7 @@ async function downloadPDF(){
         alert("❌ Gagal membuat PDF\n" + err.message);
         console.error(err);
     } finally{
-        footer.style.display = "none";
+        document.body.removeChild(capture);
         btn.classList.remove("loading");
     }
 }
