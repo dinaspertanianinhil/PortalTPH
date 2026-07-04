@@ -684,14 +684,14 @@ function render(){
         data:{
             labels:labels,
             datasets:[
-                {label:'Target', data:tData, backgroundColor:gradTarget, borderRadius:8, borderSkipped:false, maxBarThickness:26},
-                {label:'Realisasi', data:rData, backgroundColor:gradReal, borderRadius:8, borderSkipped:false, maxBarThickness:26}
+                {label:'Target', data:tData, backgroundColor:gradTarget, borderRadius:8, borderSkipped:false, maxBarThickness:22, barPercentage:0.62, categoryPercentage:0.82},
+                {label:'Realisasi', data:rData, backgroundColor:gradReal, borderRadius:8, borderSkipped:false, maxBarThickness:22, barPercentage:0.62, categoryPercentage:0.82}
             ]
         },
         options:{
             responsive:true,
             maintainAspectRatio:false,
-            layout:{ padding:{ top:26 } },
+            layout:{ padding:{ top:30 } },
             animation:{ duration:900, easing:'easeOutQuart' },
             plugins:{
                 legend:{
@@ -711,7 +711,7 @@ function render(){
             },
             scales:{
                 x:{ grid:{ display:false }, ticks:{ font:{ family:"'Plus Jakarta Sans'", size:10, weight:'600' }, color:'#5b6f63' } },
-                y:{ suggestedMax: maxVal * 1.22, grid:{ color:'rgba(27,94,32,0.08)' }, ticks:{ font:{ family:"'Space Grotesk'", size:10 }, color:'#5b6f63' } }
+                y:{ suggestedMax: maxVal * 1.28, grid:{ color:'rgba(27,94,32,0.08)' }, ticks:{ font:{ family:"'Space Grotesk'", size:10 }, color:'#5b6f63' } }
             }
         },
         plugins:[{
@@ -719,16 +719,44 @@ function render(){
             afterDatasetsDraw(c){
                 const {ctx} = c;
                 ctx.save();
-                ctx.font = "600 10px 'Space Grotesk'";
-                ctx.fillStyle = "#12241a";
+                ctx.font = "700 9.5px 'Space Grotesk'";
                 ctx.textAlign = "center";
-                c.data.datasets.forEach((ds, di)=>{
-                    const meta = c.getDatasetMeta(di);
-                    meta.data.forEach((bar, i)=>{
-                        const val = ds.data[i];
-                        if(val > 0) ctx.fillText(val.toFixed(1), bar.x, bar.y - 10);
-                    });
+                ctx.lineJoin = "round";
+
+                const metaTarget = c.getDatasetMeta(0);
+                const metaReal = c.getDatasetMeta(1);
+
+                c.data.labels.forEach((_, i)=>{
+                    const barT = metaTarget && metaTarget.data[i];
+                    const barR = metaReal && metaReal.data[i];
+                    const valT = tData[i];
+                    const valR = rData[i];
+
+                    // Jika tinggi kedua batang berdekatan, beri jarak vertikal ekstra
+                    // supaya angka Target & Realisasi tidak saling tumpuk.
+                    let extraT = 0, extraR = 0;
+                    if(barT && barR && valT > 0 && valR > 0){
+                        const gap = Math.abs(barT.y - barR.y);
+                        if(gap < 16){
+                            extraT = 10;
+                        }
+                    }
+
+                    const drawLabel = (bar, val, extra)=>{
+                        if(!bar || !(val > 0)) return;
+                        const text = val.toFixed(1);
+                        const x = bar.x, y = bar.y - 8 - extra;
+                        ctx.strokeStyle = "rgba(255,255,255,0.92)";
+                        ctx.lineWidth = 3;
+                        ctx.strokeText(text, x, y);
+                        ctx.fillStyle = "#12241a";
+                        ctx.fillText(text, x, y);
+                    };
+
+                    drawLabel(barT, valT, extraT);
+                    drawLabel(barR, valR, extraR);
                 });
+
                 ctx.restore();
             }
         }]
