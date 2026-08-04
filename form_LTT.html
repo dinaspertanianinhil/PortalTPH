@@ -1108,13 +1108,13 @@ function simpan(){
   });
 }
 
-// ================= BATAS JAM 19:00
+// ================= BATAS JAM 15:00
 (function(){
   const now = new Date();
   const btnSimpan = document.getElementById("btnSimpan");
-  if(now.getHours() >= 19){
+  if(now.getHours() >= 15){
     btnSimpan.disabled = true;
-    btnSimpan.innerHTML = `<i class="fa-solid fa-clock"></i> Lewat Jam 19:00`;
+    btnSimpan.innerHTML = `<i class="fa-solid fa-clock"></i> Lewat Jam 15:00`;
   }
 })();
 </script>
