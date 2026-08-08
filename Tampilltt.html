@@ -1346,18 +1346,24 @@
     }
 
     // ═══════════════════════════════════════════
-    // MUSIK LATAR (autoplay + fallback klik pertama)
+    // MUSIK LATAR (autoplay + fallback interaksi pertama)
     // ═══════════════════════════════════════════
     const bgMusic = document.getElementById("bgMusic");
     const musicBtn = document.getElementById("musicBtn");
+    let audioFileMissing = false;
 
     function setPlayingUI(isPlaying) {
+        if (audioFileMissing) return;
         musicBtn.textContent = isPlaying ? "🔊" : "🔈";
         musicBtn.setAttribute("aria-pressed", isPlaying ? "true" : "false");
         musicBtn.title = isPlaying ? "Jeda musik" : "Putar musik";
     }
 
     function toggleMusic() {
+        if (audioFileMissing) {
+            alert("File musik (Sentimental.mp3) tidak ditemukan di server. Pastikan file sudah diupload di folder yang sama dengan halaman ini.");
+            return;
+        }
         if (bgMusic.paused) {
             bgMusic.play().then(() => setPlayingUI(true)).catch(() => setPlayingUI(false));
         } else {
@@ -1370,16 +1376,35 @@
     bgMusic.addEventListener("play", () => setPlayingUI(true));
     bgMusic.addEventListener("pause", () => setPlayingUI(false));
 
+    // Deteksi kalau file audio gagal dimuat (404 / rusak / nama salah)
+    bgMusic.addEventListener("error", () => {
+        audioFileMissing = true;
+        musicBtn.textContent = "⚠️";
+        musicBtn.title = "File musik tidak ditemukan (cek nama file Sentimental.mp3 di server)";
+        console.error("Gagal memuat audio: periksa apakah 'Sentimental.mp3' benar-benar ada di folder yang sama dengan file HTML ini di server/GitHub Pages.");
+    });
+
     // Coba putar otomatis saat halaman dibuka — browser umumnya memblokir ini
     // sampai ada interaksi pengguna, jadi dipasang juga fallback: musik akan
-    // otomatis mulai pada klik/tap pertama di halaman kalau autoplay gagal.
+    // otomatis mulai pada interaksi pertama (klik ATAU sentuhan) di halaman
+    // kalau autoplay gagal. Dua event dipasang karena beberapa browser mobile
+    // (Safari/iOS terutama) hanya mengizinkan play() dari event 'touchstart'.
     window.addEventListener("load", () => {
-        bgMusic.play().then(() => setPlayingUI(true)).catch(() => setPlayingUI(false));
+        const p = bgMusic.play();
+        if (p !== undefined) {
+            p.then(() => setPlayingUI(true)).catch(() => setPlayingUI(false));
+        }
     });
-    document.body.addEventListener("click", function primeAudio() {
-        if (bgMusic.paused) bgMusic.play().then(() => setPlayingUI(true)).catch(() => {});
+
+    function primeAudio() {
+        if (!audioFileMissing && bgMusic.paused) {
+            bgMusic.play().then(() => setPlayingUI(true)).catch(() => {});
+        }
         document.body.removeEventListener("click", primeAudio);
-    }, { once: true });
+        document.body.removeEventListener("touchstart", primeAudio);
+    }
+    document.body.addEventListener("click", primeAudio, { once: true });
+    document.body.addEventListener("touchstart", primeAudio, { once: true });
 
     // ═══════════════════════════════════════════
     // START
@@ -1388,3 +1413,4 @@
 </script>
 </body>
 </html>
+
