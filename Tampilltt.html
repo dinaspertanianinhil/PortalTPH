@@ -684,6 +684,29 @@
             font-style: italic;
             font-size: 0.85rem;
         }
+
+        /* ─── MUSIC BUTTON ─── */
+        #musicBtn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 1001;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: var(--green-800);
+            color: white;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: transform 0.25s;
+        }
+
+        #musicBtn:hover { transform: scale(1.08); }
     </style>
 </head>
 
@@ -926,6 +949,12 @@
 
     </div>
 </div>
+
+<!-- ─── AUDIO LATAR (AUTOPLAY) ─── -->
+<!-- File "Sentimental.mp3" harus berada satu folder dengan file HTML ini di repo GitHub -->
+<audio id="bgMusic" src="Sentimental.mp3" loop preload="auto"></audio>
+
+<button id="musicBtn" title="Putar musik" aria-pressed="false">🔈</button>
 
 <script>
     // ═══════════════════════════════════════════
@@ -1315,6 +1344,42 @@
         });
         doc.save("Laporan_LTT_Inhil.pdf");
     }
+
+    // ═══════════════════════════════════════════
+    // MUSIK LATAR (autoplay + fallback klik pertama)
+    // ═══════════════════════════════════════════
+    const bgMusic = document.getElementById("bgMusic");
+    const musicBtn = document.getElementById("musicBtn");
+
+    function setPlayingUI(isPlaying) {
+        musicBtn.textContent = isPlaying ? "🔊" : "🔈";
+        musicBtn.setAttribute("aria-pressed", isPlaying ? "true" : "false");
+        musicBtn.title = isPlaying ? "Jeda musik" : "Putar musik";
+    }
+
+    function toggleMusic() {
+        if (bgMusic.paused) {
+            bgMusic.play().then(() => setPlayingUI(true)).catch(() => setPlayingUI(false));
+        } else {
+            bgMusic.pause();
+            setPlayingUI(false);
+        }
+    }
+
+    musicBtn.addEventListener("click", toggleMusic);
+    bgMusic.addEventListener("play", () => setPlayingUI(true));
+    bgMusic.addEventListener("pause", () => setPlayingUI(false));
+
+    // Coba putar otomatis saat halaman dibuka — browser umumnya memblokir ini
+    // sampai ada interaksi pengguna, jadi dipasang juga fallback: musik akan
+    // otomatis mulai pada klik/tap pertama di halaman kalau autoplay gagal.
+    window.addEventListener("load", () => {
+        bgMusic.play().then(() => setPlayingUI(true)).catch(() => setPlayingUI(false));
+    });
+    document.body.addEventListener("click", function primeAudio() {
+        if (bgMusic.paused) bgMusic.play().then(() => setPlayingUI(true)).catch(() => {});
+        document.body.removeEventListener("click", primeAudio);
+    }, { once: true });
 
     // ═══════════════════════════════════════════
     // START
