@@ -6,7 +6,6 @@
 <title>Dashboard Capaian Tanam - Dinas Pertanian Inhil</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,14 +13,15 @@
 
 <style>
 :root{
-    --forest:#1b5e20;
-    --forest-deep:#0f3d13;
-    --emerald:#10b981;
+    --forest:#14532d;
+    --paddy:#2f7a4d;
+    --forest-deep:#14532d;
+    --emerald:#4caf50;
     --lime:#84cc16;
-    --gold:#eab308;
-    --paper:#f7faf8;
-    --ink:#12241a;
-    --muted:#5b6f63;
+    --gold:#d9a441;
+    --paper:#f7f5ee;
+    --ink:#1c2b21;
+    --muted:#5b6b60;
     --glass:rgba(255,255,255,0.62);
     --glass-strong:rgba(255,255,255,0.82);
     --glass-border:rgba(255,255,255,0.55);
@@ -31,8 +31,9 @@
     --r-lightgreen:#4ade80;
     --r-darkgreen:#15803d;
     --r-emerald:#10b981;
-    --shadow-soft:0 10px 30px rgba(15,61,19,0.10);
-    --shadow-strong:0 20px 45px rgba(15,61,19,0.18);
+    --shadow-soft:0 10px 30px -12px rgba(20,83,45,0.25);
+    --shadow-strong:0 20px 45px -14px rgba(20,83,45,0.35);
+    --radius:18px;
 }
 
 *{box-sizing:border-box;}
@@ -77,51 +78,60 @@ h1,h2,h3,h4{ font-family:'Sora',sans-serif; margin:0; }
 .anim-up{ animation:fadeSlideUp .6s ease both; }
 .anim-scale{ animation:scaleIn .6s ease both; }
 
-/* ===== Header ===== */
+/* ===== Header (aligned with master design system) ===== */
 header{
-    position:sticky; top:0; z-index:50;
+    position:sticky; top:0; z-index:200;
     display:flex; align-items:center; justify-content:space-between; gap:16px;
-    padding:14px 5%;
-    background:var(--glass-strong);
-    backdrop-filter:blur(16px) saturate(160%);
-    -webkit-backdrop-filter:blur(16px) saturate(160%);
-    border-bottom:1px solid var(--glass-border);
-    box-shadow:var(--shadow-soft);
+    padding:1.1rem 1.75rem;
+    background:linear-gradient(120deg,var(--forest),var(--paddy) 70%);
+    box-shadow:0 6px 20px -8px rgba(0,0,0,0.35);
+    flex-wrap:wrap;
 }
 
 .header-left{ display:flex; align-items:center; gap:14px; }
 
 header img.logo{
     width:46px; height:46px; object-fit:contain;
-    filter:drop-shadow(0 2px 6px rgba(0,0,0,0.15));
+    background:#fff;border-radius:10px;padding:4px;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25));
 }
 
 .header-title h1{
-    font-size:1.15rem; font-weight:700; color:var(--forest-deep);
+    font-size:1.15rem; font-weight:700; color:#fff;
     letter-spacing:.2px;
 }
 
 .header-title span{
-    display:block; font-size:.78rem; color:var(--muted); font-weight:500; margin-top:2px;
+    display:block; font-size:.82rem; color:rgba(255,255,255,0.92); font-weight:500; margin-top:2px;
 }
 
 .header-icon{
     width:38px; height:38px; border-radius:12px;
-    background:linear-gradient(135deg, var(--emerald), var(--forest));
+    background:rgba(255,255,255,0.18);
     display:flex; align-items:center; justify-content:center;
-    box-shadow:0 6px 16px rgba(16,185,129,0.35);
+    box-shadow:none;
 }
 
 .header-icon svg{ width:20px; height:20px; stroke:#fff; }
 
-.header-right{ display:none; align-items:center; gap:8px; font-size:.75rem; color:var(--muted); }
+.header-right{ display:flex; flex-direction:column; align-items:flex-end; gap:.4rem; font-size:.75rem; color:#fff; }
 
-@media(min-width:720px){ .header-right{ display:flex; } }
+.back-button{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:rgba(255,255,255,0.16);color:#fff;
+  padding:.4rem .8rem;border-radius:20px;font-size:.78rem;font-weight:700;
+  text-decoration:none;border:1px solid rgba(255,255,255,0.3);
+  transition:background .2s, transform .15s;
+}
+.back-button:hover{background:rgba(255,255,255,0.28);}
+.back-button:active{transform:scale(0.96);}
+
+.live-pill{ display:inline-flex; align-items:center; gap:.4rem; font-size:.72rem; background:rgba(255,255,255,0.16); padding:.25rem .6rem; border-radius:20px; color:#fff; }
 
 .dot-live{
-    width:8px; height:8px; border-radius:50%; background:var(--emerald);
-    box-shadow:0 0 0 0 rgba(16,185,129,.6);
-    animation:livePulse 2s infinite;
+    width:7px; height:7px; border-radius:50%; background:var(--lime);
+    box-shadow:0 0 0 0 rgba(132,204,22,.7);
+    animation:livePulse 1.8s infinite;
 }
 @keyframes livePulse{
     0%{ box-shadow:0 0 0 0 rgba(16,185,129,.55); }
@@ -326,6 +336,46 @@ header img.logo{
 }
 .kec-pct{ display:block; font-size:.72rem; font-weight:700; text-align:right; margin-top:4px; }
 
+/* ===== MUSIC BUTTON (shared identity) ===== */
+#musicBtn{
+  position:fixed;right:20px;bottom:20px;z-index:1001;
+  width:50px;height:50px;border-radius:50%;border:none;
+  background:linear-gradient(120deg,var(--forest),var(--paddy));
+  color:#fff;cursor:pointer;box-shadow:var(--shadow-soft);
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;
+  transition:transform .25s;
+}
+#musicBtn:hover{transform:scale(1.08);}
+@media(max-width:600px){ #musicBtn{right:14px;bottom:14px;width:44px;height:44px;font-size:1.05rem;} }
+
+/* ===== Loading overlay (freeze layar sampai data server masuk) ===== */
+#loadingOverlay{
+    position:fixed; inset:0; z-index:5000;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+    background:linear-gradient(160deg, var(--forest) 0%, var(--paddy) 100%);
+    transition:opacity .5s ease, visibility .5s ease;
+}
+#loadingOverlay.hide{ opacity:0; visibility:hidden; pointer-events:none; }
+
+.loading-logo{
+    width:64px; height:64px; object-fit:contain;
+    background:#fff; border-radius:16px; padding:8px;
+    box-shadow:0 10px 30px -8px rgba(0,0,0,0.4);
+    animation:pulseBadge 1.6s ease-in-out infinite;
+}
+
+.loading-spinner{
+    width:38px; height:38px; border-radius:50%;
+    border:4px solid rgba(255,255,255,0.25);
+    border-top-color:#fff;
+    animation:spin 0.9s linear infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+.loading-text{ color:#fff; font-family:'Sora',sans-serif; font-size:1rem; font-weight:700; text-align:center; letter-spacing:.2px; }
+.loading-sub{ color:rgba(255,255,255,0.85); font-family:'Plus Jakarta Sans',sans-serif; font-size:.82rem; text-align:center; max-width:280px; line-height:1.5; }
+.loading-sub.error{ color:#ffe3b3; font-weight:600; }
+
 /* ===== Footer print info ===== */
 .print-footer{ display:none; }
 
@@ -345,6 +395,19 @@ header img.logo{
 
 <body>
 
+<!-- ─── AUDIO LATAR (AUTOPLAY) ─── -->
+<!-- File "Sentimental.mp3" harus berada satu folder dengan file HTML ini di repo GitHub -->
+<audio id="bgMusic" src="Sentimental.mp3" loop preload="auto"></audio>
+<button id="musicBtn" title="Putar musik" aria-pressed="false">🔈</button>
+
+<!-- ─── LOADING OVERLAY (tampil sampai data dari server benar-benar masuk) ─── -->
+<div id="loadingOverlay">
+    <img class="loading-logo" src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png" alt="Logo">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loadingText">Mengambil data dari server…</div>
+    <div class="loading-sub" id="loadingSub">Mohon tunggu sebentar, data capaian tanam sedang dimuat.</div>
+</div>
+
 <div class="overlay">
 
 <header class="anim-header">
@@ -359,8 +422,11 @@ header img.logo{
         </div>
     </div>
     <div class="header-right">
-        <span class="dot-live"></span>
-        <span>Data tersinkron</span>
+        <a href="Tampilltt.html" class="back-button" aria-label="Kembali ke Dashboard Utama">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Kembali
+        </a>
+        <span class="live-pill"><span class="dot-live"></span> Data tersinkron</span>
     </div>
 </header>
 
@@ -562,10 +628,24 @@ async function load(){
 
     render();
 
+    // data berhasil masuk → sembunyikan overlay loading
+    hideLoadingOverlay();
+
   } catch(err){
-    alert("❌ Data gagal dimuat\n" + err.message);
+    // tetap tampilkan overlay, tapi ganti keterangannya jadi pesan gagal
+    const overlay = document.getElementById("loadingOverlay");
+    document.querySelector(".loading-spinner").style.display = "none";
+    document.getElementById("loadingText").textContent = "⚠️ Gagal memuat data";
+    const sub = document.getElementById("loadingSub");
+    sub.textContent = "Periksa koneksi internet lalu muat ulang halaman. (" + err.message + ")";
+    sub.classList.add("error");
     console.error(err);
   }
+}
+
+function hideLoadingOverlay(){
+    const overlay = document.getElementById("loadingOverlay");
+    if(overlay) overlay.classList.add("hide");
 }
 
 function setMonth(val){
@@ -764,109 +844,258 @@ function render(){
 }
 
 // ===== DOWNLOAD PDF (fitur baru, tidak menyentuh logika data) =====
+function hexToRgb(hex){
+    hex = hex.replace('#','');
+    const bigint = parseInt(hex,16);
+    return [(bigint>>16)&255, (bigint>>8)&255, bigint&255];
+}
+
+// ===== DOWNLOAD PDF — versi VEKTOR (bukan screenshot) =====
+// Digambar langsung pakai perintah teks & bentuk jsPDF, jadi tajam di ukuran berapa pun
+// dan ukurannya presisi dikontrol dalam satuan mm, bukan hasil jepretan layar.
 async function downloadPDF(){
     const btn = document.getElementById("btnDownloadPdf");
     btn.classList.add("loading");
 
-    const bulanLabel = selectedMonth ?
-        new Date(selectedMonth+"-01").toLocaleDateString('id-ID', {month:'long', year:'numeric'}) :
-        "Semua Periode";
-    const tanggalCetak = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'});
-
-    // Bangun ulang baris kecamatan dalam versi flat/plain (tanpa glass & animasi) agar hasil render tajam
-    let rowsHtml = "";
-    lastLabels.forEach(k=>{
-        const r = lastRealMap[k] || 0;
-        const t = lastTargetMap[k] || 0;
-        const p = t ? r/t*100 : 0;
-        const status = getStatusColor(p);
-        const pctDisplay = Math.min(p, 100);
-        rowsHtml += `
-        <div style="border:1px solid #dfe9e2;border-radius:10px;padding:9px 12px;background:#ffffff;">
-            <div style="font-weight:700;font-size:11.5px;color:#12241a;margin-bottom:2px;">${k}</div>
-            <div style="font-size:10px;color:#5b6f63;font-weight:600;margin-bottom:6px;">${r.toFixed(2)} / ${t.toFixed(2)} Ha</div>
-            <div style="height:7px;border-radius:8px;background:#e7efe9;overflow:hidden;">
-                <div style="height:100%;width:${pctDisplay}%;background:${status.solid};border-radius:8px;"></div>
-            </div>
-            <div style="text-align:right;font-size:10px;font-weight:700;color:${status.solid};margin-top:3px;">${p.toFixed(1)}%</div>
-        </div>`;
-    });
-
-    const chartImg = chart ? chart.toBase64Image('image/png', 1.0) : "";
-
-    // Kontainer capture tersembunyi, background solid putih (tanpa efek blur/glass) supaya hasil PDF tajam
-    const capture = document.createElement("div");
-    capture.style.cssText = "position:fixed;left:-9999px;top:0;width:820px;background:#ffffff;padding:28px;font-family:'Plus Jakarta Sans',sans-serif;color:#12241a;";
-    capture.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #1b5e20;padding-bottom:12px;margin-bottom:16px;">
-            <div>
-                <div style="font-family:'Sora',sans-serif;font-size:17px;font-weight:800;color:#0f3d13;">Laporan Capaian Tanam</div>
-                <div style="font-size:11px;color:#5b6f63;margin-top:2px;">Dinas Pertanian Kabupaten Indragiri Hilir</div>
-            </div>
-            <div style="text-align:right;font-size:10.5px;color:#5b6f63;">
-                <div>Periode: <b style="color:#12241a;">${bulanLabel}</b></div>
-                <div>Dicetak: ${tanggalCetak}</div>
-            </div>
-        </div>
-
-        <div style="display:flex;gap:12px;margin-bottom:20px;">
-            <div style="flex:1;border-radius:10px;background:#f3faf5;padding:12px 14px;">
-                <div style="font-size:10px;color:#5b6f63;font-weight:700;text-transform:uppercase;">Total Target</div>
-                <div style="font-family:'Space Grotesk',monospace;font-size:16px;font-weight:700;color:#0f3d13;margin-top:4px;">${lastTotalT.toFixed(2)} Ha</div>
-            </div>
-            <div style="flex:1;border-radius:10px;background:#f3faf5;padding:12px 14px;">
-                <div style="font-size:10px;color:#5b6f63;font-weight:700;text-transform:uppercase;">Total Realisasi</div>
-                <div style="font-family:'Space Grotesk',monospace;font-size:16px;font-weight:700;color:#0f3d13;margin-top:4px;">${lastTotalR.toFixed(2)} Ha</div>
-            </div>
-            <div style="flex:1;border-radius:10px;background:#f3faf5;padding:12px 14px;">
-                <div style="font-size:10px;color:#5b6f63;font-weight:700;text-transform:uppercase;">Persentase Capaian</div>
-                <div style="font-family:'Space Grotesk',monospace;font-size:16px;font-weight:700;color:#0f3d13;margin-top:4px;">${lastPersen.toFixed(1)} %</div>
-            </div>
-        </div>
-
-        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#0f3d13;margin-bottom:10px;">Capaian per Kecamatan</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:22px;">${rowsHtml}</div>
-
-        <div style="font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:#0f3d13;margin-bottom:10px;">Grafik Target vs Realisasi</div>
-        ${chartImg ? `<img src="${chartImg}" style="width:100%;border-radius:10px;border:1px solid #e5efe8;" />` : ""}
-    `;
-    document.body.appendChild(capture);
-
     try{
-        const canvas = await html2canvas(capture, { scale:2, useCORS:true, backgroundColor:"#ffffff" });
-        const imgData = canvas.toDataURL("image/png");
+        const bulanLabel = selectedMonth ?
+            new Date(selectedMonth+"-01").toLocaleDateString('id-ID', {month:'long', year:'numeric'}) :
+            "Semua Periode";
+        const tanggalCetak = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'});
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF("p","mm","a4");
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const imgWidth = pageWidth;
-        const imgHeight = canvas.height * imgWidth / canvas.width;
+        const pageW = pdf.internal.pageSize.getWidth();
+        const marginX = 15;
+        const contentW = pageW - marginX*2;
 
-        let heightLeft = imgHeight;
-        let position = 0;
+        const cForestDeep = [15,61,19];
+        const cMuted = [91,111,99];
+        const cInk = [18,36,26];
+        const cLine = [27,94,32];
+        const cCardBg = [243,250,245];
+        const cGold = [234,179,8];
+        const cGreen = [16,185,129];
 
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+        let y = 18;
 
-        while(heightLeft > 0){
-            position = heightLeft - imgHeight;
-            pdf.addPage();
-            pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-        }
+        // ---- Header ----
+        pdf.setFont("helvetica","bold");
+        pdf.setFontSize(15);
+        pdf.setTextColor(...cForestDeep);
+        pdf.text("Laporan Capaian Tanam", marginX, y);
+
+        pdf.setFont("helvetica","normal");
+        pdf.setFontSize(8.5);
+        pdf.setTextColor(...cMuted);
+        pdf.text("Dinas Pertanian Kabupaten Indragiri Hilir", marginX, y+5);
+
+        pdf.setFontSize(8);
+        pdf.text(`Periode: ${bulanLabel}`, pageW-marginX, y-1, {align:"right"});
+        pdf.text(`Dicetak: ${tanggalCetak}`, pageW-marginX, y+4, {align:"right"});
+
+        y += 9;
+        pdf.setDrawColor(...cLine);
+        pdf.setLineWidth(0.6);
+        pdf.line(marginX, y, pageW-marginX, y);
+        y += 9;
+
+        // ---- Kartu ringkasan ----
+        const cardGap = 4;
+        const cardW = (contentW - cardGap*2)/3;
+        const cardH = 20;
+        const summaryData = [
+            {label:"TOTAL TARGET", value:`${lastTotalT.toFixed(2)} Ha`},
+            {label:"TOTAL REALISASI", value:`${lastTotalR.toFixed(2)} Ha`},
+            {label:"PERSENTASE CAPAIAN", value:`${lastPersen.toFixed(1)} %`}
+        ];
+        summaryData.forEach((s,i)=>{
+            const x = marginX + i*(cardW+cardGap);
+            pdf.setFillColor(...cCardBg);
+            pdf.roundedRect(x, y, cardW, cardH, 2, 2, "F");
+            pdf.setFont("helvetica","bold");
+            pdf.setFontSize(6.8);
+            pdf.setTextColor(...cMuted);
+            pdf.text(s.label, x+4, y+7);
+            pdf.setFont("helvetica","bold");
+            pdf.setFontSize(13);
+            pdf.setTextColor(...cForestDeep);
+            pdf.text(s.value, x+4, y+15.5);
+        });
+        y += cardH + 9;
+
+        // ---- Capaian per Kecamatan ----
+        pdf.setFont("helvetica","bold");
+        pdf.setFontSize(11);
+        pdf.setTextColor(...cForestDeep);
+        pdf.text("Capaian per Kecamatan", marginX, y);
+        y += 5;
+
+        const cols = 4;
+        const gGap = 3;
+        const gW = (contentW - gGap*(cols-1))/cols;
+        const gH = 18;
+
+        lastLabels.forEach((k, idx)=>{
+            const col = idx % cols;
+            const row = Math.floor(idx/cols);
+            const x = marginX + col*(gW+gGap);
+            const cy = y + row*(gH+gGap);
+
+            const r = lastRealMap[k] || 0;
+            const t = lastTargetMap[k] || 0;
+            const p = t ? r/t*100 : 0;
+            const status = getStatusColor(p);
+            const rgb = hexToRgb(status.solid);
+
+            pdf.setDrawColor(223,233,226);
+            pdf.setLineWidth(0.25);
+            pdf.roundedRect(x, cy, gW, gH, 1.5, 1.5, "S");
+
+            pdf.setFont("helvetica","bold");
+            pdf.setFontSize(7.2);
+            pdf.setTextColor(...cInk);
+            const nameLine = pdf.splitTextToSize(k, gW-4)[0];
+            pdf.text(nameLine, x+3, cy+5.5);
+
+            pdf.setFont("helvetica","normal");
+            pdf.setFontSize(6.2);
+            pdf.setTextColor(...cMuted);
+            pdf.text(`${r.toFixed(2)} / ${t.toFixed(2)} Ha`, x+3, cy+9.5);
+
+            const barX = x+3, barY = cy+11.5, barW = gW-6, barH = 1.8;
+            pdf.setFillColor(231,239,233);
+            pdf.roundedRect(barX, barY, barW, barH, 0.9, 0.9, "F");
+            const fillW = Math.max(0, Math.min(p,100))/100*barW;
+            if(fillW > 0.3){
+                pdf.setFillColor(...rgb);
+                pdf.roundedRect(barX, barY, fillW, barH, 0.9, 0.9, "F");
+            }
+
+            pdf.setFont("helvetica","bold");
+            pdf.setFontSize(6.8);
+            pdf.setTextColor(...rgb);
+            pdf.text(`${p.toFixed(1)}%`, x+gW-3, cy+gH-2.2, {align:"right"});
+        });
+
+        const rows = Math.ceil(lastLabels.length / cols) || 1;
+        y += rows*(gH+gGap) + 7;
+
+        // ---- Grafik Target vs Realisasi (digambar vektor, bukan gambar) ----
+        pdf.setFont("helvetica","bold");
+        pdf.setFontSize(11);
+        pdf.setTextColor(...cForestDeep);
+        pdf.text("Grafik Target vs Realisasi (Ha)", marginX, y);
+
+        // legend di kanan atas grafik
+        pdf.setFillColor(...cGold);
+        pdf.rect(pageW-marginX-38, y-3.3, 3, 3, "F");
+        pdf.setFont("helvetica","normal");
+        pdf.setFontSize(7.2);
+        pdf.setTextColor(...cInk);
+        pdf.text("Target", pageW-marginX-33.5, y-1);
+        pdf.setFillColor(...cGreen);
+        pdf.rect(pageW-marginX-15, y-3.3, 3, 3, "F");
+        pdf.text("Realisasi", pageW-marginX-10.5, y-1);
+
+        y += 6;
+        const chartX = marginX;
+        const chartY = y;
+        const chartW = contentW;
+        const chartH = 64;
+
+        pdf.setDrawColor(220,228,222);
+        pdf.setLineWidth(0.2);
+        pdf.line(chartX, chartY+chartH, chartX+chartW, chartY+chartH);
+
+        const n = lastLabels.length || 1;
+        const allVals = lastLabels.flatMap(k => [lastTargetMap[k]||0, lastRealMap[k]||0]);
+        const maxVal = Math.max(1, ...allVals) * 1.18;
+        const groupW = chartW / n;
+        const barW = Math.max(2.5, Math.min(7, groupW*0.32));
+
+        lastLabels.forEach((k, i)=>{
+            const t = lastTargetMap[k] || 0;
+            const r = lastRealMap[k] || 0;
+            const gx = chartX + i*groupW + groupW/2;
+
+            const tH = (t/maxVal)*chartH;
+            const rH = (r/maxVal)*chartH;
+            const tX = gx - barW - 0.6;
+            const rX = gx + 0.6;
+
+            if(tH > 0.3){
+                pdf.setFillColor(...cGold);
+                pdf.roundedRect(tX, chartY+chartH-tH, barW, tH, 0.6, 0.6, "F");
+            }
+            if(rH > 0.3){
+                pdf.setFillColor(...cGreen);
+                pdf.roundedRect(rX, chartY+chartH-rH, barW, rH, 0.6, 0.6, "F");
+            }
+
+            pdf.setFont("helvetica","bold");
+            pdf.setFontSize(5.4);
+            pdf.setTextColor(...cInk);
+            if(t > 0) pdf.text(t.toFixed(1), tX+barW/2, chartY+chartH-tH-1.2, {align:"center"});
+            if(r > 0) pdf.text(r.toFixed(1), rX+barW/2, chartY+chartH-rH-1.2, {align:"center"});
+
+            pdf.setFont("helvetica","normal");
+            pdf.setFontSize(5.6);
+            pdf.setTextColor(...cMuted);
+            const xLabel = pdf.splitTextToSize(k, groupW+2)[0];
+            pdf.text(xLabel, gx, chartY+chartH+4.2, {align:"center"});
+        });
 
         pdf.save(`Laporan-Capaian-Tanam-${selectedMonth || 'semua'}.pdf`);
     } catch(err){
         alert("❌ Gagal membuat PDF\n" + err.message);
         console.error(err);
     } finally{
-        document.body.removeChild(capture);
         btn.classList.remove("loading");
     }
 }
 
 load();
+
+// ================= MUSIK LATAR (autoplay + fallback interaksi pertama) =================
+const bgMusic = document.getElementById("bgMusic");
+const musicBtn = document.getElementById("musicBtn");
+let audioFileMissing = false;
+
+function setPlayingUI(isPlaying){
+  if(audioFileMissing) return;
+  musicBtn.textContent = isPlaying ? "🔊" : "🔈";
+  musicBtn.setAttribute("aria-pressed", isPlaying ? "true" : "false");
+  musicBtn.title = isPlaying ? "Jeda musik" : "Putar musik";
+}
+function toggleMusic(){
+  if(audioFileMissing){
+    alert("File musik (Sentimental.mp3) tidak ditemukan di server. Pastikan file sudah diupload di folder yang sama dengan halaman ini.");
+    return;
+  }
+  if(bgMusic.paused){ bgMusic.play().then(()=>setPlayingUI(true)).catch(()=>setPlayingUI(false)); }
+  else { bgMusic.pause(); setPlayingUI(false); }
+}
+musicBtn.addEventListener("click", toggleMusic);
+bgMusic.addEventListener("play", ()=>setPlayingUI(true));
+bgMusic.addEventListener("pause", ()=>setPlayingUI(false));
+bgMusic.addEventListener("error", ()=>{
+  audioFileMissing = true;
+  musicBtn.textContent = "⚠️";
+  musicBtn.title = "File musik tidak ditemukan (cek nama file Sentimental.mp3 di server)";
+  console.error("Gagal memuat audio: periksa apakah 'Sentimental.mp3' benar-benar ada di folder yang sama dengan file HTML ini di server/GitHub Pages.");
+});
+window.addEventListener("load", ()=>{
+  const p = bgMusic.play();
+  if(p !== undefined){ p.then(()=>setPlayingUI(true)).catch(()=>setPlayingUI(false)); }
+});
+function primeAudio(){
+  if(!audioFileMissing && bgMusic.paused){ bgMusic.play().then(()=>setPlayingUI(true)).catch(()=>{}); }
+  document.body.removeEventListener("click", primeAudio);
+  document.body.removeEventListener("touchstart", primeAudio);
+}
+document.body.addEventListener("click", primeAudio, { once:true });
+document.body.addEventListener("touchstart", primeAudio, { once:true });
 </script>
 
 </body>
