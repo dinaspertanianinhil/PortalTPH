@@ -7,16 +7,17 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --green-deep:   #0b2e1a;
-  --green-mid:    #145a32;
-  --green-bright: #1e8449;
-  --green-light:  #27ae60;
-  --green-glow:   #2ecc71;
-  --gold:         #f0c040;
-  --gold-dim:     rgba(240,192,64,0.18);
+  --green-deep:   #0d2c1a;
+  --green-mid:    #14532d;
+  --green-bright: #2f7a4d;
+  --green-light:  #4caf50;
+  --green-glow:   #4caf50;
+  --gold:         #d9a441;
+  --gold-dim:     rgba(217,164,65,0.18);
   --white:        #ffffff;
   --glass:        rgba(255,255,255,0.08);
   --glass-hover:  rgba(255,255,255,0.13);
@@ -115,20 +116,20 @@ body {
   min-height: 100vh;
 }
 
-/* HEADER */
+/* HEADER (aligned with master design system) */
 header {
   position: sticky;
   top: 0;
   z-index: 200;
-  background: rgba(11,46,26,0.72);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border-bottom: 1px solid var(--glass-border);
-  padding: 0 24px;
-  height: 66px;
+  background: linear-gradient(120deg, var(--green-mid), var(--green-bright) 70%);
+  box-shadow: 0 6px 20px -8px rgba(0,0,0,0.35);
+  padding: 1.1rem 1.75rem;
+  min-height: 66px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
   animation: slideDown 0.5s ease-out;
 }
 @keyframes slideDown {
@@ -137,40 +138,63 @@ header {
 }
 .hdr-left { display: flex; align-items: center; gap: 14px; }
 .hdr-logo {
-  width: 40px; height: 40px;
-  background: linear-gradient(135deg, var(--green-light), var(--gold));
+  width: 46px; height: 46px;
+  background: #fff;
   border-radius: 10px;
+  padding: 4px;
   display: flex; align-items: center; justify-content: center;
   font-size: 20px;
-  box-shadow: 0 0 20px rgba(46,204,113,0.35);
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
   flex-shrink: 0;
 }
-.hdr-title { font-size: 15px; font-weight: 700; line-height: 1.2; }
-.hdr-sub { font-size: 10px; color: var(--text-dim); font-weight: 400; letter-spacing: 0.4px; margin-top: 1px; }
-.hdr-right { display: flex; align-items: center; gap: 10px; }
+.hdr-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; line-height: 1.2; color: #fff; }
+.hdr-sub { font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 400; letter-spacing: 0.4px; margin-top: 1px; }
+.hdr-right { display: flex; flex-direction: column; align-items: flex-end; gap: .4rem; }
+.hdr-pillrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
 .hdr-pill {
   display: flex; align-items: center; gap: 7px;
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.3);
   border-radius: 99px;
   padding: 6px 14px;
   font-size: 11px;
-  color: var(--text-dim);
+  color: #fff;
   font-weight: 500;
   letter-spacing: 0.3px;
   white-space: nowrap;
 }
+.back-button{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:rgba(255,255,255,0.16);color:#fff;
+  padding:.4rem .8rem;border-radius:20px;font-size:.78rem;font-weight:700;
+  text-decoration:none;border:1px solid rgba(255,255,255,0.3);
+  transition:background .2s, transform .15s;
+}
+.back-button:hover{background:rgba(255,255,255,0.28);}
+.back-button:active{transform:scale(0.96);}
 .live-dot {
   width: 7px; height: 7px; border-radius: 50%;
-  background: var(--green-glow);
-  box-shadow: 0 0 8px var(--green-glow);
+  background: var(--lime, #84cc16);
+  box-shadow: 0 0 8px var(--lime, #84cc16);
   animation: blink 2s infinite;
 }
 @keyframes blink {
   0%,100% { opacity: 1; }
   50%      { opacity: 0.4; }
 }
-#clock { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text); font-weight: 500; }
+#clock { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #fff; font-weight: 500; }
+
+/* ===== MUSIC BUTTON (shared identity) ===== */
+#musicBtn{
+  position:fixed;right:20px;bottom:20px;z-index:1001;
+  width:50px;height:50px;border-radius:50%;border:none;
+  background:linear-gradient(120deg,var(--green-mid),var(--green-bright));
+  color:#fff;cursor:pointer;box-shadow:var(--shadow);
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;
+  transition:transform .25s;
+}
+#musicBtn:hover{transform:scale(1.08);}
 
 /* CONTAINER */
 .container {
@@ -590,8 +614,8 @@ footer strong { color: var(--text-dim); font-weight: 600; }
   .hdr-sub { display: none; }
 }
 @media (max-width: 540px) {
-  header { padding: 0 14px; height: 58px; }
-  .hdr-logo { width: 34px; height: 34px; font-size: 17px; }
+  header { padding: .85rem 14px; }
+  .hdr-logo { width: 36px; height: 36px; font-size: 17px; }
   .hdr-title { font-size: 13px; }
   .container { padding: 14px 12px 32px; }
   .kpi-grid { gap: 10px; }
@@ -601,12 +625,18 @@ footer strong { color: var(--text-dim); font-weight: 600; }
   .chart-legend { display: none; }
   .hdr-pill:not(:last-child) { display: none; }
   .dl-btn span { display: none; }
+  #musicBtn{right:14px;bottom:14px;width:44px;height:44px;font-size:1.05rem;}
 }
 </style>
 </head>
 <body>
 <div class="bg-scene"></div>
 <div class="bg-grain"></div>
+
+<!-- ─── AUDIO LATAR (AUTOPLAY) ─── -->
+<!-- File "Sentimental.mp3" harus berada satu folder dengan file HTML ini di repo GitHub -->
+<audio id="bgMusic" src="Sentimental.mp3" loop preload="auto"></audio>
+<button id="musicBtn" title="Putar musik" aria-pressed="false">🔈</button>
 
 <!-- LOADING -->
 <div id="loading">
@@ -619,16 +649,22 @@ footer strong { color: var(--text-dim); font-weight: 600; }
 <!-- HEADER -->
 <header>
   <div class="hdr-left">
-    <div class="hdr-logo">🌾</div>
+    <img class="hdr-logo" src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png" alt="Logo Kabupaten Indragiri Hilir">
     <div>
       <div class="hdr-title">Dashboard Monitoring LTT &amp; Panen</div>
       <div class="hdr-sub">Sistem Monitoring Luas Tambah Tanam dan Luas Panen · Dinas Pertanian</div>
     </div>
   </div>
   <div class="hdr-right">
-    <div class="hdr-pill"><div class="live-dot"></div> Live Data</div>
-    <div class="hdr-pill" id="clock">--:--:--</div>
-    <div class="hdr-pill" id="dateNow">—</div>
+    <a href="Tampilltt.html" class="back-button" aria-label="Kembali ke Dashboard Utama">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Kembali
+    </a>
+    <div class="hdr-pillrow">
+      <div class="hdr-pill"><div class="live-dot"></div> Live Data</div>
+      <div class="hdr-pill" id="clock">--:--:--</div>
+      <div class="hdr-pill" id="dateNow">—</div>
+    </div>
   </div>
 </header>
 
@@ -1289,6 +1325,46 @@ function triggerDownload(blob, name){
 
 /* ── INIT ── */
 load();
+
+// ================= MUSIK LATAR (autoplay + fallback interaksi pertama) =================
+const bgMusic = document.getElementById("bgMusic");
+const musicBtn = document.getElementById("musicBtn");
+let audioFileMissing = false;
+
+function setPlayingUI(isPlaying){
+  if(audioFileMissing) return;
+  musicBtn.textContent = isPlaying ? "🔊" : "🔈";
+  musicBtn.setAttribute("aria-pressed", isPlaying ? "true" : "false");
+  musicBtn.title = isPlaying ? "Jeda musik" : "Putar musik";
+}
+function toggleMusic(){
+  if(audioFileMissing){
+    alert("File musik (Sentimental.mp3) tidak ditemukan di server. Pastikan file sudah diupload di folder yang sama dengan halaman ini.");
+    return;
+  }
+  if(bgMusic.paused){ bgMusic.play().then(()=>setPlayingUI(true)).catch(()=>setPlayingUI(false)); }
+  else { bgMusic.pause(); setPlayingUI(false); }
+}
+musicBtn.addEventListener("click", toggleMusic);
+bgMusic.addEventListener("play", ()=>setPlayingUI(true));
+bgMusic.addEventListener("pause", ()=>setPlayingUI(false));
+bgMusic.addEventListener("error", ()=>{
+  audioFileMissing = true;
+  musicBtn.textContent = "⚠️";
+  musicBtn.title = "File musik tidak ditemukan (cek nama file Sentimental.mp3 di server)";
+  console.error("Gagal memuat audio: periksa apakah 'Sentimental.mp3' benar-benar ada di folder yang sama dengan file HTML ini di server/GitHub Pages.");
+});
+window.addEventListener("load", ()=>{
+  const p = bgMusic.play();
+  if(p !== undefined){ p.then(()=>setPlayingUI(true)).catch(()=>setPlayingUI(false)); }
+});
+function primeAudio(){
+  if(!audioFileMissing && bgMusic.paused){ bgMusic.play().then(()=>setPlayingUI(true)).catch(()=>{}); }
+  document.body.removeEventListener("click", primeAudio);
+  document.body.removeEventListener("touchstart", primeAudio);
+}
+document.body.addEventListener("click", primeAudio, { once:true });
+document.body.addEventListener("touchstart", primeAudio, { once:true });
 </script>
 </body>
 </html>
