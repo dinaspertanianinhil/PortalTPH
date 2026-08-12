@@ -812,7 +812,7 @@ function downloadExcel(){
   const wb = XLSX.utils.table_to_book(table, { sheet: "Laporan Bulanan" });
   const periode = document.getElementById('statPeriode').innerText.replace(/\s+/g,'_');
   const viewSuffix = currentView==='minggu' ? '_Mingguan' : '';
-  XLSX.writeFile(wb, `Laporan_Bulanan_Induk_${periode}${viewSuffix}.xlsx`);
+  XLSX.writeFile(wb, `Lap_Bulanan_TPH-DISTAN-INHIL_${periode}${viewSuffix}.xlsx`);
 }
 
 function downloadPDF(){
