@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Besar LTT - Dinas Pertanian Inhil</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --green-900: #1a3d20;
+        --green-800: #1b5e20;
+        --green-700: #256027;
+        --green-600: #2e7d32;
+        --green-500: #388e3c;
+        --green-400: #4caf50;
+        --green-100: #e8f5e9;
+        --green-50: #f1f8f2;
+        --amber: #f59e0b;
+        --amber-light: #fef3c7;
+        --red: #dc2626;
+        --red-light: #fee2e2;
+        --blue: #1d4ed8;
+        --blue-light: #dbeafe;
+        --teal: #0d9488;
+        --teal-light: #ccfbf1;
+        --slate-900: #0f172a;
+        --slate-700: #334155;
+        --slate-500: #64748b;
+        --slate-300: #cbd5e1;
+        --slate-100: #f1f5f9;
+        --slate-50: #f8fafc;
+        --white: #ffffff;
+        --radius-sm: 8px;
+        --radius: 14px;
+        --radius-lg: 20px;
+        --shadow-xs: 0 1px 3px rgba(0,0,0,0.06);
+        --shadow-sm: 0 2px 8px rgba(0,0,0,0.07);
+        --shadow-md: 0 6px 20px rgba(0,0,0,0.09);
+        --shadow-lg: 0 16px 40px rgba(0,0,0,0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'DM Sans', sans-serif;
+        color: var(--slate-900);
+        background: #e8f0e9;
+        background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-rice-fields-with-green-rice-with-dew-and-mountains-image_15860694.jpg');
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+        -webkit-tap-highlight-color: transparent;
+        min-height: 100vh;
+    }
+
+    .overlay {
+        min-height: 100vh;
+        background: rgba(240, 247, 240, 0.9);
+        backdrop-filter: blur(2px);
+    }
+
+    /* ─── LOADING OVERLAY ─── */
+    #loadingOverlay {
+        position: fixed; inset: 0; z-index: 5000;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 16px;
+        background: linear-gradient(160deg, var(--green-800) 0%, var(--green-600) 100%);
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #loadingOverlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+    .loading-logo {
+        width: 64px; height: 64px; object-fit: contain; background: #fff;
+        border-radius: 16px; padding: 8px; box-shadow: 0 10px 30px -8px rgba(0,0,0,0.4);
+        animation: pulseBadge 1.6s ease-in-out infinite;
+    }
+    @keyframes pulseBadge { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+    .loading-spinner {
+        width: 38px; height: 38px; border-radius: 50%;
+        border: 4px solid rgba(255,255,255,0.25); border-top-color: #fff;
+        animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: #fff; font-size: 1rem; font-weight: 700; text-align: center; }
+    .loading-sub { color: rgba(255,255,255,0.85); font-size: 0.82rem; text-align: center; max-width: 300px; line-height: 1.5; }
+    .loading-sub.error { color: #ffe3b3; font-weight: 600; }
+    .loading-retry {
+        margin-top: 4px; padding: 8px 18px; border-radius: 20px;
+        background: rgba(255,255,255,0.18); color: #fff; font-weight: 700; font-size: 0.8rem;
+        cursor: pointer; border: 1px solid rgba(255,255,255,0.35);
+        transition: background 0.2s; display: none;
+    }
+    .loading-retry:hover { background: rgba(255,255,255,0.3); }
+    .loading-retry.show { display: inline-flex; }
+
+    /* ─── HEADER ─── */
+    header {
+        display: flex; align-items: center; gap: 16px; padding: 14px 5%;
+        background: rgba(255,255,255,0.97); border-bottom: 2px solid var(--green-100);
+        position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow-sm);
+    }
+    header img { width: 46px; height: auto; flex-shrink: 0; }
+    .header-text h1 { font-size: 1rem; font-weight: 700; color: var(--green-800); line-height: 1.3; }
+    .header-text p { font-size: 0.78rem; color: var(--slate-500); margin-top: 2px; font-weight: 500; }
+    .header-badge {
+        margin-left: auto; background: var(--green-100); color: var(--green-700);
+        font-size: 0.72rem; font-weight: 700; padding: 5px 12px; border-radius: 20px;
+        white-space: nowrap; display: flex; align-items: center; gap: 5px;
+    }
+    .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    #jamUpdate { font-size: 0.72rem; color: var(--slate-500); font-weight: 500; }
+
+    /* ─── CONTAINER ─── */
+    .container { padding: 24px 5% 48px; max-width: 1440px; margin: auto; }
+
+    /* ─── NOTIF ─── */
+    .infoNotif {
+        background: #fffbeb; border: 1px solid #fcd34d; border-left: 4px solid var(--amber);
+        padding: 14px 44px 14px 16px; margin-bottom: 22px; border-radius: var(--radius);
+        font-size: 0.85rem; color: #78350f; line-height: 1.6; position: relative; box-shadow: var(--shadow-xs);
+    }
+    .infoNotif b { color: #92400e; }
+    .closeNotif {
+        position: absolute; right: 12px; top: 12px; cursor: pointer;
+        width: 22px; height: 22px; border-radius: 50%; background: rgba(0,0,0,0.06);
+        display: flex; align-items: center; justify-content: center; font-size: 0.75rem;
+        transition: background 0.2s;
+    }
+    .closeNotif:hover { background: rgba(0,0,0,0.14); }
+
+    /* ─── SECTION ─── */
+    .module-section { margin-bottom: 30px; }
+    .module-head {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
+    }
+    .module-title { display: flex; align-items: center; gap: 10px; }
+    .module-icon {
+        width: 38px; height: 38px; border-radius: 11px; display: flex;
+        align-items: center; justify-content: center; font-size: 1.05rem; flex-shrink: 0;
+    }
+    .module-title h2 { font-size: 1.05rem; font-weight: 700; color: var(--slate-900); }
+    .module-title span.sub { display: block; font-size: 0.76rem; color: var(--slate-500); font-weight: 500; margin-top: 1px; }
+    .module-link {
+        font-size: 0.78rem; font-weight: 700; color: var(--green-700);
+        text-decoration: none; background: var(--white); border: 1px solid var(--green-100);
+        padding: 7px 14px; border-radius: 20px; box-shadow: var(--shadow-xs);
+        transition: all 0.2s; white-space: nowrap;
+    }
+    .module-link:hover { background: var(--green-600); color: #fff; border-color: var(--green-600); }
+
+    .card-panel {
+        background: var(--white); border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md); padding: 20px 22px; border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    /* ─── KPI GRID ─── */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .kpi-box {
+        background: var(--white); border-radius: var(--radius); padding: 15px 16px;
+        box-shadow: var(--shadow-sm); border: 1px solid rgba(0,0,0,0.04);
+        border-top: 3px solid var(--green-500);
+    }
+    .kpi-box .kpi-label { font-size: 0.72rem; color: var(--slate-500); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+    .kpi-box .kpi-value { font-size: 1.5rem; font-weight: 700; color: var(--slate-900); margin-top: 4px; font-family: 'DM Mono', monospace; }
+    .kpi-box .kpi-value small { font-size: 0.85rem; font-weight: 600; color: var(--slate-500); }
+    .kpi-box.amber { border-top-color: var(--amber); }
+    .kpi-box.blue { border-top-color: var(--blue); }
+    .kpi-box.teal { border-top-color: var(--teal); }
+    .kpi-box.red { border-top-color: var(--red); }
+
+    /* ─── TWO-COL LAYOUT ─── */
+    .two-col { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+    .chart-box { position: relative; height: 230px; }
+    .chart-box.short { height: 190px; }
+
+    /* ─── MINI RANK LIST ─── */
+    .mini-rank { display: flex; flex-direction: column; gap: 8px; }
+    .mini-rank-row {
+        display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+        background: var(--slate-50); border-radius: 10px; font-size: 0.82rem;
+    }
+    .mini-rank-row .rk-no {
+        width: 22px; height: 22px; border-radius: 50%; background: var(--green-600); color: #fff;
+        display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
+    }
+    .mini-rank-row .rk-name { flex: 1; font-weight: 600; color: var(--slate-700); }
+    .mini-rank-row .rk-val { font-family: 'DM Mono', monospace; font-weight: 600; color: var(--green-800); }
+
+    /* ─── PROGRESS BAR ROWS (capaian) ─── */
+    .prog-row { margin-bottom: 10px; }
+    .prog-row-top { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px; }
+    .prog-row-top .pname { font-weight: 600; color: var(--slate-700); }
+    .prog-row-top .pval { font-family: 'DM Mono', monospace; color: var(--slate-500); }
+    .prog-track { height: 7px; border-radius: 6px; background: var(--slate-100); overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 6px; transition: width 0.6s ease; }
+
+    /* ─── BELUM INPUT CHIPS ─── */
+    .belum-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+    .belum-card-header h3 { font-size: 0.95rem; font-weight: 700; }
+    .belum-count-badge { font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+    .belum-count-badge.danger { background: var(--red-light); color: var(--red); }
+    .belum-count-badge.success { background: var(--green-100); color: var(--green-700); }
+    .chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+    .belum-chip {
+        background: var(--red-light); color: #991b1b; font-size: 0.76rem; font-weight: 600;
+        padding: 6px 12px; border-radius: 20px;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+        text-align: center; padding: 18px; font-size: 0.75rem; color: var(--slate-500);
+    }
+
+    .empty-note { font-size: 0.78rem; color: var(--slate-500); padding: 10px 2px; }
+</style>
+</head>
+<body>
+
+<!-- ─── LOADING OVERLAY ─── -->
+<div id="loadingOverlay">
+    <img class="loading-logo" src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png" alt="Logo">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loadingText">Mengambil data dari server…</div>
+    <div class="loading-sub" id="loadingSub">Menggabungkan data harian, capaian, bulanan, dan panen.</div>
+    <button class="loading-retry" id="loadingRetry" onclick="loadAll()">Coba Lagi</button>
+</div>
+
+<div class="overlay">
+    <!-- ─── HEADER ─── -->
+    <header>
+        <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png" alt="Logo Inhil">
+        <div class="header-text">
+            <h1>Dashboard Besar LTT</h1>
+            <p>Dinas Pertanian Kabupaten Indragiri Hilir</p>
+        </div>
+        <div class="header-right">
+            <span id="jamUpdate"></span>
+            <div class="header-badge"><span>🌾</span> Ringkasan Terpadu</div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- ─── NOTIF ─── -->
+        <div id="notifInfo" class="infoNotif">
+            <span class="closeNotif" onclick="document.getElementById('notifInfo').style.display='none'">✕</span>
+            ℹ️ <b>Halaman Ringkasan:</b> Data di halaman ini digabung otomatis dari sumber yang sama dengan Dashboard Utama, Progres Capaian, Laporan Bulanan, dan Analisis Panen — tanpa perlu buka satu-satu. Klik tombol <b>"Detail →"</b> di tiap bagian untuk melihat rincian lengkap dan filter lanjutan.
+        </div>
+
+        <!-- ═══════════════ MODULE 1: HARIAN ═══════════════ -->
+        <div class="module-section">
+            <div class="module-head">
+                <div class="module-title">
+                    <div class="module-icon" style="background:var(--green-100);">📅</div>
+                    <div>
+                        <h2>Ringkasan Harian</h2>
+                        <span class="sub">Total LTT keseluruhan &amp; LTT hari ini</span>
+                    </div>
+                </div>
+                <a class="module-link" href="Tampilltt.html" target="_blank">Detail Harian →</a>
+            </div>
+
+            <div class="kpi-grid" id="kpiHarian">
+                <div class="kpi-box"><div class="kpi-label">Total LTT Keseluruhan</div><div class="kpi-value" id="h_total">—</div></div>
+                <div class="kpi-box amber"><div class="kpi-label">LTT Hari Ini</div><div class="kpi-value" id="h_today">—</div></div>
+                <div class="kpi-box blue"><div class="kpi-label">Total Oplah</div><div class="kpi-value" id="h_oplah">—</div></div>
+                <div class="kpi-box teal"><div class="kpi-label">Total CSR</div><div class="kpi-value" id="h_csr">—</div></div>
+            </div>
+
+            <div class="two-col">
+                <div class="card-panel">
+                    <h3 style="font-size:0.85rem;font-weight:700;margin-bottom:10px;color:var(--slate-700);">Top 5 Kecamatan (LTT Keseluruhan)</h3>
+                    <div class="mini-rank" id="rankKecamatan"></div>
+                </div>
+                <div class="card-panel">
+                    <div class="belum-card-header">
+                        <h3>⚠️ Belum Input Hari Ini</h3>
+                        <span class="belum-count-badge danger" id="belumBadge">0</span>
+                    </div>
+                    <div class="chip-wrap" id="belumChips"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════ MODULE 2: CAPAIAN ═══════════════ -->
+        <div class="module-section">
+            <div class="module-head">
+                <div class="module-title">
+                    <div class="module-icon" style="background:var(--amber-light);">🎯</div>
+                    <div>
+                        <h2>Progres Capaian LTT</h2>
+                        <span class="sub" id="capaianPeriodeLabel">Target vs Realisasi bulan berjalan</span>
+                    </div>
+                </div>
+                <a class="module-link" href="capaiantargetltt.html" target="_blank">Detail Capaian →</a>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-box amber"><div class="kpi-label">Target</div><div class="kpi-value" id="c_target">—</div></div>
+                <div class="kpi-box"><div class="kpi-label">Realisasi</div><div class="kpi-value" id="c_realisasi">—</div></div>
+                <div class="kpi-box blue"><div class="kpi-label">Capaian</div><div class="kpi-value" id="c_persen">—</div></div>
+                <div class="kpi-box teal"><div class="kpi-label">Kecamatan Tercatat</div><div class="kpi-value" id="c_jumlahkec">—</div></div>
+            </div>
+
+            <div class="card-panel">
+                <h3 style="font-size:0.85rem;font-weight:700;margin-bottom:12px;color:var(--slate-700);">Top 5 Capaian per Kecamatan</h3>
+                <div id="capaianRows"></div>
+                <div class="empty-note" id="capaianEmpty" style="display:none;">Belum ada data target/realisasi untuk periode ini.</div>
+            </div>
+        </div>
+
+        <!-- ═══════════════ MODULE 3: BULANAN ═══════════════ -->
+        <div class="module-section">
+            <div class="module-head">
+                <div class="module-title">
+                    <div class="module-icon" style="background:var(--blue-light);">📆</div>
+                    <div>
+                        <h2>Laporan LTT Bulan Ini</h2>
+                        <span class="sub" id="bulananPeriodeLabel">Rekap tanam, olah lahan &amp; panen</span>
+                    </div>
+                </div>
+                <a class="module-link" href="Laporanbulananltt.html" target="_blank">Detail Bulanan →</a>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-box"><div class="kpi-label">Total LTT Bulan Ini</div><div class="kpi-value" id="b_ltt">—</div></div>
+                <div class="kpi-box blue"><div class="kpi-label">Total Olah Lahan</div><div class="kpi-value" id="b_olah">—</div></div>
+                <div class="kpi-box teal"><div class="kpi-label">Total Panen</div><div class="kpi-value" id="b_panen">—</div></div>
+                <div class="kpi-box amber"><div class="kpi-label">Kecamatan Aktif</div><div class="kpi-value" id="b_kec">—</div></div>
+            </div>
+
+            <div class="card-panel">
+                <h3 style="font-size:0.85rem;font-weight:700;margin-bottom:10px;color:var(--slate-700);">Tren LTT per Minggu (Bulan Ini)</h3>
+                <div class="chart-box short"><canvas id="chartMingguan"></canvas></div>
+            </div>
+        </div>
+
+        <!-- ═══════════════ MODULE 4: ANALISIS PANEN ═══════════════ -->
+        <div class="module-section">
+            <div class="module-head">
+                <div class="module-title">
+                    <div class="module-icon" style="background:var(--teal-light);">🌾</div>
+                    <div>
+                        <h2>Analisis Tanam &amp; Panen</h2>
+                        <span class="sub">Rasio realisasi panen terhadap LTT</span>
+                    </div>
+                </div>
+                <a class="module-link" href="analisispanen.html" target="_blank">Detail Analisis →</a>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-box"><div class="kpi-label">Total Tanam</div><div class="kpi-value" id="a_tanam">—</div></div>
+                <div class="kpi-box teal"><div class="kpi-label">Total Panen</div><div class="kpi-value" id="a_panen">—</div></div>
+                <div class="kpi-box amber"><div class="kpi-label">Selisih (Belum Panen)</div><div class="kpi-value" id="a_selisih">—</div></div>
+                <div class="kpi-box blue"><div class="kpi-label">Rasio Panen</div><div class="kpi-value" id="a_rasio">—</div></div>
+            </div>
+
+            <div class="card-panel">
+                <h3 style="font-size:0.85rem;font-weight:700;margin-bottom:10px;color:var(--slate-700);">Tanam vs Panen — Top 6 Kecamatan</h3>
+                <div class="chart-box"><canvas id="chartTanamPanen"></canvas></div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <div><strong>Dinas Pertanian Kabupaten Indragiri Hilir</strong> · Dashboard Besar — Ringkasan Terpadu LTT</div>
+        <div id="lastUpdateFooter">—</div>
+    </footer>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// KONFIGURASI — 2 EXEC (sumber data)
+// ═══════════════════════════════════════════════════════════
+const API_MAIN    = "https://script.google.com/macros/s/AKfycbz9BbxHtegnOrlIdwMBjsRRfK1weywnjIXnbX4YgGY-F6egmvMFUO3pqZ5CAXg99ac/exec"; // dipakai: harian, bulanan, analisis panen
+const API_CAPAIAN = "https://script.google.com/macros/s/AKfycbxeBdznULEYyYf0DiokNjYaoG-VJURjT2QhKyiXat65TSSzpv1Dqu69gYgAXpluKsE/exec"; // dipakai: capaian (realisasi + ?type=target)
+
+const CACHE_TTL_MS = 5 * 60 * 1000; // cache 5 menit di sessionStorage supaya tidak fetch berulang
+
+const SEMUA_KECAMATAN = [
+    "Batang Tuaka","Concong","Enok","Gaung","Gaung Anak Serka",
+    "Kateman","Kemuning","Kempas","Keritang","Kuala Indragiri",
+    "Mandah","Pelangiran","Pulau Burung","Reteh","Sungai Batang",
+    "Tanah Merah","Teluk Belengkong","Tembilahan","Tembilahan Hulu","Tempuling"
+];
+
+let rawMain = [];       // dataset mentah LTT (harian/bulanan/analisis)
+let realisasiCap = [];  // dataset realisasi dari API capaian
+let targetCap = [];     // dataset target dari API capaian
+
+// ═══════════════════════════════════════════════════════════
+// UTILITAS UMUM
+// ═══════════════════════════════════════════════════════════
+function safeNumber(val){
+    if(val === null || val === undefined) return 0;
+    if(typeof val === "number") return val;
+    let str = String(val).trim();
+    if(str.includes(",")) str = str.replace(/\./g,"").replace(",", ".");
+    return Number(str) || 0;
+}
+function fmt(n){ return (n||0).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function todayStr(){
+    const d = new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function formatDate(date){
+    if(!date) return "";
+    const d = new Date(date);
+    if(isNaN(d)) return String(date).slice(0,10);
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function getMonthKey(tgl){
+    if(!tgl) return "";
+    if(String(tgl).includes("-")) return String(tgl).slice(0,7);
+    const d = new Date(tgl);
+    if(isNaN(d)) return "";
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+}
+function namaBulanToNumber(nama){
+    const map = {"JANUARI":"01","FEBRUARI":"02","MARET":"03","APRIL":"04","MEI":"05","JUNI":"06",
+        "JULI":"07","AGUSTUS":"08","SEPTEMBER":"09","OKTOBER":"10","NOVEMBER":"11","DESEMBER":"12"};
+    return map[(nama||"").toUpperCase()] || "";
+}
+function weekOfMonth(tglStr){
+    const day = parseInt((tglStr||'').toString().slice(8,10), 10);
+    if(!day || isNaN(day)) return null;
+    if(day <= 7) return 1;
+    if(day <= 14) return 2;
+    if(day <= 21) return 3;
+    return 4;
+}
+
+// ═══════════════════════════════════════════════════════════
+// CACHE SEDERHANA (sessionStorage) — supaya pindah/reload halaman
+// tidak selalu menarik ulang dari Google Apps Script
+// ═══════════════════════════════════════════════════════════
+async function fetchCached(url, cacheKey){
+    try{
+        const cached = sessionStorage.getItem(cacheKey);
+        if(cached){
+            const parsed = JSON.parse(cached);
+            if(Date.now() - parsed.ts < CACHE_TTL_MS) return parsed.data;
+        }
+    }catch(e){ /* abaikan cache korup */ }
+
+    const res = await fetch(url);
+    if(!res.ok) throw new Error("Gagal mengambil data (" + res.status + ")");
+    const data = await res.json();
+    try{ sessionStorage.setItem(cacheKey, JSON.stringify({ts: Date.now(), data})); }catch(e){ /* storage penuh, lanjut tanpa cache */ }
+    return data;
+}
+
+// ═══════════════════════════════════════════════════════════
+// LOAD SEMUA DATA (2 exec, paralel)
+// ═══════════════════════════════════════════════════════════
+async function loadAll(){
+    showLoading(true);
+    try{
+        const [main, real, target] = await Promise.all([
+            fetchCached(API_MAIN, "cache_ltt_main"),
+            fetchCached(API_CAPAIAN, "cache_capaian_real"),
+            fetchCached(API_CAPAIAN + "?type=target", "cache_capaian_target")
+        ]);
+
+        rawMain = Array.isArray(main) ? main : (main.data || []);
+        rawMain.forEach(d => { d.TANGGAL = formatDate(d.TANGGAL); });
+
+        realisasiCap = Array.isArray(real) ? real : [];
+        targetCap = Array.isArray(target) ? target : [];
+
+        renderHarian();
+        renderCapaian();
+        renderBulanan();
+        renderAnalisis();
+
+        document.getElementById("jamUpdate").textContent = "Update: " + new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+        document.getElementById("lastUpdateFooter").textContent = "Data diperbarui: " + new Date().toLocaleString('id-ID');
+
+        showLoading(false);
+    }catch(err){
+        console.error(err);
+        showLoadingError(err.message || "Terjadi kesalahan saat memuat data");
+    }
+}
+
+function showLoading(show){
+    const overlay = document.getElementById("loadingOverlay");
+    if(show){ overlay.classList.remove("hide"); }
+    else{ overlay.classList.add("hide"); }
+}
+function showLoadingError(msg){
+    document.querySelector(".loading-spinner").style.display = "none";
+    document.getElementById("loadingText").textContent = "⚠️ Gagal memuat data";
+    const sub = document.getElementById("loadingSub");
+    sub.textContent = "Periksa koneksi internet lalu coba lagi. (" + msg + ")";
+    sub.classList.add("error");
+    document.getElementById("loadingRetry").classList.add("show");
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODULE 1: HARIAN
+// ═══════════════════════════════════════════════════════════
+function renderHarian(){
+    let totalKeseluruhan = 0, totalOplah = 0, totalCSR = 0, totalToday = 0;
+    const today = todayStr();
+    const kecTotal = {};
+    const kecSudahInput = new Set();
+
+    rawMain.forEach(d => {
+        const jenis = (d["JENIS LTT"] || "").toUpperCase();
+        const luas = safeNumber(d["LUAS TAMBAH TANAM"]);
+        const kec = d.KECAMATAN || "(Tanpa Kecamatan)";
+
+        totalKeseluruhan += luas;
+        if(jenis.includes("OPLAH")) totalOplah += luas;
+        if(jenis.includes("CSR")) totalCSR += luas;
+        if(d.TANGGAL === today){ totalToday += luas; kecSudahInput.add(d.KECAMATAN); }
+
+        kecTotal[kec] = (kecTotal[kec] || 0) + luas;
+    });
+
+    document.getElementById("h_total").innerHTML = fmt(totalKeseluruhan) + " <small>Ha</small>";
+    document.getElementById("h_today").innerHTML = fmt(totalToday) + " <small>Ha</small>";
+    document.getElementById("h_oplah").innerHTML = fmt(totalOplah) + " <small>Ha</small>";
+    document.getElementById("h_csr").innerHTML = fmt(totalCSR) + " <small>Ha</small>";
+
+    // top 5 kecamatan
+    const top5 = Object.entries(kecTotal).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const rankEl = document.getElementById("rankKecamatan");
+    rankEl.innerHTML = top5.length ? top5.map((r,i)=>`
+        <div class="mini-rank-row">
+            <div class="rk-no">${i+1}</div>
+            <div class="rk-name">${r[0]}</div>
+            <div class="rk-val">${fmt(r[1])} Ha</div>
+        </div>`).join("") : `<div class="empty-note">Belum ada data.</div>`;
+
+    // belum input hari ini
+    const belumInput = SEMUA_KECAMATAN.filter(k => !kecSudahInput.has(k));
+    document.getElementById("belumBadge").textContent = belumInput.length;
+    document.getElementById("belumBadge").className = "belum-count-badge " + (belumInput.length > 0 ? "danger" : "success");
+    document.getElementById("belumChips").innerHTML = belumInput.length
+        ? belumInput.map(k => `<span class="belum-chip">📍 ${k}</span>`).join("")
+        : `<div class="empty-note">Semua kecamatan sudah input hari ini ✅</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODULE 2: CAPAIAN (bulan berjalan, dari API_CAPAIAN)
+// ═══════════════════════════════════════════════════════════
+function renderCapaian(){
+    // tentukan bulan aktif = bulan terbaru yang punya data realisasi
+    const bulanList = realisasiCap.map(d => getMonthKey(d.TANGGAL)).filter(Boolean).sort();
+    const selectedMonth = bulanList.length ? bulanList[bulanList.length - 1] : getMonthKey(todayStr());
+
+    const bulanNames = {'01':'Januari','02':'Februari','03':'Maret','04':'April','05':'Mei','06':'Juni',
+        '07':'Juli','08':'Agustus','09':'September','10':'Oktober','11':'November','12':'Desember'};
+    const [ty, tm] = selectedMonth.split("-");
+    document.getElementById("capaianPeriodeLabel").textContent = `Target vs Realisasi — ${bulanNames[tm] || ''} ${ty || ''}`;
+
+    const realMap = {}, targetMap = {};
+    realisasiCap.filter(d => getMonthKey(d.TANGGAL) === selectedMonth).forEach(d => {
+        const k = (d.KECAMATAN || "").toUpperCase();
+        realMap[k] = (realMap[k] || 0) + safeNumber(d["LUAS TAMBAH TANAM"]);
+    });
+    targetCap.forEach(d => {
+        const bulan = namaBulanToNumber(d.BULAN);
+        const gabung = d.TAHUN + "-" + bulan;
+        if(gabung === selectedMonth){
+            const k = (d.KECAMATAN || "").toUpperCase();
+            targetMap[k] = (targetMap[k] || 0) + safeNumber(d.TARGET);
+        }
+    });
+
+    const totalT = Object.values(targetMap).reduce((a,b)=>a+b,0);
+    const totalR = Object.values(realMap).reduce((a,b)=>a+b,0);
+    const persen = totalT ? (totalR/totalT*100) : 0;
+    const keySet = new Set([...Object.keys(targetMap), ...Object.keys(realMap)]);
+
+    document.getElementById("c_target").innerHTML = fmt(totalT) + " <small>Ha</small>";
+    document.getElementById("c_realisasi").innerHTML = fmt(totalR) + " <small>Ha</small>";
+    document.getElementById("c_persen").innerHTML = persen.toFixed(1) + "<small>%</small>";
+    document.getElementById("c_jumlahkec").innerHTML = keySet.size + " <small>Kec</small>";
+
+    const rows = [...keySet].map(k => {
+        const r = realMap[k] || 0, t = targetMap[k] || 0;
+        return { k, r, t, p: t ? (r/t*100) : 0 };
+    }).sort((a,b) => b.p - a.p).slice(0,5);
+
+    const wrap = document.getElementById("capaianRows");
+    const emptyNote = document.getElementById("capaianEmpty");
+    if(!rows.length){
+        wrap.innerHTML = "";
+        emptyNote.style.display = "block";
+        return;
+    }
+    emptyNote.style.display = "none";
+    wrap.innerHTML = rows.map(r => {
+        const pct = Math.min(r.p, 100);
+        const color = r.p <= 30 ? "#ef4444" : r.p <= 50 ? "#f97316" : r.p <= 70 ? "#eab308" : r.p <= 90 ? "#4ade80" : "#15803d";
+        return `<div class="prog-row">
+            <div class="prog-row-top"><span class="pname">${r.k}</span><span class="pval">${fmt(r.r)} / ${fmt(r.t)} Ha (${r.p.toFixed(1)}%)</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${color};"></div></div>
+        </div>`;
+    }).join("");
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODULE 3: BULANAN (bulan berjalan, dari API_MAIN)
+// ═══════════════════════════════════════════════════════════
+let chartMingguanInst = null;
+function renderBulanan(){
+    const bulanNames = {'01':'Januari','02':'Februari','03':'Maret','04':'April','05':'Mei','06':'Juni',
+        '07':'Juli','08':'Agustus','09':'September','10':'Oktober','11':'November','12':'Desember'};
+    const curMonth = getMonthKey(todayStr());
+    const [cy, cm] = curMonth.split("-");
+    document.getElementById("bulananPeriodeLabel").textContent = `Rekap tanam, olah lahan & panen — ${bulanNames[cm]} ${cy}`;
+
+    const dataBulan = rawMain.filter(d => getMonthKey(d.TANGGAL) === curMonth);
+
+    let totalLTT = 0, totalOlah = 0, totalPanen = 0;
+    const kecSet = new Set();
+    const mingguMap = {1:0, 2:0, 3:0, 4:0};
+
+    dataBulan.forEach(d => {
+        const luas = safeNumber(d["LUAS TAMBAH TANAM"]);
+        totalLTT += luas;
+        if(d["LUAS OLAH LAHAN"] !== undefined) totalOlah += safeNumber(d["LUAS OLAH LAHAN"]);
+        if(d["LUAS PANEN"] !== undefined) totalPanen += safeNumber(d["LUAS PANEN"]);
+        if(d.KECAMATAN) kecSet.add(d.KECAMATAN);
+        const w = weekOfMonth(d.TANGGAL);
+        if(w) mingguMap[w] += luas;
+    });
+
+    document.getElementById("b_ltt").innerHTML = fmt(totalLTT) + " <small>Ha</small>";
+    document.getElementById("b_olah").innerHTML = fmt(totalOlah) + " <small>Ha</small>";
+    document.getElementById("b_panen").innerHTML = fmt(totalPanen) + " <small>Ha</small>";
+    document.getElementById("b_kec").innerHTML = kecSet.size + " <small>Kec</small>";
+
+    const ctx = document.getElementById("chartMingguan").getContext("2d");
+    if(chartMingguanInst) chartMingguanInst.destroy();
+    chartMingguanInst = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Minggu 1','Minggu 2','Minggu 3','Minggu 4'],
+            datasets: [{
+                label: 'LTT (Ha)',
+                data: [mingguMap[1], mingguMap[2], mingguMap[3], mingguMap[4]],
+                backgroundColor: '#4caf50',
+                borderRadius: 8,
+                maxBarThickness: 48
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODULE 4: ANALISIS TANAM & PANEN (dari API_MAIN, seluruh data)
+// ═══════════════════════════════════════════════════════════
+let chartTanamPanenInst = null;
+function renderAnalisis(){
+    let totalTanam = 0, totalPanen = 0;
+    const kecMap = {};
+
+    rawMain.forEach(d => {
+        const tanam = safeNumber(d["LUAS TAMBAH TANAM"]);
+        const panen = safeNumber(d["LUAS PANEN"]);
+        totalTanam += tanam;
+        totalPanen += panen;
+
+        const kec = d.KECAMATAN || "(Tanpa Kecamatan)";
+        if(!kecMap[kec]) kecMap[kec] = { tanam: 0, panen: 0 };
+        kecMap[kec].tanam += tanam;
+        kecMap[kec].panen += panen;
+    });
+
+    const rasio = totalTanam ? (totalPanen/totalTanam*100) : 0;
+    const selisih = totalTanam - totalPanen;
+
+    document.getElementById("a_tanam").innerHTML = fmt(totalTanam) + " <small>Ha</small>";
+    document.getElementById("a_panen").innerHTML = fmt(totalPanen) + " <small>Ha</small>";
+    document.getElementById("a_selisih").innerHTML = fmt(selisih) + " <small>Ha</small>";
+    document.getElementById("a_rasio").innerHTML = rasio.toFixed(1) + "<small>%</small>";
+
+    const top6 = Object.entries(kecMap).sort((a,b)=>b[1].tanam - a[1].tanam).slice(0,6);
+    const ctx = document.getElementById("chartTanamPanen").getContext("2d");
+    if(chartTanamPanenInst) chartTanamPanenInst.destroy();
+    chartTanamPanenInst = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: top6.map(r => r[0]),
+            datasets: [
+                { label: 'Tanam', data: top6.map(r => r[1].tanam), backgroundColor: '#388e3c', borderRadius: 6, maxBarThickness: 26 },
+                { label: 'Panen', data: top6.map(r => r[1].panen), backgroundColor: '#0d9488', borderRadius: 6, maxBarThickness: 26 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'top', labels: { usePointStyle: true, pointStyle: 'circle' } } },
+            scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════════════
+loadAll();
+</script>
+</body>
+</html>
