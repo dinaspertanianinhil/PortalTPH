@@ -3,173 +3,247 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Besar LTT - Dinas Pertanian Inhil</title>
+<title>Dashboard Besar LTT · Dinas Pertanian Inhil</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
     :root {
-        --green-900: #1a3d20;
-        --green-800: #1b5e20;
-        --green-700: #256027;
-        --green-600: #2e7d32;
-        --green-500: #388e3c;
-        --green-400: #4caf50;
-        --green-100: #e8f5e9;
-        --green-50: #f1f8f2;
-        --amber: #f59e0b;
-        --amber-light: #fef3c7;
-        --red: #dc2626;
-        --red-light: #fee2e2;
-        --blue: #1d4ed8;
-        --blue-light: #dbeafe;
-        --teal: #0d9488;
-        --teal-light: #ccfbf1;
-        --slate-900: #0f172a;
-        --slate-700: #334155;
-        --slate-500: #64748b;
-        --slate-300: #cbd5e1;
-        --slate-100: #f1f5f9;
-        --slate-50: #f8fafc;
-        --white: #ffffff;
-        --radius-sm: 8px;
-        --radius: 14px;
-        --radius-lg: 20px;
-        --shadow-xs: 0 1px 3px rgba(0,0,0,0.06);
-        --shadow-sm: 0 2px 8px rgba(0,0,0,0.07);
-        --shadow-md: 0 6px 20px rgba(0,0,0,0.09);
-        --shadow-lg: 0 16px 40px rgba(0,0,0,0.12);
+        /* ── palette: sawah & padi (rice-field / harvest) ── */
+        --forest-900: #12271a;
+        --forest-800: #17331f;
+        --forest-700: #1e4527;
+        --forest-600: #275c31;
+        --forest-500: #33753e;
+        --forest-100: #e7f0e5;
+
+        --gold-700: #92640a;
+        --gold-600: #b4830a;
+        --gold-500: #d4a017;
+        --gold-100: #faf0d6;
+
+        --rust-600: #b8481c;
+        --rust-100: #fbe6db;
+
+        --sky-600: #245a8f;
+        --sky-100: #e2edf7;
+
+        --teal-600: #0f6f63;
+        --teal-100: #e0f2ee;
+
+        --cream: #f7f4ec;
+        --paper: #fffdf8;
+        --ink-900: #1d2019;
+        --ink-700: #40453b;
+        --ink-500: #767a6d;
+        --line: #e7e1d0;
+
+        --radius-sm: 10px;
+        --radius: 16px;
+        --radius-lg: 22px;
+        --shadow-xs: 0 1px 2px rgba(24,30,20,0.05);
+        --shadow-sm: 0 3px 12px rgba(24,30,20,0.06);
+        --shadow-md: 0 10px 28px rgba(24,30,20,0.09);
+        --shadow-lg: 0 22px 50px rgba(24,30,20,0.14);
+
+        --font-display: 'Fraunces', serif;
+        --font-body: 'DM Sans', sans-serif;
+        --font-mono: 'DM Mono', monospace;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html { scroll-behavior: smooth; }
+
     body {
-        font-family: 'DM Sans', sans-serif;
-        color: var(--slate-900);
-        background: #e8f0e9;
-        background-image: url('https://png.pngtree.com/thumb_back/fh260/background/20240705/pngtree-view-of-rice-fields-with-green-rice-with-dew-and-mountains-image_15860694.jpg');
-        background-size: cover;
-        background-attachment: fixed;
-        background-position: center;
-        -webkit-tap-highlight-color: transparent;
+        font-family: var(--font-body);
+        color: var(--ink-900);
+        background-color: var(--cream);
         min-height: 100vh;
+        -webkit-tap-highlight-color: transparent;
     }
 
-    .overlay {
-        min-height: 100vh;
-        background: rgba(240, 247, 240, 0.9);
-        backdrop-filter: blur(2px);
+    /* ─── LATAR VIDEO SAWAH (bergerak, sudut pandang sejajar tanah — bukan udara) ─── */
+    .bg-scene {
+        position: fixed; inset: 0; z-index: -1; overflow: hidden;
+        background: var(--cream);
+    }
+    .bg-scene .bg-video {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover; object-position: center 55%;
+    }
+    .bg-scene .bg-wash {
+        position: absolute; inset: 0;
+        background: linear-gradient(180deg, rgba(247,244,236,0.30) 0%, rgba(247,244,236,0.50) 45%, var(--cream) 90%);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .bg-scene .bg-video { display: none; }
+        .bg-scene { background: linear-gradient(180deg, #eef2df 0%, var(--cream) 70%); }
+        *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
     }
 
     /* ─── LOADING OVERLAY ─── */
     #loadingOverlay {
         position: fixed; inset: 0; z-index: 5000;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 16px;
-        background: linear-gradient(160deg, var(--green-800) 0%, var(--green-600) 100%);
+        gap: 16px; padding: 24px; text-align: center;
+        background:
+            radial-gradient(700px 400px at 50% 0%, rgba(212,160,23,0.18), transparent 60%),
+            linear-gradient(160deg, var(--forest-900) 0%, var(--forest-600) 100%);
         transition: opacity 0.5s ease, visibility 0.5s ease;
     }
     #loadingOverlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
     .loading-logo {
-        width: 64px; height: 64px; object-fit: contain; background: #fff;
+        width: 60px; height: 60px; object-fit: contain; background: #fff;
         border-radius: 16px; padding: 8px; box-shadow: 0 10px 30px -8px rgba(0,0,0,0.4);
-        animation: pulseBadge 1.6s ease-in-out infinite;
+        animation: pulseBadge 1.8s ease-in-out infinite;
     }
     @keyframes pulseBadge { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
     .loading-spinner {
-        width: 38px; height: 38px; border-radius: 50%;
-        border: 4px solid rgba(255,255,255,0.25); border-top-color: #fff;
-        animation: spin 0.9s linear infinite;
+        width: 34px; height: 34px; border-radius: 50%;
+        border: 3px solid rgba(255,255,255,0.22); border-top-color: var(--gold-500);
+        animation: spin 0.85s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { color: #fff; font-size: 1rem; font-weight: 700; text-align: center; }
-    .loading-sub { color: rgba(255,255,255,0.85); font-size: 0.82rem; text-align: center; max-width: 300px; line-height: 1.5; }
-    .loading-sub.error { color: #ffe3b3; font-weight: 600; }
+    .loading-text { font-family: var(--font-display); color: #fff; font-size: 1.15rem; font-weight: 600; }
+    .loading-sub { color: rgba(255,255,255,0.82); font-size: 0.84rem; max-width: 320px; line-height: 1.55; }
+    .loading-sub.error { color: #ffd9a8; font-weight: 600; }
     .loading-retry {
-        margin-top: 4px; padding: 8px 18px; border-radius: 20px;
-        background: rgba(255,255,255,0.18); color: #fff; font-weight: 700; font-size: 0.8rem;
-        cursor: pointer; border: 1px solid rgba(255,255,255,0.35);
-        transition: background 0.2s; display: none;
+        margin-top: 2px; padding: 9px 20px; border-radius: 20px;
+        background: var(--gold-500); color: var(--forest-900); font-weight: 700; font-size: 0.8rem;
+        cursor: pointer; border: none; transition: transform 0.15s, background 0.2s;
+        display: none;
     }
-    .loading-retry:hover { background: rgba(255,255,255,0.3); }
+    .loading-retry:hover { background: #e6b125; transform: translateY(-1px); }
     .loading-retry.show { display: inline-flex; }
 
     /* ─── HEADER ─── */
     header {
-        display: flex; align-items: center; gap: 16px; padding: 14px 5%;
-        background: rgba(255,255,255,0.97); border-bottom: 2px solid var(--green-100);
-        position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow-sm);
+        display: flex; align-items: center; gap: 14px; padding: 12px 5%;
+        background: rgba(255,253,248,0.9); backdrop-filter: blur(10px) saturate(140%);
+        border-bottom: 1px solid var(--line);
+        position: sticky; top: 0; z-index: 1000;
     }
-    header img { width: 46px; height: auto; flex-shrink: 0; }
-    .header-text h1 { font-size: 1rem; font-weight: 700; color: var(--green-800); line-height: 1.3; }
-    .header-text p { font-size: 0.78rem; color: var(--slate-500); margin-top: 2px; font-weight: 500; }
+    header img { width: 42px; height: auto; flex-shrink: 0; border-radius: 8px; }
+    .header-text h1 {
+        font-family: var(--font-display); font-size: 1.05rem; font-weight: 600;
+        color: var(--forest-800); line-height: 1.25; letter-spacing: -0.01em;
+    }
+    .header-text p { font-size: 0.74rem; color: var(--ink-500); margin-top: 1px; font-weight: 500; }
+    .header-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    #jamUpdate { font-size: 0.7rem; color: var(--ink-500); font-weight: 500; display: none; }
+    @media (min-width: 640px) { #jamUpdate { display: inline; } }
+
     .header-badge {
-        margin-left: auto; background: var(--green-100); color: var(--green-700);
-        font-size: 0.72rem; font-weight: 700; padding: 5px 12px; border-radius: 20px;
+        background: var(--forest-100); color: var(--forest-700);
+        font-size: 0.72rem; font-weight: 700; padding: 6px 13px; border-radius: 20px;
         white-space: nowrap; display: flex; align-items: center; gap: 5px;
     }
-    .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-    #jamUpdate { font-size: 0.72rem; color: var(--slate-500); font-weight: 500; }
+
+    /* music toggle */
+    .music-btn {
+        width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line);
+        background: var(--paper); cursor: pointer; font-size: 1rem;
+        display: flex; align-items: center; justify-content: center;
+        transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+        flex-shrink: 0;
+    }
+    .music-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .music-btn[aria-pressed="true"] { background: var(--gold-100); border-color: var(--gold-500); }
 
     /* ─── CONTAINER ─── */
-    .container { padding: 24px 5% 48px; max-width: 1440px; margin: auto; }
+    .container { padding: 26px 5% 56px; max-width: 1440px; margin: auto; position: relative; z-index: 1; }
+    footer { position: relative; z-index: 1; }
 
-    /* ─── NOTIF ─── */
-    .infoNotif {
-        background: #fffbeb; border: 1px solid #fcd34d; border-left: 4px solid var(--amber);
-        padding: 14px 44px 14px 16px; margin-bottom: 22px; border-radius: var(--radius);
-        font-size: 0.85rem; color: #78350f; line-height: 1.6; position: relative; box-shadow: var(--shadow-xs);
+    /* ─── HERO NOTE ─── */
+    .heroNote {
+        display: flex; align-items: flex-start; gap: 14px;
+        background: linear-gradient(135deg, var(--forest-800), var(--forest-600));
+        color: #f4f1e6; padding: 20px 22px; margin-bottom: 26px; border-radius: var(--radius-lg);
+        position: relative; box-shadow: var(--shadow-md); overflow: hidden;
     }
-    .infoNotif b { color: #92400e; }
+    .heroNote::after {
+        content: ""; position: absolute; inset: 0;
+        background: radial-gradient(420px 220px at 100% 0%, rgba(212,160,23,0.35), transparent 65%);
+        pointer-events: none;
+    }
+    .heroNote .heroIcon { font-size: 1.6rem; line-height: 1; flex-shrink: 0; }
+    .heroNote h2 { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; margin-bottom: 4px; }
+    .heroNote p { font-size: 0.85rem; line-height: 1.6; color: rgba(244,241,230,0.88); }
+    .heroNote b { color: var(--gold-500); font-weight: 700; }
     .closeNotif {
-        position: absolute; right: 12px; top: 12px; cursor: pointer;
-        width: 22px; height: 22px; border-radius: 50%; background: rgba(0,0,0,0.06);
-        display: flex; align-items: center; justify-content: center; font-size: 0.75rem;
+        position: absolute; right: 14px; top: 14px; cursor: pointer;
+        width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.14);
+        display: flex; align-items: center; justify-content: center; font-size: 0.72rem; color: #fff;
         transition: background 0.2s;
     }
-    .closeNotif:hover { background: rgba(0,0,0,0.14); }
+    .closeNotif:hover { background: rgba(255,255,255,0.26); }
 
     /* ─── SECTION ─── */
-    .module-section { margin-bottom: 30px; }
+    .module-section {
+        margin-bottom: 34px;
+        opacity: 0; transform: translateY(14px);
+        animation: riseIn 0.6s ease forwards;
+    }
+    .module-section:nth-of-type(2) { animation-delay: 0.05s; }
+    .module-section:nth-of-type(3) { animation-delay: 0.1s; }
+    .module-section:nth-of-type(4) { animation-delay: 0.15s; }
+    .module-section:nth-of-type(5) { animation-delay: 0.2s; }
+    @keyframes riseIn { to { opacity: 1; transform: translateY(0); } }
+
     .module-head {
         display: flex; align-items: center; justify-content: space-between;
-        margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
+        margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
     }
-    .module-title { display: flex; align-items: center; gap: 10px; }
+    .module-title { display: flex; align-items: center; gap: 12px; }
     .module-icon {
-        width: 38px; height: 38px; border-radius: 11px; display: flex;
-        align-items: center; justify-content: center; font-size: 1.05rem; flex-shrink: 0;
+        width: 40px; height: 40px; border-radius: 12px; display: flex;
+        align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;
+        box-shadow: var(--shadow-xs);
     }
-    .module-title h2 { font-size: 1.05rem; font-weight: 700; color: var(--slate-900); }
-    .module-title span.sub { display: block; font-size: 0.76rem; color: var(--slate-500); font-weight: 500; margin-top: 1px; }
+    .module-title h2 {
+        font-family: var(--font-display); font-size: 1.15rem; font-weight: 600;
+        color: var(--ink-900); letter-spacing: -0.01em;
+    }
+    .module-title span.sub { display: block; font-size: 0.78rem; color: var(--ink-500); font-weight: 500; margin-top: 2px; }
     .module-link {
-        font-size: 0.78rem; font-weight: 700; color: var(--green-700);
-        text-decoration: none; background: var(--white); border: 1px solid var(--green-100);
-        padding: 7px 14px; border-radius: 20px; box-shadow: var(--shadow-xs);
+        font-size: 0.78rem; font-weight: 700; color: var(--forest-700);
+        text-decoration: none; background: var(--paper); border: 1px solid var(--line);
+        padding: 8px 15px; border-radius: 20px; box-shadow: var(--shadow-xs);
         transition: all 0.2s; white-space: nowrap;
     }
-    .module-link:hover { background: var(--green-600); color: #fff; border-color: var(--green-600); }
+    .module-link:hover { background: var(--forest-600); color: #fff; border-color: var(--forest-600); transform: translateY(-1px); }
 
     .card-panel {
-        background: var(--white); border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-md); padding: 20px 22px; border: 1px solid rgba(0,0,0,0.04);
+        background: var(--paper); border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm); padding: 22px 24px; border: 1px solid var(--line);
+        transition: box-shadow 0.25s ease;
     }
+    .card-panel:hover { box-shadow: var(--shadow-md); }
+    .panel-heading { font-size: 0.86rem; font-weight: 700; margin-bottom: 14px; color: var(--ink-700); }
 
     /* ─── KPI GRID ─── */
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
     .kpi-box {
-        background: var(--white); border-radius: var(--radius); padding: 15px 16px;
-        box-shadow: var(--shadow-sm); border: 1px solid rgba(0,0,0,0.04);
-        border-top: 3px solid var(--green-500);
+        background: var(--paper); border-radius: var(--radius); padding: 16px 17px;
+        box-shadow: var(--shadow-sm); border: 1px solid var(--line);
+        border-top: 3px solid var(--forest-500);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .kpi-box .kpi-label { font-size: 0.72rem; color: var(--slate-500); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
-    .kpi-box .kpi-value { font-size: 1.5rem; font-weight: 700; color: var(--slate-900); margin-top: 4px; font-family: 'DM Mono', monospace; }
-    .kpi-box .kpi-value small { font-size: 0.85rem; font-weight: 600; color: var(--slate-500); }
-    .kpi-box.amber { border-top-color: var(--amber); }
-    .kpi-box.blue { border-top-color: var(--blue); }
-    .kpi-box.teal { border-top-color: var(--teal); }
-    .kpi-box.red { border-top-color: var(--red); }
+    .kpi-box:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .kpi-box .kpi-label { font-size: 0.7rem; color: var(--ink-500); font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+    .kpi-box .kpi-value {
+        font-size: 1.5rem; font-weight: 500; color: var(--ink-900); margin-top: 6px;
+        font-family: var(--font-mono);
+    }
+    .kpi-box .kpi-value small { font-size: 0.82rem; font-weight: 600; color: var(--ink-500); }
+    .kpi-box.amber { border-top-color: var(--gold-500); }
+    .kpi-box.blue { border-top-color: var(--sky-600); }
+    .kpi-box.teal { border-top-color: var(--teal-600); }
+    .kpi-box.red { border-top-color: var(--rust-600); }
 
     /* ─── TWO-COL LAYOUT ─── */
     .two-col { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
@@ -181,45 +255,79 @@
     /* ─── MINI RANK LIST ─── */
     .mini-rank { display: flex; flex-direction: column; gap: 8px; }
     .mini-rank-row {
-        display: flex; align-items: center; gap: 10px; padding: 8px 10px;
-        background: var(--slate-50); border-radius: 10px; font-size: 0.82rem;
+        display: flex; align-items: center; gap: 11px; padding: 9px 11px;
+        background: var(--cream); border-radius: 11px; font-size: 0.82rem;
+        transition: background 0.15s ease;
     }
+    .mini-rank-row:hover { background: var(--forest-100); }
     .mini-rank-row .rk-no {
-        width: 22px; height: 22px; border-radius: 50%; background: var(--green-600); color: #fff;
+        width: 23px; height: 23px; border-radius: 50%; background: var(--forest-600); color: #fff;
         display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
+        font-family: var(--font-mono);
     }
-    .mini-rank-row .rk-name { flex: 1; font-weight: 600; color: var(--slate-700); }
-    .mini-rank-row .rk-val { font-family: 'DM Mono', monospace; font-weight: 600; color: var(--green-800); }
+    .mini-rank-row:nth-child(1) .rk-no { background: var(--gold-600); }
+    .mini-rank-row .rk-name { flex: 1; font-weight: 600; color: var(--ink-700); }
+    .mini-rank-row .rk-val { font-family: var(--font-mono); font-weight: 600; color: var(--forest-800); }
 
     /* ─── PROGRESS BAR ROWS (capaian) ─── */
-    .prog-row { margin-bottom: 10px; }
-    .prog-row-top { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px; }
-    .prog-row-top .pname { font-weight: 600; color: var(--slate-700); }
-    .prog-row-top .pval { font-family: 'DM Mono', monospace; color: var(--slate-500); }
-    .prog-track { height: 7px; border-radius: 6px; background: var(--slate-100); overflow: hidden; }
-    .prog-fill { height: 100%; border-radius: 6px; transition: width 0.6s ease; }
+    .prog-row { margin-bottom: 12px; }
+    .prog-row-top { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 5px; }
+    .prog-row-top .pname { font-weight: 600; color: var(--ink-700); }
+    .prog-row-top .pval { font-family: var(--font-mono); color: var(--ink-500); }
+    .prog-track { height: 8px; border-radius: 6px; background: var(--cream); overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 6px; transition: width 0.8s cubic-bezier(.22,1,.36,1); }
 
     /* ─── BELUM INPUT CHIPS ─── */
-    .belum-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
-    .belum-card-header h3 { font-size: 0.95rem; font-weight: 700; }
+    .belum-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 13px; flex-wrap: wrap; gap: 8px; }
+    .belum-card-header h3 { font-size: 0.86rem; font-weight: 700; color: var(--ink-700); }
     .belum-count-badge { font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
-    .belum-count-badge.danger { background: var(--red-light); color: var(--red); }
-    .belum-count-badge.success { background: var(--green-100); color: var(--green-700); }
+    .belum-count-badge.danger { background: var(--rust-100); color: var(--rust-600); }
+    .belum-count-badge.success { background: var(--forest-100); color: var(--forest-700); }
     .chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
     .belum-chip {
-        background: var(--red-light); color: #991b1b; font-size: 0.76rem; font-weight: 600;
+        background: var(--rust-100); color: #8a3512; font-size: 0.76rem; font-weight: 600;
         padding: 6px 12px; border-radius: 20px;
     }
 
     /* ─── FOOTER ─── */
     footer {
-        text-align: center; padding: 18px; font-size: 0.75rem; color: var(--slate-500);
+        text-align: center; padding: 24px 20px 32px; font-size: 0.75rem; color: var(--ink-500);
+        border-top: 1px solid var(--line); margin-top: 10px;
     }
+    footer strong { color: var(--forest-700); }
 
-    .empty-note { font-size: 0.78rem; color: var(--slate-500); padding: 10px 2px; }
+    .empty-note { font-size: 0.78rem; color: var(--ink-500); padding: 10px 2px; }
+
+    @media (max-width: 480px) {
+        .header-text h1 { font-size: 0.92rem; }
+        .header-text p { font-size: 0.68rem; }
+        .module-title h2 { font-size: 1.02rem; }
+        .kpi-box .kpi-value { font-size: 1.28rem; }
+    }
 </style>
 </head>
 <body>
+
+<!-- ─── LATAR VIDEO SAWAH (dekorasi, tidak menghalangi konten) ───
+     Video close-up sawah dari sudut sejajar tanah (bukan drone/udara), loop otomatis & bisu.
+     Ganti src di bawah kalau mau pakai video lain (mis. dari repo GitHub-mu sendiri). -->
+<div class="bg-scene" aria-hidden="true">
+    <video class="bg-video" autoplay muted loop playsinline preload="auto"
+           poster="https://images.pexels.com/videos/6701387/agriculture-act-agriculture-act-2020-in-telugu-agriculture-agriculture-agriculture-bill-2020-6701387.jpeg?auto=compress&cs=tinysrgb&h=800&fit=crop&w=1400">
+        <source src="https://videos.pexels.com/video-files/6701387/6701387-hd_1920_1080_30fps.mp4" type="video/mp4">
+    </video>
+    <div class="bg-wash"></div>
+</div>
+
+
+<!-- ─── MUSIK LATAR ───
+     Ganti nama file di baris <source> di bawah untuk mengganti lagu.
+     Contoh: file lagu ada di repo GitHub → pakai raw.githubusercontent.com,
+     atau taruh file mp3 di folder yang sama dengan halaman ini lalu tulis
+     nama filenya saja (mis. "sentimental.mp3"). -->
+<audio id="bgMusic" loop preload="none">
+    <source src="sentimental.mp3" type="audio/mpeg">
+</audio>
 
 <!-- ─── LOADING OVERLAY ─── -->
 <div id="loadingOverlay">
@@ -230,149 +338,152 @@
     <button class="loading-retry" id="loadingRetry" onclick="loadAll()">Coba Lagi</button>
 </div>
 
-<div class="overlay">
-    <!-- ─── HEADER ─── -->
-    <header>
-        <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png" alt="Logo Inhil">
-        <div class="header-text">
-            <h1>Dashboard Besar LTT</h1>
-            <p>Dinas Pertanian Kabupaten Indragiri Hilir</p>
+<!-- ─── HEADER ─── -->
+<header>
+    <img src="https://www.inhilkab.go.id/assets/portal/img/logos/logo-inhil-big.png" alt="Logo Inhil">
+    <div class="header-text">
+        <h1>Dashboard Besar LTT</h1>
+        <p>Dinas Pertanian Kabupaten Indragiri Hilir</p>
+    </div>
+    <div class="header-right">
+        <span id="jamUpdate"></span>
+        <div class="header-badge"><span>🌾</span> Ringkasan Terpadu</div>
+        <button class="music-btn" id="musicBtn" aria-pressed="false" title="Putar musik">🔈</button>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- ─── NOTIF ─── -->
+    <div id="notifInfo" class="heroNote">
+        <span class="closeNotif" onclick="document.getElementById('notifInfo').style.display='none'">✕</span>
+        <div class="heroIcon">🌱</div>
+        <div>
+            <h2>Semua data dalam satu layar</h2>
+            <p>Halaman ini menggabungkan otomatis data dari sumber yang sama dengan <b>Dashboard Utama</b>, <b>Progres Capaian</b>, <b>Laporan Bulanan</b>, dan <b>Analisis Panen</b> — tanpa perlu buka satu-satu. Klik <b>"Detail →"</b> di tiap bagian untuk rincian lengkap dan filter lanjutan.</p>
         </div>
-        <div class="header-right">
-            <span id="jamUpdate"></span>
-            <div class="header-badge"><span>🌾</span> Ringkasan Terpadu</div>
-        </div>
-    </header>
-
-    <div class="container">
-
-        <!-- ─── NOTIF ─── -->
-        <div id="notifInfo" class="infoNotif">
-            <span class="closeNotif" onclick="document.getElementById('notifInfo').style.display='none'">✕</span>
-            ℹ️ <b>Halaman Ringkasan:</b> Data di halaman ini digabung otomatis dari sumber yang sama dengan Dashboard Utama, Progres Capaian, Laporan Bulanan, dan Analisis Panen — tanpa perlu buka satu-satu. Klik tombol <b>"Detail →"</b> di tiap bagian untuk melihat rincian lengkap dan filter lanjutan.
-        </div>
-
-        <!-- ═══════════════ MODULE 1: HARIAN ═══════════════ -->
-        <div class="module-section">
-            <div class="module-head">
-                <div class="module-title">
-                    <div class="module-icon" style="background:var(--green-100);">📅</div>
-                    <div>
-                        <h2>Ringkasan Harian</h2>
-                        <span class="sub">Total LTT keseluruhan &amp; LTT hari ini</span>
-                    </div>
-                </div>
-                <a class="module-link" href="Tampilltt.html" target="_blank">Detail Harian →</a>
-            </div>
-
-            <div class="kpi-grid" id="kpiHarian">
-                <div class="kpi-box"><div class="kpi-label">Total LTT Keseluruhan</div><div class="kpi-value" id="h_total">—</div></div>
-                <div class="kpi-box amber"><div class="kpi-label">LTT Hari Ini</div><div class="kpi-value" id="h_today">—</div></div>
-                <div class="kpi-box blue"><div class="kpi-label">Total Oplah</div><div class="kpi-value" id="h_oplah">—</div></div>
-                <div class="kpi-box teal"><div class="kpi-label">Total CSR</div><div class="kpi-value" id="h_csr">—</div></div>
-            </div>
-
-            <div class="two-col">
-                <div class="card-panel">
-                    <h3 style="font-size:0.85rem;font-weight:700;margin-bottom:10px;color:var(--slate-700);">Top 5 Kecamatan (LTT Keseluruhan)</h3>
-                    <div class="mini-rank" id="rankKecamatan"></div>
-                </div>
-                <div class="card-panel">
-                    <div class="belum-card-header">
-                        <h3>⚠️ Belum Input Hari Ini</h3>
-                        <span class="belum-count-badge danger" id="belumBadge">0</span>
-                    </div>
-                    <div class="chip-wrap" id="belumChips"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ═══════════════ MODULE 2: CAPAIAN ═══════════════ -->
-        <div class="module-section">
-            <div class="module-head">
-                <div class="module-title">
-                    <div class="module-icon" style="background:var(--amber-light);">🎯</div>
-                    <div>
-                        <h2>Progres Capaian LTT</h2>
-                        <span class="sub" id="capaianPeriodeLabel">Target vs Realisasi bulan berjalan</span>
-                    </div>
-                </div>
-                <a class="module-link" href="capaiantargetltt.html" target="_blank">Detail Capaian →</a>
-            </div>
-
-            <div class="kpi-grid">
-                <div class="kpi-box amber"><div class="kpi-label">Target</div><div class="kpi-value" id="c_target">—</div></div>
-                <div class="kpi-box"><div class="kpi-label">Realisasi</div><div class="kpi-value" id="c_realisasi">—</div></div>
-                <div class="kpi-box blue"><div class="kpi-label">Capaian</div><div class="kpi-value" id="c_persen">—</div></div>
-                <div class="kpi-box teal"><div class="kpi-label">Kecamatan Tercatat</div><div class="kpi-value" id="c_jumlahkec">—</div></div>
-            </div>
-
-            <div class="card-panel">
-                <h3 style="font-size:0.85rem;font-weight:700;margin-bottom:12px;color:var(--slate-700);">Top 5 Capaian per Kecamatan</h3>
-                <div id="capaianRows"></div>
-                <div class="empty-note" id="capaianEmpty" style="display:none;">Belum ada data target/realisasi untuk periode ini.</div>
-            </div>
-        </div>
-
-        <!-- ═══════════════ MODULE 3: BULANAN ═══════════════ -->
-        <div class="module-section">
-            <div class="module-head">
-                <div class="module-title">
-                    <div class="module-icon" style="background:var(--blue-light);">📆</div>
-                    <div>
-                        <h2>Laporan LTT Bulan Ini</h2>
-                        <span class="sub" id="bulananPeriodeLabel">Rekap tanam, olah lahan &amp; panen</span>
-                    </div>
-                </div>
-                <a class="module-link" href="Laporanbulananltt.html" target="_blank">Detail Bulanan →</a>
-            </div>
-
-            <div class="kpi-grid">
-                <div class="kpi-box"><div class="kpi-label">Total LTT Bulan Ini</div><div class="kpi-value" id="b_ltt">—</div></div>
-                <div class="kpi-box blue"><div class="kpi-label">Total Olah Lahan</div><div class="kpi-value" id="b_olah">—</div></div>
-                <div class="kpi-box teal"><div class="kpi-label">Total Panen</div><div class="kpi-value" id="b_panen">—</div></div>
-                <div class="kpi-box amber"><div class="kpi-label">Kecamatan Aktif</div><div class="kpi-value" id="b_kec">—</div></div>
-            </div>
-
-            <div class="card-panel">
-                <h3 style="font-size:0.85rem;font-weight:700;margin-bottom:10px;color:var(--slate-700);">Tren LTT per Minggu (Bulan Ini)</h3>
-                <div class="chart-box short"><canvas id="chartMingguan"></canvas></div>
-            </div>
-        </div>
-
-        <!-- ═══════════════ MODULE 4: ANALISIS PANEN ═══════════════ -->
-        <div class="module-section">
-            <div class="module-head">
-                <div class="module-title">
-                    <div class="module-icon" style="background:var(--teal-light);">🌾</div>
-                    <div>
-                        <h2>Analisis Tanam &amp; Panen</h2>
-                        <span class="sub">Rasio realisasi panen terhadap LTT</span>
-                    </div>
-                </div>
-                <a class="module-link" href="analisispanen.html" target="_blank">Detail Analisis →</a>
-            </div>
-
-            <div class="kpi-grid">
-                <div class="kpi-box"><div class="kpi-label">Total Tanam</div><div class="kpi-value" id="a_tanam">—</div></div>
-                <div class="kpi-box teal"><div class="kpi-label">Total Panen</div><div class="kpi-value" id="a_panen">—</div></div>
-                <div class="kpi-box amber"><div class="kpi-label">Selisih (Belum Panen)</div><div class="kpi-value" id="a_selisih">—</div></div>
-                <div class="kpi-box blue"><div class="kpi-label">Rasio Panen</div><div class="kpi-value" id="a_rasio">—</div></div>
-            </div>
-
-            <div class="card-panel">
-                <h3 style="font-size:0.85rem;font-weight:700;margin-bottom:10px;color:var(--slate-700);">Tanam vs Panen — Top 6 Kecamatan</h3>
-                <div class="chart-box"><canvas id="chartTanamPanen"></canvas></div>
-            </div>
-        </div>
-
     </div>
 
-    <footer>
-        <div><strong>Dinas Pertanian Kabupaten Indragiri Hilir</strong> · Dashboard Besar — Ringkasan Terpadu LTT</div>
-        <div id="lastUpdateFooter">—</div>
-    </footer>
+    <!-- ═══════════════ MODULE 1: HARIAN ═══════════════ -->
+    <div class="module-section">
+        <div class="module-head">
+            <div class="module-title">
+                <div class="module-icon" style="background:var(--forest-100);">📅</div>
+                <div>
+                    <h2>Ringkasan Harian</h2>
+                    <span class="sub">Total LTT keseluruhan &amp; LTT hari ini</span>
+                </div>
+            </div>
+            <a class="module-link" href="Tampilltt.html" target="_blank">Detail Harian →</a>
+        </div>
+
+        <div class="kpi-grid" id="kpiHarian">
+            <div class="kpi-box"><div class="kpi-label">Total LTT Keseluruhan</div><div class="kpi-value" id="h_total">—</div></div>
+            <div class="kpi-box amber"><div class="kpi-label">LTT Hari Ini</div><div class="kpi-value" id="h_today">—</div></div>
+            <div class="kpi-box blue"><div class="kpi-label">Total Oplah</div><div class="kpi-value" id="h_oplah">—</div></div>
+            <div class="kpi-box teal"><div class="kpi-label">Total CSR</div><div class="kpi-value" id="h_csr">—</div></div>
+        </div>
+
+        <div class="two-col">
+            <div class="card-panel">
+                <h3 class="panel-heading">Top 5 Kecamatan (LTT Keseluruhan)</h3>
+                <div class="mini-rank" id="rankKecamatan"></div>
+            </div>
+            <div class="card-panel">
+                <div class="belum-card-header">
+                    <h3>⚠️ Belum Input Hari Ini</h3>
+                    <span class="belum-count-badge danger" id="belumBadge">0</span>
+                </div>
+                <div class="chip-wrap" id="belumChips"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ MODULE 2: CAPAIAN ═══════════════ -->
+    <div class="module-section">
+        <div class="module-head">
+            <div class="module-title">
+                <div class="module-icon" style="background:var(--gold-100);">🎯</div>
+                <div>
+                    <h2>Progres Capaian LTT</h2>
+                    <span class="sub" id="capaianPeriodeLabel">Target vs Realisasi bulan berjalan</span>
+                </div>
+            </div>
+            <a class="module-link" href="capaiantargetltt.html" target="_blank">Detail Capaian →</a>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-box amber"><div class="kpi-label">Target</div><div class="kpi-value" id="c_target">—</div></div>
+            <div class="kpi-box"><div class="kpi-label">Realisasi</div><div class="kpi-value" id="c_realisasi">—</div></div>
+            <div class="kpi-box blue"><div class="kpi-label">Capaian</div><div class="kpi-value" id="c_persen">—</div></div>
+            <div class="kpi-box teal"><div class="kpi-label">Kecamatan Tercatat</div><div class="kpi-value" id="c_jumlahkec">—</div></div>
+        </div>
+
+        <div class="card-panel">
+            <h3 class="panel-heading">Top 5 Capaian per Kecamatan</h3>
+            <div id="capaianRows"></div>
+            <div class="empty-note" id="capaianEmpty" style="display:none;">Belum ada data target/realisasi untuk periode ini.</div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ MODULE 3: BULANAN ═══════════════ -->
+    <div class="module-section">
+        <div class="module-head">
+            <div class="module-title">
+                <div class="module-icon" style="background:var(--sky-100);">📆</div>
+                <div>
+                    <h2>Laporan LTT Bulan Ini</h2>
+                    <span class="sub" id="bulananPeriodeLabel">Rekap tanam, olah lahan &amp; panen</span>
+                </div>
+            </div>
+            <a class="module-link" href="Laporanbulananltt.html" target="_blank">Detail Bulanan →</a>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-box"><div class="kpi-label">Total LTT Bulan Ini</div><div class="kpi-value" id="b_ltt">—</div></div>
+            <div class="kpi-box blue"><div class="kpi-label">Total Olah Lahan</div><div class="kpi-value" id="b_olah">—</div></div>
+            <div class="kpi-box teal"><div class="kpi-label">Total Panen</div><div class="kpi-value" id="b_panen">—</div></div>
+            <div class="kpi-box amber"><div class="kpi-label">Kecamatan Aktif</div><div class="kpi-value" id="b_kec">—</div></div>
+        </div>
+
+        <div class="card-panel">
+            <h3 class="panel-heading">Tren LTT per Minggu (Bulan Ini)</h3>
+            <div class="chart-box short"><canvas id="chartMingguan"></canvas></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ MODULE 4: ANALISIS PANEN ═══════════════ -->
+    <div class="module-section">
+        <div class="module-head">
+            <div class="module-title">
+                <div class="module-icon" style="background:var(--teal-100);">🌾</div>
+                <div>
+                    <h2>Analisis Tanam &amp; Panen</h2>
+                    <span class="sub">Rasio realisasi panen terhadap LTT</span>
+                </div>
+            </div>
+            <a class="module-link" href="analisispanen.html" target="_blank">Detail Analisis →</a>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-box"><div class="kpi-label">Total Tanam</div><div class="kpi-value" id="a_tanam">—</div></div>
+            <div class="kpi-box teal"><div class="kpi-label">Total Panen</div><div class="kpi-value" id="a_panen">—</div></div>
+            <div class="kpi-box amber"><div class="kpi-label">Selisih (Belum Panen)</div><div class="kpi-value" id="a_selisih">—</div></div>
+            <div class="kpi-box blue"><div class="kpi-label">Rasio Panen</div><div class="kpi-value" id="a_rasio">—</div></div>
+        </div>
+
+        <div class="card-panel">
+            <h3 class="panel-heading">Tanam vs Panen — Top 6 Kecamatan</h3>
+            <div class="chart-box"><canvas id="chartTanamPanen"></canvas></div>
+        </div>
+    </div>
+
 </div>
+
+<footer>
+    <div><strong>Dinas Pertanian Kabupaten Indragiri Hilir</strong> · Dashboard Besar — Ringkasan Terpadu LTT</div>
+    <div id="lastUpdateFooter">—</div>
+</footer>
 
 <script>
 // ═══════════════════════════════════════════════════════════
@@ -601,7 +712,7 @@ function renderCapaian(){
     emptyNote.style.display = "none";
     wrap.innerHTML = rows.map(r => {
         const pct = Math.min(r.p, 100);
-        const color = r.p <= 30 ? "#ef4444" : r.p <= 50 ? "#f97316" : r.p <= 70 ? "#eab308" : r.p <= 90 ? "#4ade80" : "#15803d";
+        const color = r.p <= 30 ? "#c1440e" : r.p <= 50 ? "#d4a017" : r.p <= 70 ? "#c9a227" : r.p <= 90 ? "#5a9b52" : "#1e4527";
         return `<div class="prog-row">
             <div class="prog-row-top"><span class="pname">${r.k}</span><span class="pval">${fmt(r.r)} / ${fmt(r.t)} Ha (${r.p.toFixed(1)}%)</span></div>
             <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${color};"></div></div>
@@ -650,7 +761,7 @@ function renderBulanan(){
             datasets: [{
                 label: 'LTT (Ha)',
                 data: [mingguMap[1], mingguMap[2], mingguMap[3], mingguMap[4]],
-                backgroundColor: '#4caf50',
+                backgroundColor: '#33753e',
                 borderRadius: 8,
                 maxBarThickness: 48
             }]
@@ -658,7 +769,7 @@ function renderBulanan(){
         options: {
             responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+            scales: { y: { beginAtZero: true, grid: { color: '#eee8d5' } }, x: { grid: { display: false } } }
         }
     });
 }
@@ -699,17 +810,69 @@ function renderAnalisis(){
         data: {
             labels: top6.map(r => r[0]),
             datasets: [
-                { label: 'Tanam', data: top6.map(r => r[1].tanam), backgroundColor: '#388e3c', borderRadius: 6, maxBarThickness: 26 },
-                { label: 'Panen', data: top6.map(r => r[1].panen), backgroundColor: '#0d9488', borderRadius: 6, maxBarThickness: 26 }
+                { label: 'Tanam', data: top6.map(r => r[1].tanam), backgroundColor: '#275c31', borderRadius: 6, maxBarThickness: 26 },
+                { label: 'Panen', data: top6.map(r => r[1].panen), backgroundColor: '#0f6f63', borderRadius: 6, maxBarThickness: 26 }
             ]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
             plugins: { legend: { position: 'top', labels: { usePointStyle: true, pointStyle: 'circle' } } },
-            scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+            scales: { y: { beginAtZero: true, grid: { color: '#eee8d5' } }, x: { grid: { display: false } } }
         }
     });
 }
+
+// ═══════════════════════════════════════════
+// MUSIK LATAR (autoplay + fallback interaksi pertama)
+// ═══════════════════════════════════════════
+const bgMusic = document.getElementById("bgMusic");
+const musicBtn = document.getElementById("musicBtn");
+let audioFileMissing = false;
+function setPlayingUI(isPlaying) {
+    if (audioFileMissing) return;
+    musicBtn.textContent = isPlaying ? "🔊" : "🔈";
+    musicBtn.setAttribute("aria-pressed", isPlaying ? "true" : "false");
+    musicBtn.title = isPlaying ? "Jeda musik" : "Putar musik";
+}
+function toggleMusic() {
+    if (audioFileMissing) {
+        alert("File musik (sentimental.mp3) tidak ditemukan di server. Pastikan file sudah diupload di folder yang sama dengan halaman ini, atau perbarui alamat src pada tag <audio>.");
+        return;
+    }
+    if (bgMusic.paused) {
+        bgMusic.play().then(() => setPlayingUI(true)).catch(() => setPlayingUI(false));
+    } else {
+        bgMusic.pause();
+        setPlayingUI(false);
+    }
+}
+musicBtn.addEventListener("click", toggleMusic);
+bgMusic.addEventListener("play", () => setPlayingUI(true));
+bgMusic.addEventListener("pause", () => setPlayingUI(false));
+// Deteksi kalau file audio gagal dimuat (404 / rusak / nama salah)
+bgMusic.addEventListener("error", () => {
+    audioFileMissing = true;
+    musicBtn.textContent = "⚠️";
+    musicBtn.title = "File musik tidak ditemukan (cek alamat src pada tag <audio>)";
+    console.error("Gagal memuat audio: periksa apakah file lagu benar-benar ada di alamat yang ditulis pada tag <audio> (src) di HTML ini.");
+});
+// Coba putar otomatis saat halaman dibuka — browser umumnya memblokir ini
+// sampai ada interaksi pengguna, jadi dipasang juga fallback: musik akan
+// otomatis mulai pada interaksi pertama (klik ATAU sentuhan) di halaman
+// kalau autoplay gagal. Dua event dipasang karena beberapa browser mobile
+// (Safari/iOS terutama) hanya mengizinkan play() dari event 'touchstart'.
+window.addEventListener("load", () => {
+    const p = bgMusic.play();
+    if (p !== undefined) {
+        p.then(() => setPlayingUI(true)).catch(() => setPlayingUI(false));
+    }
+});
+function tryAutoplayOnFirstInteraction() {
+    if (!bgMusic.paused || audioFileMissing) return;
+    bgMusic.play().then(() => setPlayingUI(true)).catch(() => {});
+}
+window.addEventListener("click", tryAutoplayOnFirstInteraction, { once: true });
+window.addEventListener("touchstart", tryAutoplayOnFirstInteraction, { once: true });
 
 // ═══════════════════════════════════════════════════════════
 // START
