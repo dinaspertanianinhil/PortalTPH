@@ -833,11 +833,32 @@
 
         <!-- ─── NAV TABS ─── -->
         <div class="nav-tabs">
-            <button id="btn-dash" class="active" onclick="switchTab('dashboard')">🏠 Dashboard Utama</button>
-            <button id="btn-table" onclick="switchTab('tabel')">📋 Data LTT Perhari</button>
+            <button class="active" disabled>🏠 Dashboard &amp; LTT Harian</button>
             <button onclick="window.location.href='capaiantargetltt.html'">📊 Progres Capaian LTT</button>
             <button onclick="window.location.href='Laporanbulananltt.html'">📊 Data LTT Perbulan</button>
             <button onclick="window.location.href='analisispanen.html'">📊 Analisis LTT dan Panen</button>
+        </div>
+
+        <!-- ─── FILTER (dipindah ke atas, memengaruhi rekap & tabel sekaligus) ─── -->
+        <div class="filter-section">
+            <div class="filter-group">
+                <div class="input-control">
+                    <label>Kecamatan</label>
+                    <select id="filterKecamatan"><option value="">Semua Kecamatan</option></select>
+                </div>
+                <div class="input-control">
+                    <label>Jenis LTT</label>
+                    <select id="filterJenis"><option value="">Semua Jenis</option></select>
+                </div>
+                <div class="input-control">
+                    <label>Tanggal</label>
+                    <input type="date" id="filterTanggal">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-outline" onclick="downloadExcel()">📗 Export Excel</button>
+                <button class="btn btn-primary" onclick="downloadPDF()">📕 Export PDF</button>
+            </div>
         </div>
 
         <!-- ═══════════════════════════════════ -->
@@ -994,33 +1015,17 @@
         <!-- ═══════════════════════════════════ -->
         <!-- PAGE: TABEL REKAP                   -->
         <!-- ═══════════════════════════════════ -->
-        <div id="tablePage" style="display:none">
+        <div id="tablePage">
+
+            <div style="display:flex;align-items:center;gap:10px;margin:32px 0 16px;">
+                <h2 style="font-size:1rem;font-weight:700;color:var(--green-800);white-space:nowrap;">📋 Data LTT Perhari</h2>
+                <div style="flex:1;height:1px;background:var(--green-100);"></div>
+            </div>
 
             <div class="score-cards">
                 <div class="score-card"><h3>Rekap Reguler</h3><p id="scoreReguler">0 Ha</p></div>
                 <div class="score-card"><h3>Rekap Oplah</h3><p id="scoreOplah">0 Ha</p></div>
                 <div class="score-card"><h3>Rekap Jagung</h3><p id="scoreJagung">0 Ha</p></div>
-            </div>
-
-            <div class="filter-section">
-                <div class="filter-group">
-                    <div class="input-control">
-                        <label>Kecamatan</label>
-                        <select id="filterKecamatan"><option value="">Semua Kecamatan</option></select>
-                    </div>
-                    <div class="input-control">
-                        <label>Jenis LTT</label>
-                        <select id="filterJenis"><option value="">Semua Jenis</option></select>
-                    </div>
-                    <div class="input-control">
-                        <label>Tanggal</label>
-                        <input type="date" id="filterTanggal">
-                    </div>
-                </div>
-                <div class="btn-group">
-                    <button class="btn btn-outline" onclick="downloadExcel()">📗 Export Excel</button>
-                    <button class="btn btn-primary" onclick="downloadPDF()">📕 Export PDF</button>
-                </div>
             </div>
 
             <div class="table-wrapper">
@@ -1157,13 +1162,6 @@
     // ═══════════════════════════════════════════
     // SWITCH TAB
     // ═══════════════════════════════════════════
-    function switchTab(page) {
-        document.getElementById("dashboardPage").style.display = page === "dashboard" ? "block" : "none";
-        document.getElementById("tablePage").style.display = page === "tabel" ? "block" : "none";
-        document.getElementById("btn-dash").classList.toggle("active", page === "dashboard");
-        document.getElementById("btn-table").classList.toggle("active", page === "tabel");
-    }
-
     // ═══════════════════════════════════════════
     // LOAD DATA
     // ═══════════════════════════════════════════
