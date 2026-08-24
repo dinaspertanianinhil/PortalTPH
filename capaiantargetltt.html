@@ -166,7 +166,8 @@ header img.logo{
 
 .filter-box label{ font-size:.72rem; color:var(--muted); font-weight:600; display:block; margin-bottom:2px; text-transform:uppercase; letter-spacing:.5px; }
 
-.filter-box input[type=month]{
+.filter-box input[type=month],
+.filter-box select{
     padding:9px 12px;
     border-radius:10px;
     border:1px solid rgba(27,94,32,0.18);
@@ -177,7 +178,26 @@ header img.logo{
     outline:none;
     transition:.2s;
 }
-.filter-box input[type=month]:focus{ border-color:var(--emerald); box-shadow:0 0 0 3px rgba(16,185,129,0.18); }
+.filter-box input[type=month]:focus,
+.filter-box select:focus{ border-color:var(--emerald); box-shadow:0 0 0 3px rgba(16,185,129,0.18); }
+
+/* ===== Mode toggle (Bulanan / Tahunan) ===== */
+.mode-toggle{
+    display:flex; align-items:center; gap:3px;
+    background:rgba(27,94,32,0.08);
+    padding:4px; border-radius:12px;
+}
+.mode-toggle button{
+    border:none; background:transparent; cursor:pointer;
+    padding:8px 16px; border-radius:9px;
+    font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:.8rem;
+    color:var(--muted); transition:.2s;
+}
+.mode-toggle button.active{
+    background:linear-gradient(135deg,var(--forest),var(--paddy));
+    color:#fff;
+    box-shadow:0 4px 12px rgba(20,83,45,0.28);
+}
 
 .btn-pdf{
     display:flex; align-items:center; gap:8px;
@@ -389,6 +409,7 @@ header img.logo{
     .card-gauge{ flex-direction:column; text-align:center; }
     .gauge-info{ text-align:center; }
     .badge-exceeded{ margin-left:auto; margin-right:auto; }
+    .mode-toggle{ width:100%; justify-content:center; }
 }
 </style>
 </head>
@@ -433,7 +454,12 @@ header img.logo{
 <div class="container" id="pdfArea">
 
     <div class="toolbar anim-up">
-        <div class="filter-box">
+        <div class="mode-toggle" id="modeToggle">
+            <button type="button" class="active" data-mode="bulanan" onclick="setMode('bulanan')">📅 Bulanan</button>
+            <button type="button" data-mode="tahunan" onclick="setMode('tahunan')">📆 Tahunan</button>
+        </div>
+
+        <div class="filter-box" id="filterBulananBox">
             <div class="ico">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
             </div>
@@ -442,6 +468,17 @@ header img.logo{
                 <input type="month" id="filterBulan" onchange="setMonth(this.value)">
             </div>
         </div>
+
+        <div class="filter-box" id="filterTahunanBox" style="display:none;">
+            <div class="ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </div>
+            <div>
+                <label>Tahun</label>
+                <select id="filterTahun" onchange="setYear(this.value)"></select>
+            </div>
+        </div>
+
         <button class="btn-pdf" id="btnDownloadPdf" onclick="downloadPDF()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
             <span>Download PDF</span>
@@ -479,7 +516,7 @@ header img.logo{
             </div>
             <div class="gauge-info">
                 <h3>📈 Persentase Capaian</h3>
-                <div class="desc">Realisasi tanam dibandingkan target pada periode terpilih.</div>
+                <div class="desc" id="gaugeDesc">Realisasi tanam dibandingkan target pada periode terpilih.</div>
                 <div class="badge-exceeded" id="badgeExceeded">
                     <span>🏆</span><span>TARGET TERLAMPAUI</span>
                 </div>
@@ -517,7 +554,9 @@ const API = "https://script.google.com/macros/s/AKfycbxeBdznULEYyYf0DiokNjYaoG-V
 
 let realisasi = [];
 let target = [];
-let selectedMonth = "";
+let filterMode = "bulanan";   // "bulanan" | "tahunan"
+let selectedMonth = "";       // dipakai saat mode bulanan, format "YYYY-MM"
+let selectedYear = "";        // dipakai saat mode tahunan, format "YYYY"
 let chart;
 let lastLabels = [], lastRealMap = {}, lastTargetMap = {};
 let lastTotalT = 0, lastTotalR = 0, lastPersen = 0;
@@ -549,6 +588,12 @@ function getMonth(tgl){
     if(isNaN(d)) return "";
 
     return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+}
+
+// Ambil tahun (YYYY) dari sebuah tanggal realisasi
+function getYear(tgl){
+    const m = getMonth(tgl);
+    return m ? m.slice(0,4) : "";
 }
 
 function namaBulanToNumber(nama){
@@ -600,7 +645,56 @@ function updateGauge(p){
     document.getElementById("badgeExceeded").classList.toggle("show", p > 100);
 }
 
-// ===== LOAD (tidak diubah) =====
+// ===== FILTER MODE (Bulanan / Tahunan) =====
+function setMode(mode){
+    filterMode = mode;
+
+    document.querySelectorAll("#modeToggle button").forEach(btn=>{
+        btn.classList.toggle("active", btn.dataset.mode === mode);
+    });
+
+    document.getElementById("filterBulananBox").style.display = mode === "bulanan" ? "flex" : "none";
+    document.getElementById("filterTahunanBox").style.display = mode === "tahunan" ? "flex" : "none";
+
+    const desc = document.getElementById("gaugeDesc");
+    desc.textContent = mode === "bulanan"
+        ? "Realisasi tanam dibandingkan target pada bulan terpilih."
+        : "Realisasi tanam dibandingkan target sepanjang tahun terpilih.";
+
+    render();
+}
+
+// Isi dropdown tahun berdasarkan tahun yang benar-benar ada di data realisasi & target
+function populateYearOptions(){
+    const years = new Set();
+
+    realisasi.forEach(d=>{
+        const y = getYear(d.TANGGAL);
+        if(y) years.add(y);
+    });
+    target.forEach(d=>{
+        if(d.TAHUN) years.add(String(d.TAHUN));
+    });
+
+    // Tahun berjalan selalu tersedia sebagai opsi, walau belum ada datanya
+    years.add(String(new Date().getFullYear()));
+
+    const sorted = Array.from(years).sort((a,b)=> b - a); // terbaru dulu
+    const sel = document.getElementById("filterTahun");
+    sel.innerHTML = "";
+    sorted.forEach(y=>{
+        const opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = y + (y === String(new Date().getFullYear()) ? " (Tahun berjalan)" : "");
+        sel.appendChild(opt);
+    });
+
+    // default: tahun terbaru yang ada datanya, atau tahun berjalan
+    selectedYear = sorted[0] || String(new Date().getFullYear());
+    sel.value = selectedYear;
+}
+
+// ===== LOAD (tidak diubah, hanya tambah populateYearOptions) =====
 async function load(){
   try{
     const r1 = await fetch(API);
@@ -625,6 +719,8 @@ async function load(){
 
     selectedMonth = lastMonth;
     document.getElementById("filterBulan").value = lastMonth;
+
+    populateYearOptions();
 
     render();
 
@@ -653,50 +749,67 @@ function setMonth(val){
     render();
 }
 
-// ===== RENDER (logika perhitungan tidak diubah, hanya tampilan diperkaya) =====
+function setYear(val){
+    selectedYear = val;
+    render();
+}
+
+// ===== RENDER (logika perhitungan tidak diubah untuk mode bulanan, ditambah cabang tahunan) =====
 function render(){
 
     let realMap = {};
     let targetMap = {};
 
-    if(!selectedMonth){
-        document.getElementById("listCapaian").innerHTML = "Tidak ada data";
-        return;
-    }
+    if(filterMode === "bulanan"){
 
-    // ===== REALISASI =====
-    realisasi
-    .filter(d => getMonth(d.TANGGAL) === selectedMonth)
-    .forEach(d=>{
-        let k = (d.KECAMATAN || "").toUpperCase();
-        realMap[k] = (realMap[k]||0) + safeNumber(d["LUAS TAMBAH TANAM"]);
-    });
-
-    // ===== TARGET =====
-    if(selectedMonth){
-
-    target.forEach(d=>{
-
-        let bulan = namaBulanToNumber(d.BULAN);
-        let gabung = d.TAHUN + "-" + bulan;
-
-        if(gabung === selectedMonth){
-
-            let k = d.KECAMATAN.toUpperCase();
-            targetMap[k] = (targetMap[k]||0) + safeNumber(d["TARGET"]);
+        if(!selectedMonth){
+            document.getElementById("listCapaian").innerHTML = "Tidak ada data";
+            return;
         }
 
-    });
+        // ===== REALISASI (per bulan) =====
+        realisasi
+        .filter(d => getMonth(d.TANGGAL) === selectedMonth)
+        .forEach(d=>{
+            let k = (d.KECAMATAN || "").toUpperCase();
+            realMap[k] = (realMap[k]||0) + safeNumber(d["LUAS TAMBAH TANAM"]);
+        });
 
-} else {
+        // ===== TARGET (per bulan) =====
+        target.forEach(d=>{
+            let bulan = namaBulanToNumber(d.BULAN);
+            let gabung = d.TAHUN + "-" + bulan;
 
-    // tanpa filter = total setahun
-    target.forEach(d=>{
-        let k = d.KECAMATAN.toUpperCase();
-        targetMap[k] = (targetMap[k]||0) + safeNumber(d["TARGET"]);
-    });
+            if(gabung === selectedMonth){
+                let k = d.KECAMATAN.toUpperCase();
+                targetMap[k] = (targetMap[k]||0) + safeNumber(d["TARGET"]);
+            }
+        });
 
-}
+    } else {
+
+        // ===== MODE TAHUNAN =====
+        if(!selectedYear){
+            document.getElementById("listCapaian").innerHTML = "Tidak ada data";
+            return;
+        }
+
+        // ===== REALISASI (seluruh tahun) =====
+        realisasi
+        .filter(d => getYear(d.TANGGAL) === String(selectedYear))
+        .forEach(d=>{
+            let k = (d.KECAMATAN || "").toUpperCase();
+            realMap[k] = (realMap[k]||0) + safeNumber(d["LUAS TAMBAH TANAM"]);
+        });
+
+        // ===== TARGET (seluruh tahun, semua bulan dijumlahkan) =====
+        target
+        .filter(d => String(d.TAHUN) === String(selectedYear))
+        .forEach(d=>{
+            let k = d.KECAMATAN.toUpperCase();
+            targetMap[k] = (targetMap[k]||0) + safeNumber(d["TARGET"]);
+        });
+    }
 
     let totalR = Object.values(realMap).reduce((a,b)=>a+b,0);
     let totalT = Object.values(targetMap).reduce((a,b)=>a+b,0);
@@ -718,7 +831,10 @@ function render(){
     container.innerHTML = "";
 
     let labels=[], tData=[], rData=[];
-    let keys = Object.keys(targetMap);
+    // gabungkan semua kecamatan yang punya target ATAU realisasi supaya data tahunan tidak hilang
+    // (misalnya kecamatan yang belum tanam sama sekali tetap tampil dengan realisasi 0)
+    let keySet = new Set([...Object.keys(targetMap), ...Object.keys(realMap)]);
+    let keys = Array.from(keySet).sort();
     document.getElementById("jumlahKec").innerText = keys.length + " kecamatan";
     lastLabels = keys;
 
@@ -858,9 +974,12 @@ async function downloadPDF(){
     btn.classList.add("loading");
 
     try{
-        const bulanLabel = selectedMonth ?
-            new Date(selectedMonth+"-01").toLocaleDateString('id-ID', {month:'long', year:'numeric'}) :
-            "Semua Periode";
+        const bulanLabel = filterMode === "bulanan"
+            ? (selectedMonth ?
+                new Date(selectedMonth+"-01").toLocaleDateString('id-ID', {month:'long', year:'numeric'}) :
+                "Semua Periode")
+            : ("Tahun " + (selectedYear || "-"));
+
         const tanggalCetak = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'});
 
         const { jsPDF } = window.jspdf;
@@ -1046,7 +1165,8 @@ async function downloadPDF(){
             pdf.text(xLabel, gx, chartY+chartH+4.2, {align:"center"});
         });
 
-        pdf.save(`Laporan-Capaian-Tanam-${selectedMonth || 'semua'}.pdf`);
+        const fileLabel = filterMode === "bulanan" ? (selectedMonth || 'semua') : ("tahun-" + (selectedYear || 'semua'));
+        pdf.save(`Laporan-Capaian-Tanam-${fileLabel}.pdf`);
     } catch(err){
         alert("❌ Gagal membuat PDF\n" + err.message);
         console.error(err);
