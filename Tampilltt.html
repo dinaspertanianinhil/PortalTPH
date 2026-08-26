@@ -381,7 +381,7 @@
             <div class="kpi-box"><div class="kpi-label">Total LTT Keseluruhan</div><div class="kpi-value" id="h_total">—</div></div>
             <div class="kpi-box amber"><div class="kpi-label">LTT Hari Ini</div><div class="kpi-value" id="h_today">—</div></div>
             <div class="kpi-box blue"><div class="kpi-label">Total Oplah</div><div class="kpi-value" id="h_oplah">—</div></div>
-            <div class="kpi-box teal"><div class="kpi-label">Total CSR</div><div class="kpi-value" id="h_csr">—</div></div>
+            <div class="kpi-box teal"><div class="kpi-label">Total Reguler</div><div class="kpi-value" id="h_reguler">—</div></div>
         </div>
 
         <div class="two-col">
@@ -390,11 +390,8 @@
                 <div class="mini-rank" id="rankKecamatan"></div>
             </div>
             <div class="card-panel">
-                <div class="belum-card-header">
-                    <h3>⚠️ Belum Input Hari Ini</h3>
-                    <span class="belum-count-badge danger" id="belumBadge">0</span>
-                </div>
-                <div class="chip-wrap" id="belumChips"></div>
+                <h3 class="panel-heading">Top 5 Kecamatan (LTT Jagung)</h3>
+                <div class="mini-rank" id="rankJagung"></div>
             </div>
         </div>
     </div>
@@ -618,10 +615,10 @@ function showLoadingError(msg){
 // MODULE 1: HARIAN
 // ═══════════════════════════════════════════════════════════
 function renderHarian(){
-    let totalKeseluruhan = 0, totalOplah = 0, totalCSR = 0, totalToday = 0;
+    let totalKeseluruhan = 0, totalOplah = 0, totalReguler = 0, totalToday = 0;
     const today = todayStr();
     const kecTotal = {};
-    const kecSudahInput = new Set();
+    const kecJagungTotal = {};
 
     rawMain.forEach(d => {
         const jenis = (d["JENIS LTT"] || "").toUpperCase();
@@ -630,8 +627,9 @@ function renderHarian(){
 
         totalKeseluruhan += luas;
         if(jenis.includes("OPLAH")) totalOplah += luas;
-        if(jenis.includes("CSR")) totalCSR += luas;
-        if(d.TANGGAL === today){ totalToday += luas; kecSudahInput.add(d.KECAMATAN); }
+        if(jenis.includes("REGULER")) totalReguler += luas;
+        if(jenis.includes("JAGUNG")) kecJagungTotal[kec] = (kecJagungTotal[kec] || 0) + luas;
+        if(d.TANGGAL === today){ totalToday += luas; }
 
         kecTotal[kec] = (kecTotal[kec] || 0) + luas;
     });
@@ -639,7 +637,7 @@ function renderHarian(){
     document.getElementById("h_total").innerHTML = fmt(totalKeseluruhan) + " <small>Ha</small>";
     document.getElementById("h_today").innerHTML = fmt(totalToday) + " <small>Ha</small>";
     document.getElementById("h_oplah").innerHTML = fmt(totalOplah) + " <small>Ha</small>";
-    document.getElementById("h_csr").innerHTML = fmt(totalCSR) + " <small>Ha</small>";
+    document.getElementById("h_reguler").innerHTML = fmt(totalReguler) + " <small>Ha</small>";
 
     // top 5 kecamatan
     const top5 = Object.entries(kecTotal).sort((a,b)=>b[1]-a[1]).slice(0,5);
@@ -651,13 +649,15 @@ function renderHarian(){
             <div class="rk-val">${fmt(r[1])} Ha</div>
         </div>`).join("") : `<div class="empty-note">Belum ada data.</div>`;
 
-    // belum input hari ini
-    const belumInput = SEMUA_KECAMATAN.filter(k => !kecSudahInput.has(k));
-    document.getElementById("belumBadge").textContent = belumInput.length;
-    document.getElementById("belumBadge").className = "belum-count-badge " + (belumInput.length > 0 ? "danger" : "success");
-    document.getElementById("belumChips").innerHTML = belumInput.length
-        ? belumInput.map(k => `<span class="belum-chip">📍 ${k}</span>`).join("")
-        : `<div class="empty-note">Semua kecamatan sudah input hari ini ✅</div>`;
+    // top 5 kecamatan LTT Jagung
+    const top5Jagung = Object.entries(kecJagungTotal).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const rankJagungEl = document.getElementById("rankJagung");
+    rankJagungEl.innerHTML = top5Jagung.length ? top5Jagung.map((r,i)=>`
+        <div class="mini-rank-row">
+            <div class="rk-no">${i+1}</div>
+            <div class="rk-name">${r[0]}</div>
+            <div class="rk-val">${fmt(r[1])} Ha</div>
+        </div>`).join("") : `<div class="empty-note">Belum ada data Jagung.</div>`;
 }
 
 // ═══════════════════════════════════════════════════════════
