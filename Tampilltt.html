@@ -1096,7 +1096,7 @@ loadAll();
 const JarvisApp = (function () {
 
     const CONFIG = {
-        greeting: "Selamat datang. Saya JARVIS, asisten digital Portal TPH. Ketik atau tekan mic lalu bicara — saya akan langsung menjawab. Bisa juga panggil saya kapan saja dengan bilang \"Halo JARVIS\".",
+        greeting: "Selamat datang. Saya JARVIS, asisten digital Portal TPH. Ketik, atau klik ikon 👂 Mode Dengar supaya mic langsung aktif tanpa perlu klik lagi. Saya juga bisa cari data LTT per tanggal, bulan, atau kecamatan tertentu.",
         thinkingLabel: "JARVIS sedang berpikir...",
         placeholder: "Tulis pertanyaan Anda...",
         wakeRegex: /\b(halo|hai|hei|hey)\s*jarvis\b/i,
@@ -1140,7 +1140,7 @@ const JarvisApp = (function () {
                         <span class="jarvis-title">JARVIS</span>
                         <span class="jarvis-subtitle">AI ASSISTANT • PORTAL TPH</span>
                     </div>
-                    <button class="jarvis-close" id="jarvisWakeBtn" type="button" aria-label="Aktifkan mode selalu dengar 'Halo JARVIS'" title="Selalu dengar 'Halo JARVIS'">
+                    <button class="jarvis-close" id="jarvisWakeBtn" type="button" aria-label="Aktifkan Mode Dengar (mic langsung aktif + siaga 'Halo JARVIS')" title="Mode Dengar — klik untuk mic auto aktif">
                         ${ICONS.ear}
                     </button>
                     <button class="jarvis-close" id="jarvisSpeakerBtn" type="button" aria-label="Aktif/nonaktifkan suara JARVIS" title="Suara JARVIS">
@@ -1256,14 +1256,131 @@ const JarvisApp = (function () {
     }
 
     // ---------------------------------------------------------------------
+    // FILTER PENUH: tanggal, bulan, dan/atau kecamatan — dihitung langsung
+    // dari `rawMain` (data mentah yang sama dipakai dashboard; `rawMain`,
+    // `SEMUA_KECAMATAN`, `fmt`, `safeNumber`, `getMonthKey` semuanya berasal
+    // dari <script> pertama dan otomatis terlihat di sini karena berbagi
+    // scope global yang sama). 100% akurat, instan, tanpa AI/API.
+    // ---------------------------------------------------------------------
+    const BULAN_NAMES = {
+        januari:"01", februari:"02", maret:"03", april:"04", mei:"05", juni:"06",
+        juli:"07", agustus:"08", september:"09", oktober:"10", november:"11", desember:"12"
+    };
+    const BULAN_LABEL = ["", "Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+    const BULAN_REGEX = /(januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)/;
+
+    function filterRawMain({ dateStr, monthKey, kecamatan }) {
+        const source = (typeof rawMain !== "undefined" && Array.isArray(rawMain)) ? rawMain : [];
+        return source.filter(d => {
+            if (dateStr && d.TANGGAL !== dateStr) return false;
+            if (monthKey && getMonthKey(d.TANGGAL) !== monthKey) return false;
+            if (kecamatan && !(d.KECAMATAN || "").toLowerCase().includes(kecamatan.toLowerCase())) return false;
+            return true;
+        });
+    }
+    function summarizeRows(data) {
+        let totalLTT = 0, totalOlah = 0, totalPanen = 0;
+        const kecSet = new Set();
+        data.forEach(d => {
+            totalLTT += safeNumber(d["LUAS TAMBAH TANAM"]);
+            if (d["LUAS OLAH LAHAN"] !== undefined) totalOlah += safeNumber(d["LUAS OLAH LAHAN"]);
+            if (d["LUAS PANEN"] !== undefined) totalPanen += safeNumber(d["LUAS PANEN"]);
+            if (d.KECAMATAN) kecSet.add(d.KECAMATAN);
+        });
+        return { totalLTT, totalOlah, totalPanen, kecamatanAktif: kecSet.size, jumlahData: data.length };
+    }
+
+    // ---------------------------------------------------------------------
     // JARVIS "melek data" — jawab pertanyaan dari angka dashboard yang
     // sudah dihitung (window.JarvisData), tanpa perlu AI/API sama sekali.
-    // Diperluas: sinonim lebih banyak, small-talk, dan sapaan.
+    // Diperluas: sinonim lebih banyak, small-talk, sapaan, dan filter
+    // tanggal / bulan / kecamatan penuh dari seluruh data LTT.
     // Kalau pertanyaan tidak dikenali, fallback ke jawaban umum lokal.
     // ---------------------------------------------------------------------
     function answerFromDashboardData(message) {
         const q = message.toLowerCase().trim();
         const D = window.JarvisData || {};
+
+        const bulanMatchPre = q.match(BULAN_REGEX);
+        const dayNearMonthPre = q.match(/(\d{1,2})\s+(?:januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)/);
+        const dayViaKeywordPre = q.match(/tanggal\s*(\d{1,2})/);
+        const dayPre = dayNearMonthPre ? dayNearMonthPre[1] : (dayViaKeywordPre ? dayViaKeywordPre[1] : null);
+        const yearMatchPre = q.match(/\b(20\d{2})\b/);
+        const bulanIniMatchPre = /bulan ini/.test(q);
+
+        // ── Kecamatan mana yang BELUM lapor (hari ini / bulan tertentu / bulan ini) ──
+        if (/(belum|tidak|siapa) .*(lapor|melapor|melaporkan|input|mengisi|ada data)|kecamatan (mana|apa) .*belum/.test(q)) {
+            const year = yearMatchPre ? yearMatchPre[1] : String(new Date().getFullYear());
+            let scopeDateStr = null, scopeMonthKey = null, scopeLabel = "";
+            if (bulanMatchPre) {
+                const bulanNum = BULAN_NAMES[bulanMatchPre[1]];
+                if (dayPre) {
+                    scopeDateStr = `${year}-${bulanNum}-${String(parseInt(dayPre, 10)).padStart(2, "0")}`;
+                    scopeLabel = `tanggal ${parseInt(dayPre, 10)} ${BULAN_LABEL[parseInt(bulanNum, 10)]} ${year}`;
+                } else {
+                    scopeMonthKey = `${year}-${bulanNum}`;
+                    scopeLabel = `bulan ${BULAN_LABEL[parseInt(bulanNum, 10)]} ${year}`;
+                }
+            } else if (bulanIniMatchPre) {
+                const now = new Date();
+                scopeMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+                scopeLabel = "bulan ini";
+            } else {
+                scopeDateStr = todayStr();
+                scopeLabel = `hari ini (${scopeDateStr})`;
+            }
+
+            const filtered = filterRawMain({ dateStr: scopeDateStr, monthKey: scopeMonthKey, kecamatan: null });
+            const reported = new Set(filtered.map(d => (d.KECAMATAN || "").toUpperCase()));
+            const kecList = (typeof SEMUA_KECAMATAN !== "undefined" ? SEMUA_KECAMATAN : []);
+            const belum = kecList.filter(k => !reported.has(k.toUpperCase()));
+
+            if (belum.length === 0) {
+                return `Semua ${kecList.length} kecamatan sudah melaporkan data untuk ${scopeLabel}.`;
+            }
+            return `Kecamatan yang belum melaporkan data untuk ${scopeLabel}: ${belum.join(", ")} (${belum.length} dari ${kecList.length} kecamatan).`;
+        }
+
+        // ── Query dengan filter TANGGAL / BULAN / KECAMATAN ──
+        // Contoh yang dikenali: "LTT bulan Juli berapa", "data tanggal 15 Juli 2026",
+        // "LTT Kecamatan Tembilahan bulan Juli", "panen di Kateman bulan ini"
+        const bulanMatch = bulanMatchPre;
+        const day = dayPre;
+        const yearMatch = yearMatchPre;
+        const kecFound = (typeof SEMUA_KECAMATAN !== "undefined" ? SEMUA_KECAMATAN : []).find(k => q.includes(k.toLowerCase()));
+        const bulanIniMatch = bulanIniMatchPre;
+
+        if ((bulanMatch || kecFound || bulanIniMatch) && /(ltt|tanam|panen|olah|data|rekap|berapa|kecamatan)/.test(q)) {
+            const year = yearMatch ? yearMatch[1] : String(new Date().getFullYear());
+            let dateStr = null, monthKey = null;
+            const labelParts = [];
+
+            if (bulanMatch) {
+                const bulanNum = BULAN_NAMES[bulanMatch[1]];
+                if (day) {
+                    dateStr = `${year}-${bulanNum}-${String(parseInt(day, 10)).padStart(2, "0")}`;
+                    labelParts.push(`tanggal ${parseInt(day, 10)} ${BULAN_LABEL[parseInt(bulanNum, 10)]} ${year}`);
+                } else {
+                    monthKey = `${year}-${bulanNum}`;
+                    labelParts.push(`bulan ${BULAN_LABEL[parseInt(bulanNum, 10)]} ${year}`);
+                }
+            } else if (bulanIniMatch) {
+                const now = new Date();
+                monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+                labelParts.push("bulan ini");
+            }
+            if (kecFound) labelParts.push(`Kecamatan ${kecFound}`);
+
+            const filtered = filterRawMain({ dateStr, monthKey, kecamatan: kecFound });
+            const stats = summarizeRows(filtered);
+            const label = labelParts.join(", ");
+
+            if (stats.jumlahData === 0) {
+                return `Belum ada data tercatat untuk ${label}.`;
+            }
+            const kecInfo = kecFound ? "" : `, dari ${stats.kecamatanAktif} kecamatan`;
+            return `Data untuk ${label}: Total LTT ${fmt(stats.totalLTT)} Ha, Olah Lahan ${fmt(stats.totalOlah)} Ha, Panen ${fmt(stats.totalPanen)} Ha${kecInfo} (${stats.jumlahData} baris data).`;
+        }
 
         // ── Sapaan & wake phrase ──
         if (CONFIG.wakeRegex.test(q) && q.replace(CONFIG.wakeRegex, "").trim().length < 3) {
@@ -1275,8 +1392,23 @@ const JarvisApp = (function () {
         if (/siapa (kamu|nama kamu|namamu)|kamu siapa/.test(q)) {
             return "Saya JARVIS, asisten digital Dashboard LTT Dinas Pertanian Kabupaten Indragiri Hilir. Saya bisa membaca data harian, capaian target, laporan bulanan, dan analisis panen langsung dari dashboard ini.";
         }
+        if (/(dashboard|halaman|portal|web|situs|aplikasi) (ini|apa)|ini (dashboard|halaman|portal|web|situs|aplikasi)( ini)?( apa)?|dashboard apa ini/.test(q)) {
+            return "Ini Dashboard Besar LTT (Luas Tambah Tanam) milik Dinas Pertanian Kabupaten Indragiri Hilir. Ada 4 bagian: (1) Ringkasan Harian — total LTT keseluruhan & hari ini, (2) Progres Capaian — target vs realisasi bulan berjalan, (3) Laporan Bulanan — rekap tanam, olah lahan & panen bulan ini, (4) Analisis Tanam & Panen — rasio panen terhadap total tanam. Tanya saja soal salah satu bagian itu, atau sebut bulan/tanggal/kecamatan tertentu.";
+        }
+        if (/apa itu ltt|ltt itu apa|apa (arti|kepanjangan) ltt/.test(q)) {
+            return "LTT adalah singkatan dari Luas Tambah Tanam — luas lahan pertanian yang baru mulai ditanami dalam periode tertentu, diukur dalam hektar (Ha). Ini indikator utama dashboard ini.";
+        }
+        if (/apa itu oplah|oplah itu apa/.test(q)) {
+            return "Oplah adalah singkatan dari Olah Lahan — kegiatan pengolahan tanah sebelum atau sesudah tanam (mis. membajak, meratakan lahan).";
+        }
+        if (/apa itu reguler|reguler itu apa/.test(q)) {
+            return "LTT Reguler adalah luas tambah tanam pada musim tanam biasa/normal, sebagai pembeda dari kategori Oplah.";
+        }
+        if (/apa itu capaian|capaian itu apa/.test(q)) {
+            return "Capaian adalah persentase realisasi LTT dibanding target yang ditetapkan untuk bulan berjalan, dihitung per kecamatan lalu dijumlah. Semakin mendekati 100%, semakin baik pencapaiannya.";
+        }
         if (/(apa|apa aja|apa saja) yang (bisa|dapat) kamu (bantu|lakukan)|kamu bisa apa/.test(q)) {
-            return "Saya bisa jawab pertanyaan seputar: total LTT keseluruhan & hari ini, LTT oplah/reguler/jagung, kecamatan tertinggi, target vs realisasi (capaian), tren mingguan, olah lahan, dan rasio panen — semua langsung dari data dashboard yang sedang tampil.";
+            return "Saya bisa jawab pertanyaan seputar: total LTT keseluruhan & hari ini, LTT oplah/reguler/jagung, kecamatan tertinggi, target vs realisasi (capaian), tren mingguan, olah lahan, rasio panen, dan data untuk tanggal/bulan/kecamatan tertentu — semua langsung dari data dashboard ini. Untuk pertanyaan umum di luar itu, saya juga tetap coba bantu jawab.";
         }
         if (/terima kasih|makasih|thanks/.test(q)) {
             return "Sama-sama! Ada lagi yang ingin ditanyakan soal data LTT?";
@@ -1374,6 +1506,95 @@ const JarvisApp = (function () {
     const API_JARVIS_PROXY = "https://script.google.com/macros/s/AKfycbyWKsBPmEINaMiABUFXIngByJL29xBQ7x0wVYu3N4T14nJLoT6UZawrTsLvAudiYnlpCg/exec"; // <-- isi dengan URL /exec proxy Gemini kamu
     let jarvisHistory = [];
 
+    // ---------------------------------------------------------------------
+    // LAYER EKSTRAKSI MAKSUD (NLU) — supaya JARVIS bisa jawab pertanyaan
+    // data LTT dengan cara nanya BEBAS (bukan cuma pola yang sudah ditulis
+    // manual di answerFromDashboardData). Gemini di sini HANYA bertugas
+    // "menerjemahkan" pertanyaan bebas jadi filter terstruktur (bulan,
+    // tanggal, kecamatan, jenis data) — Gemini TIDAK menjawab angkanya.
+    // Perhitungan angka tetap 100% dari rawMain (data asli), jadi hasilnya
+    // akurat, bukan karangan AI. Kalau pertanyaan bukan soal data LTT,
+    // extractor akan bilang "general" dan JARVIS lanjut ke obrolan bebas.
+    // ---------------------------------------------------------------------
+    async function extractIntentViaGemini(message) {
+        try {
+            const res = await fetch(API_JARVIS_PROXY, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ mode: "extract", message: message })
+            });
+            const data = await res.json();
+            if (!data || !data.reply) return null;
+            const parsed = JSON.parse(data.reply);
+            return parsed;
+        } catch (err) {
+            console.error("Ekstraksi maksud gagal, lanjut ke jawaban umum:", err);
+            return null;
+        }
+    }
+
+    function answerFromIntent(intent) {
+        if (!intent || intent.metric === "general" || !intent.metric) return null;
+
+        const now = new Date();
+        const year = intent.tahun ? String(intent.tahun) : String(now.getFullYear());
+        let dateStr = null, monthKey = null;
+        const labelParts = [];
+
+        if (intent.tanggal && intent.bulan) {
+            dateStr = `${year}-${String(intent.bulan).padStart(2, "0")}-${String(intent.tanggal).padStart(2, "0")}`;
+            labelParts.push(`tanggal ${intent.tanggal} ${BULAN_LABEL[parseInt(intent.bulan, 10)]} ${year}`);
+        } else if (intent.bulan) {
+            monthKey = `${year}-${String(intent.bulan).padStart(2, "0")}`;
+            labelParts.push(`bulan ${BULAN_LABEL[parseInt(intent.bulan, 10)]} ${year}`);
+        } else if (intent.periode === "bulan_ini") {
+            monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+            labelParts.push("bulan ini");
+        } else if (intent.periode === "hari_ini" || intent.metric === "belum_lapor") {
+            dateStr = intent.periode === "hari_ini" ? todayStr() : (dateStr || monthKey ? dateStr : todayStr());
+            if (intent.metric !== "belum_lapor" || (!intent.bulan && !intent.periode)) {
+                labelParts.push(`hari ini (${todayStr()})`);
+            }
+        }
+
+        const kecamatan = intent.kecamatan &&
+            (typeof SEMUA_KECAMATAN !== "undefined" ? SEMUA_KECAMATAN : []).find(k => k.toLowerCase() === String(intent.kecamatan).toLowerCase());
+        if (kecamatan) labelParts.push(`Kecamatan ${kecamatan}`);
+        const label = labelParts.length ? labelParts.join(", ") : "seluruh data";
+
+        if (intent.metric === "belum_lapor") {
+            const scopeDateStr = (intent.bulan || intent.periode === "bulan_ini") ? null : (dateStr || todayStr());
+            const scopeMonthKey = monthKey;
+            const filtered = filterRawMain({ dateStr: scopeDateStr, monthKey: scopeMonthKey, kecamatan: null });
+            const reported = new Set(filtered.map(d => (d.KECAMATAN || "").toUpperCase()));
+            const kecList = (typeof SEMUA_KECAMATAN !== "undefined" ? SEMUA_KECAMATAN : []);
+            const belum = kecList.filter(k => !reported.has(k.toUpperCase()));
+            const scopeLabel = labelParts.length ? labelParts.join(", ") : `hari ini (${todayStr()})`;
+            if (belum.length === 0) return `Semua ${kecList.length} kecamatan sudah melaporkan data untuk ${scopeLabel}.`;
+            return `Kecamatan yang belum melaporkan data untuk ${scopeLabel}: ${belum.join(", ")} (${belum.length} dari ${kecList.length} kecamatan).`;
+        }
+
+        // Metric lain (total_ltt, oplah, reguler, jagung, olah_lahan, panen, rasio_panen, top_kecamatan, dst)
+        const filtered = filterRawMain({ dateStr, monthKey, kecamatan });
+        const stats = summarizeRows(filtered);
+        if (stats.jumlahData === 0) return `Belum ada data tercatat untuk ${label}.`;
+
+        if (intent.metric === "top_kecamatan") {
+            const kecMap = {};
+            filtered.forEach(d => {
+                const k = d.KECAMATAN || "(Tanpa Kecamatan)";
+                kecMap[k] = (kecMap[k] || 0) + safeNumber(d["LUAS TAMBAH TANAM"]);
+            });
+            const top = Object.entries(kecMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            if (!top.length) return `Belum ada data untuk ${label}.`;
+            const list = top.map((r, i) => `${i + 1}. ${r[0]} (${fmt(r[1])} Ha)`).join(", ");
+            return `Top kecamatan LTT untuk ${label}: ${list}.`;
+        }
+
+        const kecInfo = kecamatan ? "" : `, dari ${stats.kecamatanAktif} kecamatan`;
+        return `Data untuk ${label}: Total LTT ${fmt(stats.totalLTT)} Ha, Olah Lahan ${fmt(stats.totalOlah)} Ha, Panen ${fmt(stats.totalPanen)} Ha${kecInfo} (${stats.jumlahData} baris data).`;
+    }
+
     async function fallbackAnswerLocal(message) {
         const replies = [
             "Pertanyaan itu di luar data dashboard LTT. Coba tanya seputar LTT hari ini, capaian target, laporan bulanan, atau analisis panen ya.",
@@ -1385,7 +1606,12 @@ const JarvisApp = (function () {
 
     async function fallbackAnswerGemini(message) {
         const D = window.JarvisData || {};
-        const context = `Konteks data dashboard saat ini — LTT hari ini: ${D.harian?.totalToday || 0} Ha, total LTT: ${D.harian?.totalKeseluruhan || 0} Ha, capaian bulan ini: ${D.capaian?.persen?.toFixed(1) || 0}%, total panen bulan ini: ${D.bulanan?.totalPanen || 0} Ha.`;
+        const contextParts = [];
+        if (D.harian) contextParts.push(`LTT hari ini ${fmt(D.harian.totalToday)} Ha, total LTT keseluruhan ${fmt(D.harian.totalKeseluruhan)} Ha (Oplah ${fmt(D.harian.totalOplah)} Ha, Reguler ${fmt(D.harian.totalReguler)} Ha), kecamatan tertinggi ${D.harian.topKecamatan?.[0]?.nama || "-"}`);
+        if (D.capaian) contextParts.push(`capaian bulan ini: target ${fmt(D.capaian.target)} Ha, realisasi ${fmt(D.capaian.realisasi)} Ha (${D.capaian.persen.toFixed(1)}%) dari ${D.capaian.jumlahKecamatan} kecamatan`);
+        if (D.bulanan) contextParts.push(`bulan ${D.bulanan.bulanLabel}: total LTT ${fmt(D.bulanan.totalLTT)} Ha, olah lahan ${fmt(D.bulanan.totalOlah)} Ha, panen ${fmt(D.bulanan.totalPanen)} Ha, ${D.bulanan.kecamatanAktif} kecamatan aktif`);
+        if (D.analisis) contextParts.push(`sepanjang data: total tanam ${fmt(D.analisis.totalTanam)} Ha, total panen ${fmt(D.analisis.totalPanen)} Ha, rasio panen ${D.analisis.rasio.toFixed(1)}%`);
+        const context = contextParts.length ? `Konteks angka dashboard saat ini — ${contextParts.join("; ")}.` : "";
 
         try {
             const res = await fetch(API_JARVIS_PROXY, {
@@ -1409,7 +1635,13 @@ const JarvisApp = (function () {
     async function sendToJarvis(message) {
         const localAnswer = answerFromDashboardData(message);
         if (localAnswer !== null) return localAnswer;
-        if (API_JARVIS_PROXY) return fallbackAnswerGemini(message);
+
+        if (API_JARVIS_PROXY) {
+            const intent = await extractIntentViaGemini(message);
+            const intentAnswer = answerFromIntent(intent);
+            if (intentAnswer !== null) return intentAnswer;
+            return fallbackAnswerGemini(message);
+        }
         return fallbackAnswerLocal(message);
     }
 
@@ -1621,16 +1853,31 @@ const JarvisApp = (function () {
         else stopConversationMode();
     }
 
+    // Klik ikon "Mode Dengar" (👂) sekali = mic LANGSUNG aktif dengar saat itu
+    // juga (tanpa perlu klik tombol mic terpisah lagi), dan kalau nanti mode
+    // percakapan berhenti (user bilang "stop"/tutup panel), JARVIS otomatis
+    // pindah ke mendengarkan kata panggil "Halo JARVIS" di latar belakang.
     function toggleWakeWordMode() {
         wakeWordMode = !wakeWordMode;
         elements.wakeBtn.style.background = wakeWordMode ? "rgba(255,255,255,.16)" : "transparent";
         if (wakeWordMode) {
-            appendMessage('Mode "Selalu dengar" aktif — panggil saya kapan saja dengan bilang "Halo JARVIS".', "bot");
-            try { wakeRecognition.start(); } catch (e) {}
+            openPanel();
+            appendMessage('Mode Dengar aktif — saya langsung mendengarkan sekarang. Bicara saja, tidak perlu klik mic lagi. Setelah selesai ngobrol, saya tetap siaga menunggu "Halo JARVIS".', "bot");
+            startConversationMode(); // mic auto nyala, tanpa klik manual
         } else {
-            appendMessage('Mode "Selalu dengar" dimatikan.', "bot");
+            appendMessage('Mode Dengar dimatikan.', "bot");
+            stopConversationMode0(); // matikan tanpa memicu restart wake recognition
             if (wakeRecognition && isWakeListening) { try { wakeRecognition.stop(); } catch (e) {} }
         }
+    }
+
+    // Varian stopConversationMode yang TIDAK auto-restart wake recognition —
+    // dipakai saat user mematikan Mode Dengar secara eksplisit.
+    function stopConversationMode0() {
+        conversationMode = false;
+        elements.micBtn.title = "Tekan untuk mulai ngobrol dengan suara";
+        setStatus("");
+        if (convRecognition && isConvListening) { try { convRecognition.stop(); } catch (e) {} }
     }
 
     function bindEvents() {
