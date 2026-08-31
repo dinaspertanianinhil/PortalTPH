@@ -304,6 +304,180 @@
         .module-title h2 { font-size: 1.02rem; }
         .kpi-box .kpi-value { font-size: 1.28rem; }
     }
+
+    /* ══════════════════════════════════════════════════════════
+       JARVIS AI ASSISTANT — mengikuti palet halaman ini
+       (forest/gold/cream), namespace .jarvis-* agar tidak
+       bentrok dengan class dashboard yang sudah ada.
+       ══════════════════════════════════════════════════════════ */
+    .jarvis-fab{
+        position:fixed; right:24px; bottom:24px; width:60px; height:60px;
+        border-radius:50%; z-index:1200;
+        display:flex; align-items:center; justify-content:center;
+        background:radial-gradient(circle at 30% 30%, var(--forest-500), var(--forest-700) 75%);
+        border:none; cursor:pointer;
+        box-shadow: var(--shadow-md);
+        animation: jarvis-pulse 2.6s ease-in-out infinite;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .jarvis-fab:hover{ transform: translateY(-2px) scale(1.04); }
+    .jarvis-fab:active{ transform: scale(.96); }
+    .jarvis-fab svg{ width:26px; height:26px; stroke:#f4f1e6; fill:none; stroke-width:1.8; }
+    @keyframes jarvis-pulse{
+        0%,100%{ box-shadow: var(--shadow-md), 0 0 0 0 rgba(39,92,49,.35); }
+        50%{ box-shadow: var(--shadow-lg), 0 0 0 10px rgba(39,92,49,0); }
+    }
+    .jarvis-fab.jarvis-open svg.jarvis-icon-bot{ display:none; }
+    .jarvis-fab:not(.jarvis-open) svg.jarvis-icon-close{ display:none; }
+    .jarvis-fab::after{
+        content:""; position:absolute; top:2px; right:2px; width:12px; height:12px;
+        border-radius:50%; background:var(--gold-500); border:2px solid var(--forest-900);
+    }
+    .jarvis-fab.jarvis-wake::after{ background: var(--rust-600); animation: jarvis-wakepulse 1.2s ease-in-out infinite; }
+    @keyframes jarvis-wakepulse{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
+
+    .jarvis-panel{
+        position:fixed; right:24px; bottom:96px; width:360px; max-width:calc(100vw - 32px);
+        height:min(520px, calc(100vh - 140px));
+        display:flex; flex-direction:column;
+        background: var(--paper);
+        border:1px solid var(--line); border-radius: var(--radius-lg);
+        overflow:hidden; z-index:1199; box-shadow: var(--shadow-lg);
+        opacity:0; visibility:hidden; transform:translateY(16px) scale(.97);
+        transform-origin:bottom right; pointer-events:none;
+        transition:opacity .22s ease, transform .22s ease, visibility .22s;
+    }
+    .jarvis-panel.jarvis-open{
+        opacity:1; visibility:visible; transform:translateY(0) scale(1); pointer-events:auto;
+    }
+
+    .jarvis-header{
+        display:flex; align-items:center; gap:12px; padding:16px 18px;
+        border-bottom:1px solid var(--line);
+        background: linear-gradient(135deg, var(--forest-800), var(--forest-600));
+        flex-shrink:0;
+    }
+    .jarvis-header-avatar{
+        width:36px; height:36px; border-radius:50%; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        background:radial-gradient(circle at 30% 30%, var(--forest-500), var(--forest-700) 75%);
+    }
+    .jarvis-header-avatar svg{ width:18px; height:18px; stroke:#f4f1e6; fill:none; stroke-width:1.8; }
+    .jarvis-header-text{ display:flex; flex-direction:column; line-height:1.3; flex:1; }
+    .jarvis-header-text .jarvis-title{
+        font-family: var(--font-display); font-weight:600; font-size:1rem; color:#fff; letter-spacing:.2px;
+    }
+    .jarvis-header-text .jarvis-subtitle{ font-size:.7rem; color: var(--gold-500); font-weight:700; }
+    .jarvis-close{
+        background:transparent; border:none; color:rgba(244,241,230,.75); cursor:pointer;
+        padding:6px; border-radius:8px; display:flex;
+        transition:background .15s ease, color .15s ease;
+    }
+    .jarvis-close:hover{ background:rgba(255,255,255,.12); color:#fff; }
+    .jarvis-close svg{ width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; }
+
+    .jarvis-messages{
+        flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px;
+        background: var(--cream);
+    }
+    .jarvis-messages::-webkit-scrollbar{ width:6px; }
+    .jarvis-messages::-webkit-scrollbar-thumb{ background: var(--line); border-radius:10px; }
+
+    .jarvis-msg{
+        max-width:85%; padding:10px 14px; border-radius:14px; font-size:.86rem; line-height:1.5;
+        word-wrap:break-word; animation: jarvis-msg-in .2s ease;
+    }
+    @keyframes jarvis-msg-in{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+
+    .jarvis-msg-bot{
+        align-self:flex-start; background: var(--paper); border:1px solid var(--line);
+        border-bottom-left-radius:4px; color: var(--ink-900);
+    }
+    .jarvis-msg-user{
+        align-self:flex-end; background: linear-gradient(135deg, var(--forest-500), var(--forest-700));
+        border-bottom-right-radius:4px; color:#f4f1e6; font-weight:500;
+    }
+
+    .jarvis-typing{
+        align-self:flex-start; display:flex; align-items:center; gap:8px;
+        padding:10px 14px; border-radius:14px; border-bottom-left-radius:4px;
+        background: var(--paper); border:1px solid var(--line);
+        font-size:.8rem; color: var(--ink-500);
+    }
+    .jarvis-typing-dots{ display:flex; gap:4px; }
+    .jarvis-typing-dots span{
+        width:5px; height:5px; border-radius:50%; background: var(--gold-500);
+        animation: jarvis-dot 1.1s infinite ease-in-out;
+    }
+    .jarvis-typing-dots span:nth-child(2){ animation-delay:.15s; }
+    .jarvis-typing-dots span:nth-child(3){ animation-delay:.3s; }
+    @keyframes jarvis-dot{
+        0%,60%,100%{ opacity:.3; transform:translateY(0); }
+        30%{ opacity:1; transform:translateY(-3px); }
+    }
+
+    .jarvis-status{
+        padding: 6px 16px; font-size: .72rem; font-weight: 700; text-align:center;
+        color: var(--forest-700); background: var(--forest-100);
+        border-top: 1px solid var(--line); display:none; letter-spacing:.2px;
+    }
+    .jarvis-status.jarvis-status-show{ display:block; }
+    .jarvis-status.jarvis-status-listening{ color:#8a3512; background: var(--rust-100); }
+
+    .jarvis-input-row{
+        display:flex; align-items:flex-end; gap:8px; padding:12px;
+        border-top:1px solid var(--line); flex-shrink:0; background: var(--paper);
+    }
+    .jarvis-input{
+        flex:1; resize:none; max-height:90px;
+        background: var(--cream); border:1px solid var(--line); border-radius:12px;
+        padding:10px 12px; color: var(--ink-900); font-size:.86rem; font-family: var(--font-body);
+        outline:none; transition:border-color .15s ease;
+    }
+    .jarvis-input:focus{ border-color: var(--forest-500); }
+    .jarvis-input::placeholder{ color: var(--ink-500); }
+    .jarvis-send{
+        width:40px; height:40px; flex-shrink:0; border-radius:12px; border:none; cursor:pointer;
+        display:flex; align-items:center; justify-content:center;
+        background: linear-gradient(135deg, var(--forest-500), var(--forest-700));
+        transition:transform .15s ease, opacity .15s ease;
+    }
+    .jarvis-send:hover{ transform:scale(1.05); }
+    .jarvis-send:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+    .jarvis-send svg{ width:18px; height:18px; stroke:#f4f1e6; fill:none; stroke-width:2; }
+
+    .jarvis-mic{
+        width:40px; height:40px; flex-shrink:0; border-radius:12px;
+        border:1px solid var(--line); cursor:pointer;
+        display:flex; align-items:center; justify-content:center;
+        background: var(--cream);
+        transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+    .jarvis-mic:hover{ transform:scale(1.05); }
+    .jarvis-mic svg{ width:18px; height:18px; stroke: var(--forest-700); fill:none; stroke-width:2; }
+    .jarvis-mic.jarvis-listening{
+        background: var(--rust-100); border-color: var(--rust-600);
+        animation: jarvis-mic-pulse 1.3s ease-in-out infinite;
+    }
+    .jarvis-mic.jarvis-listening svg{ stroke: var(--rust-600); }
+    @keyframes jarvis-mic-pulse{
+        0%,100%{ box-shadow:0 0 0 0 rgba(184,72,28,.35); }
+        50%{ box-shadow:0 0 0 8px rgba(184,72,28,0); }
+    }
+    .jarvis-mic:disabled{ opacity:.4; cursor:not-allowed; }
+
+    @media (max-width:520px){
+        .jarvis-fab{ right:16px; bottom:16px; width:56px; height:56px; }
+        .jarvis-panel{
+            right:12px; left:12px; bottom:84px; width:auto; max-width:none;
+            height:min(70vh, 560px); border-radius:18px;
+        }
+    }
+    @media (prefers-reduced-motion: reduce){
+        .jarvis-fab{ animation:none; }
+        .jarvis-msg{ animation:none; }
+        .jarvis-typing-dots span{ animation:none; }
+    }
 </style>
 </head>
 <body>
@@ -502,6 +676,17 @@ let rawMain = [];       // dataset mentah LTT (harian/bulanan/analisis)
 let realisasiCap = [];  // dataset realisasi dari API capaian
 let targetCap = [];     // dataset target dari API capaian
 
+// Snapshot angka dashboard yang sudah dihitung, supaya JARVIS bisa
+// menjawab pertanyaan seperti "berapa LTT hari ini" tanpa perlu AI
+// eksternal — selalu sinkron karena diisi ulang setiap render selesai.
+window.JarvisData = {
+    harian: null,
+    capaian: null,
+    bulanan: null,
+    analisis: null,
+    lastUpdate: null
+};
+
 // ═══════════════════════════════════════════════════════════
 // UTILITAS UMUM
 // ═══════════════════════════════════════════════════════════
@@ -658,6 +843,12 @@ function renderHarian(){
             <div class="rk-name">${r[0]}</div>
             <div class="rk-val">${fmt(r[1])} Ha</div>
         </div>`).join("") : `<div class="empty-note">Belum ada data Jagung.</div>`;
+
+    window.JarvisData.harian = {
+        totalKeseluruhan, totalToday, totalOplah, totalReguler,
+        topKecamatan: top5.map(r => ({ nama: r[0], nilai: r[1] })),
+        topJagung: top5Jagung.map(r => ({ nama: r[0], nilai: r[1] }))
+    };
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -701,6 +892,11 @@ function renderCapaian(){
         const r = realMap[k] || 0, t = targetMap[k] || 0;
         return { k, r, t, p: t ? (r/t*100) : 0 };
     }).sort((a,b) => b.p - a.p).slice(0,5);
+
+    window.JarvisData.capaian = {
+        target: totalT, realisasi: totalR, persen, jumlahKecamatan: keySet.size,
+        topKecamatan: rows.map(r => ({ nama: r.k, realisasi: r.r, target: r.t, persen: r.p }))
+    };
 
     const wrap = document.getElementById("capaianRows");
     const emptyNote = document.getElementById("capaianEmpty");
@@ -751,6 +947,12 @@ function renderBulanan(){
     document.getElementById("b_olah").innerHTML = fmt(totalOlah) + " <small>Ha</small>";
     document.getElementById("b_panen").innerHTML = fmt(totalPanen) + " <small>Ha</small>";
     document.getElementById("b_kec").innerHTML = kecSet.size + " <small>Kec</small>";
+
+    window.JarvisData.bulanan = {
+        bulanLabel: `${bulanNames[cm]} ${cy}`,
+        totalLTT, totalOlah, totalPanen, kecamatanAktif: kecSet.size,
+        mingguan: mingguMap
+    };
 
     const ctx = document.getElementById("chartMingguan").getContext("2d");
     if(chartMingguanInst) chartMingguanInst.destroy();
@@ -803,6 +1005,12 @@ function renderAnalisis(){
     document.getElementById("a_rasio").innerHTML = rasio.toFixed(1) + "<small>%</small>";
 
     const top6 = Object.entries(kecMap).sort((a,b)=>b[1].tanam - a[1].tanam).slice(0,6);
+
+    window.JarvisData.analisis = {
+        totalTanam, totalPanen, selisih, rasio,
+        topKecamatan: top6.map(r => ({ nama: r[0], tanam: r[1].tanam, panen: r[1].panen }))
+    };
+    window.JarvisData.lastUpdate = new Date().toLocaleString('id-ID');
     const ctx = document.getElementById("chartTanamPanen").getContext("2d");
     if(chartTanamPanenInst) chartTanamPanenInst.destroy();
     chartTanamPanenInst = new Chart(ctx, {
@@ -879,5 +1087,594 @@ window.addEventListener("touchstart", tryAutoplayOnFirstInteraction, { once: tru
 // ═══════════════════════════════════════════════════════════
 loadAll();
 </script>
+
+<!-- ══════════════════════════════════════════════════════════
+     JARVIS AI ASSISTANT (script terpisah, namespace JarvisApp,
+     tidak menyentuh fungsi/variabel dashboard di atas)
+     ══════════════════════════════════════════════════════════ -->
+<script>
+const JarvisApp = (function () {
+
+    const CONFIG = {
+        greeting: "Selamat datang. Saya JARVIS, asisten digital Portal TPH. Ketik atau tekan mic lalu bicara — saya akan langsung menjawab. Bisa juga panggil saya kapan saja dengan bilang \"Halo JARVIS\".",
+        thinkingLabel: "JARVIS sedang berpikir...",
+        placeholder: "Tulis pertanyaan Anda...",
+        wakeRegex: /\b(halo|hai|hei|hey)\s*jarvis\b/i,
+        stopRegex: /^(stop|selesai|sudah|cukup|berhenti|terima kasih jarvis|makasih jarvis)\b/i
+    };
+
+    let elements = {};
+    let isOpen = false;
+    let isThinking = false;
+
+    // Mode percakapan berkelanjutan: setelah aktif, JARVIS otomatis
+    // dengar -> jawab -> bicara -> dengar lagi, tanpa perlu klik ulang.
+    let conversationMode = false;
+    // Mode "selalu dengar" kata panggil "Halo JARVIS" walau panel tertutup.
+    let wakeWordMode = false;
+
+    const ICONS = {
+        bot: `<svg class="jarvis-icon-bot" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="14" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="14" r="1.3" fill="currentColor" stroke="none"/><path d="M9 18h6"/></svg>`,
+        close: `<svg class="jarvis-icon-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
+        closeSmall: `<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
+        send: `<svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 8 6 8-16-8z"/></svg>`,
+        mic: `<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/><path d="M9 21h6"/></svg>`,
+        speakerOn: `<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M17 8a5 5 0 0 1 0 8"/></svg>`,
+        speakerOff: `<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>`,
+        ear: `<svg viewBox="0 0 24 24"><path d="M9 4a5 5 0 0 1 5 5c0 2-1 2.5-1 4a2 2 0 0 1-4 0"/><path d="M9 4a5 5 0 0 0-5 5v6a5 5 0 0 0 5 5"/></svg>`
+    };
+
+    function buildMarkup() {
+        const wrapper = document.createElement("div");
+        wrapper.id = "jarvisRoot";
+        wrapper.innerHTML = `
+            <button class="jarvis-fab" id="jarvisFab" type="button" aria-label="Buka JARVIS Assistant">
+                ${ICONS.bot}
+                ${ICONS.close}
+            </button>
+
+            <div class="jarvis-panel" id="jarvisPanel" role="dialog" aria-label="JARVIS Assistant">
+                <div class="jarvis-header">
+                    <div class="jarvis-header-avatar">${ICONS.bot.replace('jarvis-icon-bot','')}</div>
+                    <div class="jarvis-header-text">
+                        <span class="jarvis-title">JARVIS</span>
+                        <span class="jarvis-subtitle">AI ASSISTANT • PORTAL TPH</span>
+                    </div>
+                    <button class="jarvis-close" id="jarvisWakeBtn" type="button" aria-label="Aktifkan mode selalu dengar 'Halo JARVIS'" title="Selalu dengar 'Halo JARVIS'">
+                        ${ICONS.ear}
+                    </button>
+                    <button class="jarvis-close" id="jarvisSpeakerBtn" type="button" aria-label="Aktif/nonaktifkan suara JARVIS" title="Suara JARVIS">
+                        ${ICONS.speakerOn}
+                    </button>
+                    <button class="jarvis-close" id="jarvisCloseBtn" type="button" aria-label="Tutup panel">
+                        ${ICONS.closeSmall}
+                    </button>
+                </div>
+
+                <div class="jarvis-messages" id="jarvisMessages"></div>
+
+                <div class="jarvis-status" id="jarvisStatus"></div>
+
+                <div class="jarvis-input-row">
+                    <textarea
+                        class="jarvis-input"
+                        id="jarvisInput"
+                        rows="1"
+                        placeholder="${CONFIG.placeholder}"
+                    ></textarea>
+                    <button class="jarvis-mic" id="jarvisMicBtn" type="button" aria-label="Bicara ke JARVIS (mode percakapan)" title="Tekan untuk mulai ngobrol dengan suara">
+                        ${ICONS.mic}
+                    </button>
+                    <button class="jarvis-send" id="jarvisSendBtn" type="button" aria-label="Kirim pesan">
+                        ${ICONS.send}
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(wrapper);
+
+        elements = {
+            fab: document.getElementById("jarvisFab"),
+            panel: document.getElementById("jarvisPanel"),
+            closeBtn: document.getElementById("jarvisCloseBtn"),
+            messages: document.getElementById("jarvisMessages"),
+            input: document.getElementById("jarvisInput"),
+            sendBtn: document.getElementById("jarvisSendBtn"),
+            micBtn: document.getElementById("jarvisMicBtn"),
+            speakerBtn: document.getElementById("jarvisSpeakerBtn"),
+            wakeBtn: document.getElementById("jarvisWakeBtn"),
+            status: document.getElementById("jarvisStatus"),
+        };
+    }
+
+    function setStatus(text, listening) {
+        if (!text) {
+            elements.status.classList.remove("jarvis-status-show", "jarvis-status-listening");
+            elements.status.textContent = "";
+            return;
+        }
+        elements.status.textContent = text;
+        elements.status.classList.add("jarvis-status-show");
+        elements.status.classList.toggle("jarvis-status-listening", !!listening);
+    }
+
+    function openPanel() {
+        isOpen = true;
+        elements.panel.classList.add("jarvis-open");
+        elements.fab.classList.add("jarvis-open");
+        elements.input.focus();
+    }
+
+    function closePanel() {
+        isOpen = false;
+        elements.panel.classList.remove("jarvis-open");
+        elements.fab.classList.remove("jarvis-open");
+        stopConversationMode();
+    }
+
+    function togglePanel() {
+        isOpen ? closePanel() : openPanel();
+    }
+
+    function appendMessage(text, sender) {
+        const bubble = document.createElement("div");
+        bubble.className = "jarvis-msg " + (sender === "user" ? "jarvis-msg-user" : "jarvis-msg-bot");
+        bubble.textContent = text;
+        elements.messages.appendChild(bubble);
+        scrollToBottom();
+    }
+
+    function showTyping() {
+        const typing = document.createElement("div");
+        typing.className = "jarvis-typing";
+        typing.id = "jarvisTypingIndicator";
+        typing.innerHTML = `
+            <span>${CONFIG.thinkingLabel}</span>
+            <span class="jarvis-typing-dots"><span></span><span></span><span></span></span>
+        `;
+        elements.messages.appendChild(typing);
+        scrollToBottom();
+    }
+
+    function hideTyping() {
+        const typing = document.getElementById("jarvisTypingIndicator");
+        if (typing) typing.remove();
+    }
+
+    function scrollToBottom() {
+        elements.messages.scrollTop = elements.messages.scrollHeight;
+    }
+
+    // ---------------------------------------------------------------------
+    // Helper kecil untuk sapaan & obrolan ringan (100% lokal, tanpa API)
+    // ---------------------------------------------------------------------
+    function jamSekarangText() {
+        return new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + " WIB";
+    }
+    function tanggalSekarangText() {
+        return new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    // ---------------------------------------------------------------------
+    // JARVIS "melek data" — jawab pertanyaan dari angka dashboard yang
+    // sudah dihitung (window.JarvisData), tanpa perlu AI/API sama sekali.
+    // Diperluas: sinonim lebih banyak, small-talk, dan sapaan.
+    // Kalau pertanyaan tidak dikenali, fallback ke jawaban umum lokal.
+    // ---------------------------------------------------------------------
+    function answerFromDashboardData(message) {
+        const q = message.toLowerCase().trim();
+        const D = window.JarvisData || {};
+
+        // ── Sapaan & wake phrase ──
+        if (CONFIG.wakeRegex.test(q) && q.replace(CONFIG.wakeRegex, "").trim().length < 3) {
+            return "Ya, saya dengarkan. Ada yang bisa saya bantu soal data LTT Kabupaten Inhil?";
+        }
+        if (/^(halo|hai|hei|hey|pagi|siang|sore|malam)[\s,!.]*$/.test(q) || /^(halo|hai)\s*(jarvis)?[\s,!.]*$/.test(q)) {
+            return "Halo! Saya JARVIS. Anda bisa tanya soal LTT hari ini, capaian, panen, atau olah lahan Kabupaten Inhil.";
+        }
+        if (/siapa (kamu|nama kamu|namamu)|kamu siapa/.test(q)) {
+            return "Saya JARVIS, asisten digital Dashboard LTT Dinas Pertanian Kabupaten Indragiri Hilir. Saya bisa membaca data harian, capaian target, laporan bulanan, dan analisis panen langsung dari dashboard ini.";
+        }
+        if (/(apa|apa aja|apa saja) yang (bisa|dapat) kamu (bantu|lakukan)|kamu bisa apa/.test(q)) {
+            return "Saya bisa jawab pertanyaan seputar: total LTT keseluruhan & hari ini, LTT oplah/reguler/jagung, kecamatan tertinggi, target vs realisasi (capaian), tren mingguan, olah lahan, dan rasio panen — semua langsung dari data dashboard yang sedang tampil.";
+        }
+        if (/terima kasih|makasih|thanks/.test(q)) {
+            return "Sama-sama! Ada lagi yang ingin ditanyakan soal data LTT?";
+        }
+        if (/jam berapa/.test(q)) {
+            return `Sekarang pukul ${jamSekarangText()}.`;
+        }
+        if (/tanggal berapa|hari apa (ini|sekarang)/.test(q)) {
+            return `Hari ini ${tanggalSekarangText()}.`;
+        }
+        if (/kapan.*(update|perbarui|diperbarui)|data.*terakhir/.test(q)) {
+            return D.lastUpdate ? `Data terakhir diperbarui pada ${D.lastUpdate}.` : "Data belum selesai dimuat.";
+        }
+
+        if (!D.harian && !D.capaian && !D.bulanan && !D.analisis) {
+            return "Data dashboard belum selesai dimuat, coba tanya lagi sebentar ya.";
+        }
+
+        // ── LTT Harian ──
+        if (D.harian && /(ltt|tanam).*(hari ini)|hari ini.*(ltt|tanam)/.test(q)) {
+            return `LTT hari ini tercatat ${fmt(D.harian.totalToday)} Ha.`;
+        }
+        if (D.harian && /oplah/.test(q)) {
+            return `Total LTT Oplah saat ini ${fmt(D.harian.totalOplah)} Ha.`;
+        }
+        if (D.harian && /reguler/.test(q)) {
+            return `Total LTT Reguler saat ini ${fmt(D.harian.totalReguler)} Ha.`;
+        }
+        if (D.harian && /jagung/.test(q)) {
+            const top = D.harian.topJagung[0];
+            return top
+                ? `Kecamatan tertinggi untuk LTT Jagung adalah ${top.nama} dengan ${fmt(top.nilai)} Ha.`
+                : "Belum ada data LTT Jagung.";
+        }
+        if (D.harian && /kecamatan (tertinggi|teratas|terbesar|terluas|paling banyak|no ?1|nomor satu)/.test(q)) {
+            const top = D.harian.topKecamatan[0];
+            return top ? `Kecamatan dengan LTT tertinggi adalah ${top.nama} dengan ${fmt(top.nilai)} Ha.` : "Belum ada data kecamatan.";
+        }
+        if (D.harian && /(top ?5|5 (kecamatan|besar)|peringkat kecamatan)/.test(q) && !/jagung/.test(q)) {
+            const list = D.harian.topKecamatan.map((k, i) => `${i + 1}. ${k.nama} (${fmt(k.nilai)} Ha)`).join(", ");
+            return `Top 5 kecamatan LTT keseluruhan: ${list}.`;
+        }
+        if (D.harian && /(total|jumlah).*(ltt|tanam).*(keseluruhan)?|ltt keseluruhan/.test(q) && !q.includes("hari ini")) {
+            return `Total LTT keseluruhan saat ini ${fmt(D.harian.totalKeseluruhan)} Ha, terdiri dari Oplah ${fmt(D.harian.totalOplah)} Ha dan Reguler ${fmt(D.harian.totalReguler)} Ha.`;
+        }
+
+        // ── Capaian / target vs realisasi ──
+        if (D.capaian && /(capaian|target|realisasi)/.test(q)) {
+            return `Capaian bulan ini: target ${fmt(D.capaian.target)} Ha, realisasi ${fmt(D.capaian.realisasi)} Ha (${D.capaian.persen.toFixed(1)}%) dari ${D.capaian.jumlahKecamatan} kecamatan.`;
+        }
+
+        // ── Bulanan ──
+        if (D.bulanan && /panen/.test(q) && /bulan ini/.test(q)) {
+            return `Total panen bulan ${D.bulanan.bulanLabel} sebesar ${fmt(D.bulanan.totalPanen)} Ha.`;
+        }
+        if (D.bulanan && /olah lahan/.test(q)) {
+            return `Total olah lahan bulan ${D.bulanan.bulanLabel} sebesar ${fmt(D.bulanan.totalOlah)} Ha.`;
+        }
+        if (D.bulanan && /kecamatan aktif/.test(q)) {
+            return `Ada ${D.bulanan.kecamatanAktif} kecamatan aktif melapor bulan ${D.bulanan.bulanLabel}.`;
+        }
+        if (D.bulanan && /(minggu|mingguan|tren)/.test(q)) {
+            const m = D.bulanan.mingguan;
+            return `Tren LTT mingguan bulan ${D.bulanan.bulanLabel}: Minggu 1: ${fmt(m[1])} Ha, Minggu 2: ${fmt(m[2])} Ha, Minggu 3: ${fmt(m[3])} Ha, Minggu 4: ${fmt(m[4])} Ha.`;
+        }
+        if (D.bulanan && /(total|jumlah).*ltt.*bulan ini|ltt bulan ini/.test(q)) {
+            return `Total LTT bulan ${D.bulanan.bulanLabel} sebesar ${fmt(D.bulanan.totalLTT)} Ha.`;
+        }
+
+        // ── Analisis tanam-panen ──
+        if (D.analisis && /(rasio|persentase).*panen|panen.*(rasio|persentase)/.test(q)) {
+            return `Rasio panen terhadap total tanam saat ini ${D.analisis.rasio.toFixed(1)}%, dengan selisih ${fmt(D.analisis.selisih)} Ha yang belum dipanen.`;
+        }
+        if (D.analisis && /(total|jumlah) (tanam|panen)/.test(q)) {
+            return `Total tanam ${fmt(D.analisis.totalTanam)} Ha dan total panen ${fmt(D.analisis.totalPanen)} Ha, selisih ${fmt(D.analisis.selisih)} Ha belum dipanen.`;
+        }
+        if (D.analisis && /selisih|belum panen/.test(q)) {
+            return `Luas yang belum dipanen (selisih tanam-panen) sebesar ${fmt(D.analisis.selisih)} Ha.`;
+        }
+
+        // Tidak dikenali → fallback lokal umum
+        return null;
+    }
+
+    // ---------------------------------------------------------------------
+    // FALLBACK UMUM — via proxy Google Apps Script -> Gemini API (gratis).
+    // Dipanggil HANYA kalau pertanyaan tidak terjawab oleh data dashboard
+    // di atas (jadi kuota gratis Gemini tidak boros untuk pertanyaan data
+    // yang sebenarnya sudah bisa dijawab lokal & instan).
+    //
+    // GANTI URL DI BAWAH dengan URL /exec hasil deploy Web App dari
+    // gemini-proxy.gs milikmu. Kosongkan ("") kalau belum di-deploy —
+    // JARVIS otomatis kembali ke jawaban template lokal.
+    // ---------------------------------------------------------------------
+    const API_JARVIS_PROXY = "https://script.google.com/macros/s/AKfycbyWKsBPmEINaMiABUFXIngByJL29xBQ7x0wVYu3N4T14nJLoT6UZawrTsLvAudiYnlpCg/exec"; // <-- isi dengan URL /exec proxy Gemini kamu
+    let jarvisHistory = [];
+
+    async function fallbackAnswerLocal(message) {
+        const replies = [
+            "Pertanyaan itu di luar data dashboard LTT. Coba tanya seputar LTT hari ini, capaian target, laporan bulanan, atau analisis panen ya.",
+            "Saya belum punya jawaban untuk itu — fokus saya saat ini membantu data LTT Kabupaten Inhil. Coba tanya soal kecamatan tertinggi, target vs realisasi, atau tren mingguan.",
+            "Hmm, itu di luar kemampuan saya saat ini. Saya paling jago menjawab soal angka-angka LTT di dashboard ini."
+        ];
+        return replies[Math.floor(Math.random() * replies.length)];
+    }
+
+    async function fallbackAnswerGemini(message) {
+        const D = window.JarvisData || {};
+        const context = `Konteks data dashboard saat ini — LTT hari ini: ${D.harian?.totalToday || 0} Ha, total LTT: ${D.harian?.totalKeseluruhan || 0} Ha, capaian bulan ini: ${D.capaian?.persen?.toFixed(1) || 0}%, total panen bulan ini: ${D.bulanan?.totalPanen || 0} Ha.`;
+
+        try {
+            const res = await fetch(API_JARVIS_PROXY, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" }, // GAS lebih stabil terima text/plain
+                body: JSON.stringify({
+                    message: `${context}\n\nPertanyaan pengguna: ${message}`,
+                    history: jarvisHistory
+                })
+            });
+            const data = await res.json();
+            jarvisHistory.push({ role: "user", content: message }, { role: "assistant", content: data.reply });
+            if (jarvisHistory.length > 12) jarvisHistory = jarvisHistory.slice(-12); // batasi supaya hemat token
+            return data.reply || "Maaf, saya tidak bisa menjawab itu sekarang.";
+        } catch (err) {
+            console.error("Gagal menghubungi proxy JARVIS:", err);
+            return "Maaf, saya sedang tidak bisa terhubung ke server AI. Coba lagi sebentar ya.";
+        }
+    }
+
+    async function sendToJarvis(message) {
+        const localAnswer = answerFromDashboardData(message);
+        if (localAnswer !== null) return localAnswer;
+        if (API_JARVIS_PROXY) return fallbackAnswerGemini(message);
+        return fallbackAnswerLocal(message);
+    }
+
+    async function handleSend(fromVoice) {
+        const text = elements.input.value.trim();
+        if (!text || isThinking) return;
+
+        appendMessage(text, "user");
+        elements.input.value = "";
+        autoResizeInput();
+
+        isThinking = true;
+        elements.sendBtn.disabled = true;
+        if (!fromVoice) setStatus("");
+        showTyping();
+
+        try {
+            const reply = await sendToJarvis(text);
+            hideTyping();
+            appendMessage(reply, "bot");
+            speakText(reply);
+        } catch (err) {
+            hideTyping();
+            const errMsg = "Maaf, terjadi kendala saat memproses permintaan Anda. Silakan coba lagi.";
+            appendMessage(errMsg, "bot");
+            speakText(errMsg);
+        } finally {
+            isThinking = false;
+            elements.sendBtn.disabled = false;
+        }
+    }
+
+    function autoResizeInput() {
+        elements.input.style.height = "auto";
+        elements.input.style.height = Math.min(elements.input.scrollHeight, 90) + "px";
+    }
+
+    // ---------------------------------------------------------------------
+    // JARVIS bicara (Text-to-Speech) — Web Speech API bawaan browser,
+    // gratis, tanpa backend. Bisa dimatikan lewat tombol speaker di header.
+    // Setelah JARVIS selesai bicara, kalau mode percakapan aktif, mic
+    // otomatis mendengar lagi — jadi user tidak perlu klik ulang.
+    // ---------------------------------------------------------------------
+    let voiceEnabled = true;
+
+    function speakText(text) {
+        if (!voiceEnabled || !("speechSynthesis" in window)) {
+            if (conversationMode) resumeConversationListening();
+            return;
+        }
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = "id-ID";
+        utter.rate = 1;
+        utter.pitch = 1;
+        utter.onend = () => { if (conversationMode) resumeConversationListening(); };
+        utter.onerror = () => { if (conversationMode) resumeConversationListening(); };
+        window.speechSynthesis.speak(utter);
+    }
+
+    function toggleVoice() {
+        voiceEnabled = !voiceEnabled;
+        elements.speakerBtn.innerHTML = voiceEnabled ? ICONS.speakerOn : ICONS.speakerOff;
+        if (!voiceEnabled) window.speechSynthesis.cancel();
+    }
+
+    // ---------------------------------------------------------------------
+    // Input suara — dua recognizer terpisah:
+    // 1) convRecognition  : mode percakapan aktif (klik tombol mic)
+    //    -> dengar sekali -> auto kirim -> JARVIS jawab & bicara -> dengar lagi
+    //    sampai user klik mic lagi / bilang "stop" / "selesai".
+    // 2) wakeRecognition  : mode "selalu dengar" kata panggil "Halo JARVIS"
+    //    (klik ikon telinga di header) -> berjalan terus-menerus, bahkan
+    //    saat panel tertutup; begitu dengar "Halo JARVIS", panel dibuka
+    //    otomatis dan langsung masuk ke mode percakapan.
+    // ---------------------------------------------------------------------
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let convRecognition = null;
+    let wakeRecognition = null;
+    let isConvListening = false;
+    let isWakeListening = false;
+
+    function setupSpeechRecognition() {
+        if (!SpeechRecognition) {
+            elements.micBtn.style.display = "none";
+            elements.wakeBtn.style.display = "none";
+            return;
+        }
+
+        // Recognizer percakapan (single-utterance, auto restart oleh alur mode)
+        convRecognition = new SpeechRecognition();
+        convRecognition.lang = "id-ID";
+        convRecognition.continuous = false;
+        convRecognition.interimResults = false;
+
+        convRecognition.onstart = function () {
+            isConvListening = true;
+            elements.micBtn.classList.add("jarvis-listening");
+            setStatus("🎙️ Mendengarkan...", true);
+        };
+
+        convRecognition.onresult = function (event) {
+            const transcript = event.results[0][0].transcript.trim();
+            if (!transcript) return;
+
+            if (CONFIG.stopRegex.test(transcript.toLowerCase())) {
+                stopConversationMode();
+                const bye = "Baik, mode percakapan saya matikan. Panggil lagi kapan saja ya.";
+                appendMessage(bye, "bot");
+                speakText(bye);
+                return;
+            }
+
+            elements.input.value = transcript;
+            autoResizeInput();
+            handleSend(true);
+        };
+
+        convRecognition.onerror = function (event) {
+            if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+                appendMessage("Akses mikrofon ditolak. Izinkan akses mikrofon di pengaturan browser untuk memakai mode percakapan.", "bot");
+                stopConversationMode();
+            } else if (event.error === "no-speech" && conversationMode) {
+                // tidak ada suara terdengar — coba dengar lagi kalau mode masih aktif
+                resumeConversationListening(true);
+            }
+        };
+
+        convRecognition.onend = function () {
+            isConvListening = false;
+            elements.micBtn.classList.remove("jarvis-listening");
+            if (!conversationMode) setStatus("");
+        };
+
+        // Recognizer kata panggil "Halo JARVIS" — jalan terus di belakang layar
+        wakeRecognition = new SpeechRecognition();
+        wakeRecognition.lang = "id-ID";
+        wakeRecognition.continuous = true;
+        wakeRecognition.interimResults = true;
+
+        wakeRecognition.onstart = function () {
+            isWakeListening = true;
+            elements.wakeBtn.style.color = "#ffd9a8";
+            elements.fab.classList.add("jarvis-wake");
+        };
+
+        wakeRecognition.onresult = function (event) {
+            const last = event.results[event.results.length - 1];
+            const transcript = last[0].transcript.toLowerCase();
+            if (CONFIG.wakeRegex.test(transcript)) {
+                try { wakeRecognition.stop(); } catch (e) {}
+                openPanel();
+                const greet = "Ya, saya dengarkan. Ada yang bisa saya bantu?";
+                appendMessage(greet, "bot");
+                if (voiceEnabled && "speechSynthesis" in window) {
+                    window.speechSynthesis.cancel();
+                    const utter = new SpeechSynthesisUtterance(greet);
+                    utter.lang = "id-ID";
+                    utter.onend = () => startConversationMode();
+                    window.speechSynthesis.speak(utter);
+                } else {
+                    startConversationMode();
+                }
+            }
+        };
+
+        wakeRecognition.onerror = function (event) {
+            // abaikan no-speech, restart otomatis di onend
+        };
+
+        wakeRecognition.onend = function () {
+            isWakeListening = false;
+            elements.fab.classList.remove("jarvis-wake");
+            // auto-restart selama mode "selalu dengar" masih aktif & percakapan tidak sedang berjalan
+            if (wakeWordMode && !conversationMode) {
+                setTimeout(() => { try { wakeRecognition.start(); } catch (e) {} }, 400);
+            }
+        };
+    }
+
+    function resumeConversationListening(delayed) {
+        if (!conversationMode || !convRecognition) return;
+        const start = () => { try { convRecognition.start(); } catch (e) {} };
+        delayed ? setTimeout(start, 500) : start();
+    }
+
+    function startConversationMode() {
+        if (!convRecognition) return;
+        conversationMode = true;
+        elements.micBtn.title = "Tekan untuk menghentikan mode percakapan";
+        setStatus("🎙️ Mode percakapan aktif — bicara langsung, saya dengarkan.", true);
+        resumeConversationListening();
+    }
+
+    function stopConversationMode() {
+        conversationMode = false;
+        elements.micBtn.title = "Tekan untuk mulai ngobrol dengan suara";
+        setStatus("");
+        if (convRecognition && isConvListening) {
+            try { convRecognition.stop(); } catch (e) {}
+        }
+        if (wakeWordMode) {
+            setTimeout(() => { try { wakeRecognition.start(); } catch (e) {} }, 400);
+        }
+    }
+
+    function toggleConversationMode() {
+        if (!conversationMode) startConversationMode();
+        else stopConversationMode();
+    }
+
+    function toggleWakeWordMode() {
+        wakeWordMode = !wakeWordMode;
+        elements.wakeBtn.style.background = wakeWordMode ? "rgba(255,255,255,.16)" : "transparent";
+        if (wakeWordMode) {
+            appendMessage('Mode "Selalu dengar" aktif — panggil saya kapan saja dengan bilang "Halo JARVIS".', "bot");
+            try { wakeRecognition.start(); } catch (e) {}
+        } else {
+            appendMessage('Mode "Selalu dengar" dimatikan.', "bot");
+            if (wakeRecognition && isWakeListening) { try { wakeRecognition.stop(); } catch (e) {} }
+        }
+    }
+
+    function bindEvents() {
+        elements.fab.addEventListener("click", togglePanel);
+        elements.closeBtn.addEventListener("click", closePanel);
+        elements.sendBtn.addEventListener("click", () => handleSend(false));
+        elements.micBtn.addEventListener("click", toggleConversationMode);
+        elements.speakerBtn.addEventListener("click", toggleVoice);
+        elements.wakeBtn.addEventListener("click", toggleWakeWordMode);
+
+        elements.input.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSend(false);
+            }
+        });
+
+        elements.input.addEventListener("input", autoResizeInput);
+
+        document.addEventListener("click", function (e) {
+            if (!isOpen) return;
+            const clickedInsideJarvis = e.target.closest("#jarvisRoot");
+            if (!clickedInsideJarvis) closePanel();
+        });
+
+        elements.panel.addEventListener("click", function (e) {
+            e.stopPropagation();
+        });
+    }
+
+    function init() {
+        buildMarkup();
+        bindEvents();
+        setupSpeechRecognition();
+        appendMessage(CONFIG.greeting, "bot");
+    }
+
+    return { init, open: openPanel, close: closePanel, toggle: togglePanel };
+})();
+
+document.addEventListener("DOMContentLoaded", function () {
+    JarvisApp.init();
+});
+</script>
+
 </body>
 </html>
