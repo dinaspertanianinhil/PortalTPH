@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+y<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -1108,13 +1108,13 @@ function simpan(){
   });
 }
 
-// ================= BATAS JAM 19:00
+// ================= BATAS JAM 23:00
 (function(){
   const now = new Date();
   const btnSimpan = document.getElementById("btnSimpan");
-  if(now.getHours() >= 19){
+  if(now.getHours() >= 23){
     btnSimpan.disabled = true;
-    btnSimpan.innerHTML = `<i class="fa-solid fa-clock"></i> Lewat Jam 19:00`;
+    btnSimpan.innerHTML = `<i class="fa-solid fa-clock"></i> Lewat Jam 23:00`;
   }
 })();
 </script>
