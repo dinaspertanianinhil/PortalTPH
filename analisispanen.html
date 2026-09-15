@@ -553,7 +553,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.06); }
 .detail-table-wrap::-webkit-scrollbar { height: 4px; }
 .detail-table-wrap::-webkit-scrollbar-track { background: transparent; }
 .detail-table-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
-#detailTable { min-width: 600px; }
+#detailTable { min-width: 680px; }
 #detailTable th { cursor: pointer; user-select: none; }
 #detailTable th:hover { color: var(--text-dim); }
 .sort-arrow { color: var(--text-muted); margin-left: 4px; }
@@ -718,6 +718,10 @@ footer strong { color: var(--text-dim); font-weight: 600; }
       <select id="fKec" onchange="applyFilters()"><option value="">Semua Kecamatan</option></select>
     </div>
     <div class="filter-group">
+      <span class="filter-lbl">🌾 Jenis LTT</span>
+      <select id="fJenis" onchange="applyFilters()"><option value="">Semua Jenis</option></select>
+    </div>
+    <div class="filter-group">
       <span class="filter-lbl">📅 Tahun</span>
       <select id="fTahun" onchange="applyFilters()"><option value="">Semua Tahun</option></select>
     </div>
@@ -752,7 +756,7 @@ footer strong { color: var(--text-dim); font-weight: 600; }
   </div>
 </div>
 
-<!-- MAIN GRID (Bar Chart + Status Table) -->
+<!-- MAIN GRID (Bar Chart + Status Table per Kecamatan) -->
 <div class="main-grid">
   <div class="card">
     <div class="card-hdr">
@@ -788,6 +792,42 @@ footer strong { color: var(--text-dim); font-weight: 600; }
   </div>
 </div>
 
+<!-- MAIN GRID (Bar Chart + Status Table per Jenis LTT) -->
+<div class="main-grid">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title"><span class="card-dot" style="background:var(--gold);box-shadow:0 0 8px var(--gold)"></span>LTT vs Panen per Jenis LTT</div>
+      <div class="chart-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:#2ecc71"></div> LTT</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#3498db"></div> Panen</div>
+      </div>
+    </div>
+    <div id="jenisBarEmpty" class="empty-state" style="display:none">
+      <div class="empty-icon">📭</div>
+      <div class="empty-title">Data Tidak Ditemukan</div>
+      <div class="empty-sub">Silakan ubah filter yang dipilih.</div>
+    </div>
+    <canvas id="jenisBarChart"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title"><span class="card-dot" style="background:var(--gold);box-shadow:0 0 8px var(--gold)"></span>Status Jenis LTT</div>
+    </div>
+    <div class="kec-search-wrap">
+      <input type="text" class="search-input" id="jenisSearch" placeholder="🔍 Cari jenis LTT / komoditas..." oninput="renderJenisTable()">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Jenis LTT</th><th>LTT</th><th>Panen</th><th>Status</th>
+        </tr></thead>
+        <tbody id="jenisTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- LINE CHART SECTION -->
 <div class="chart-section card">
   <div class="card-hdr">
@@ -811,7 +851,7 @@ footer strong { color: var(--text-dim); font-weight: 600; }
     <div class="card-title"><span class="card-dot" style="background:var(--gold);box-shadow:0 0 8px var(--gold)"></span>Data Detail LTT &amp; Panen</div>
   </div>
   <div class="detail-toolbar">
-    <input type="text" class="search-input detail-search" id="detailSearch" placeholder="🔍 Cari data..." oninput="renderDetail(1)">
+    <input type="text" class="search-input detail-search" id="detailSearch" placeholder="🔍 Cari data (kecamatan / jenis / tanggal)..." oninput="renderDetail(1)">
     <button class="dl-btn green" onclick="downloadCSV()">📊 <span>Download CSV</span></button>
     <button class="dl-btn blue" onclick="downloadExcel()">📥 <span>Download Excel</span></button>
     <button class="dl-btn gold" onclick="downloadPDF()">📄 <span>Download PDF</span></button>
@@ -821,6 +861,7 @@ footer strong { color: var(--text-dim); font-weight: 600; }
       <thead><tr>
         <th onclick="sortDetail('TANGGAL')">Tanggal <span class="sort-arrow" id="sa-TANGGAL">↕</span></th>
         <th onclick="sortDetail('KECAMATAN')">Kecamatan <span class="sort-arrow" id="sa-KECAMATAN">↕</span></th>
+        <th onclick="sortDetail('JENIS')">Jenis LTT <span class="sort-arrow" id="sa-JENIS">↕</span></th>
         <th onclick="sortDetail('LTT')">LTT <span class="sort-arrow" id="sa-LTT">↕</span></th>
         <th onclick="sortDetail('PANEN')">Panen <span class="sort-arrow" id="sa-PANEN">↕</span></th>
         <th onclick="sortDetail('RASIO')">Rasio % <span class="sort-arrow" id="sa-RASIO">↕</span></th>
@@ -848,7 +889,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz9BbxHtegnOrlIdwMBjsRR
 
 let raw = [];
 let filtered = [];
-let barChartInst, lineChartInst;
+let barChartInst, lineChartInst, jenisBarChartInst;
 
 /* ── detail table state ── */
 let detailPage = 1;
@@ -882,11 +923,17 @@ function updateClock(){
 setInterval(updateClock,1000);
 updateClock();
 
-/* ── LOAD DATA ── */
+/* ── LOAD DATA ──
+   Catatan: exec Apps Script (Tampilltt) mengembalikan objek berisi field
+   ringkasan (total_kabupaten, jenis_total, dst) DAN array "rows" berisi
+   data mentah per baris (termasuk kolom "JENIS LTT"). Dashboard ini
+   memakai "rows" tsb supaya bisa difilter bebas per Jenis LTT.
+   Fallback: kalau suatu saat responsnya berupa array biasa, tetap dipakai apa adanya. */
 async function load(){
   try {
     const res = await fetch(API_URL);
-    raw = await res.json();
+    const json = await res.json();
+    raw = Array.isArray(json) ? json : (json.rows || []);
   } catch(e){
     console.error('Gagal memuat data:', e);
     raw = [];
@@ -903,6 +950,10 @@ function initSelects(){
   const sel = document.getElementById('fKec');
   kecs.forEach(k => { let o=document.createElement('option'); o.value=o.textContent=k; sel.appendChild(o); });
 
+  const jenisList = [...new Set(raw.map(d=>d['JENIS LTT']).filter(Boolean))].sort();
+  const selJ = document.getElementById('fJenis');
+  jenisList.forEach(j => { let o=document.createElement('option'); o.value=j; o.textContent=j; selJ.appendChild(o); });
+
   const years = [...new Set(raw.map(d=>{
     let dt = parseDate(d.TANGGAL||d.DATE||d.TGL||d.tanggal||d.date);
     return dt ? dt.getFullYear() : null;
@@ -914,6 +965,7 @@ function initSelects(){
 /* ── FILTER ── */
 function applyFilters(){
   const kec   = document.getElementById('fKec').value;
+  const jenis = document.getElementById('fJenis').value;
   const tahun = document.getElementById('fTahun').value;
   const bulan = document.getElementById('fBulan').value;
   const dari  = document.getElementById('fDari').value;
@@ -921,6 +973,7 @@ function applyFilters(){
 
   filtered = raw.filter(d => {
     if(kec && d.KECAMATAN !== kec) return false;
+    if(jenis && d['JENIS LTT'] !== jenis) return false;
     const dateField = d.TANGGAL||d.DATE||d.TGL||d.tanggal||d.date;
     const dt = parseDate(dateField);
     if(tahun && dt && dt.getFullYear() != +tahun) return false;
@@ -946,6 +999,7 @@ function quickFilter(type){
 
   // reset filters first
   document.getElementById('fKec').value='';
+  document.getElementById('fJenis').value='';
   document.getElementById('fTahun').value='';
   document.getElementById('fBulan').value='';
   document.getElementById('fDari').value='';
@@ -975,8 +1029,10 @@ function quickFilter(type){
 function renderAll(){
   renderKPI();
   renderBarChart();
+  renderJenisChart();
   renderLineChart();
   renderKecTable();
+  renderJenisTable();
   renderDetail(1);
 }
 
@@ -1005,7 +1061,7 @@ function animate(id, start, end, dur){
   requestAnimationFrame(step);
 }
 
-/* ── BAR CHART ── */
+/* ── BAR CHART: per Kecamatan ── */
 function renderBarChart(){
   const map = {};
   filtered.forEach(d=>{
@@ -1064,15 +1120,69 @@ function renderBarChart(){
   });
 }
 
+/* ── BAR CHART: per Jenis LTT ── */
+function renderJenisChart(){
+  const map = {};
+  filtered.forEach(d=>{
+    const k = d['JENIS LTT'] || 'Lainnya';
+    if(!map[k]) map[k]={ltt:0,panen:0};
+    map[k].ltt   += num(d['LUAS TAMBAH TANAM']);
+    map[k].panen += num(d['LUAS PANEN']);
+  });
+  const labels = Object.keys(map);
+  const lttData = labels.map(k=>map[k].ltt);
+  const panData = labels.map(k=>map[k].panen);
+
+  document.getElementById('jenisBarEmpty').style.display = labels.length ? 'none' : 'flex';
+  document.getElementById('jenisBarChart').style.display = labels.length ? 'block' : 'none';
+
+  if(jenisBarChartInst) jenisBarChartInst.destroy();
+  if(!labels.length) return;
+
+  jenisBarChartInst = new Chart(document.getElementById('jenisBarChart'),{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        { label:'LTT', data:lttData, backgroundColor:'rgba(46,204,113,0.72)', borderRadius:6, borderSkipped:false, barPercentage:0.6, categoryPercentage:0.7 },
+        { label:'Panen', data:panData, backgroundColor:'rgba(52,152,219,0.72)', borderRadius:6, borderSkipped:false, barPercentage:0.6, categoryPercentage:0.7 }
+      ]
+    },
+    options:{
+      responsive:true,
+      animation:{ duration:600, easing:'easeOutQuart' },
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          backgroundColor:'rgba(11,46,26,0.92)',
+          borderColor:'rgba(240,192,64,0.3)',
+          borderWidth:1,
+          padding:12,
+          titleFont:{size:12,weight:'700'},
+          bodyFont:{size:11},
+          titleColor:'#f0f7f2',
+          bodyColor:'rgba(240,247,242,0.6)',
+          cornerRadius:8,
+          callbacks:{
+            label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)} ha`
+          }
+        }
+      },
+      scales:{
+        x:{ grid:{ color:'rgba(255,255,255,0.04)', drawBorder:false }, ticks:{ font:{size:10,weight:'600'}, maxRotation:30 }},
+        y:{ grid:{ color:'rgba(255,255,255,0.05)', drawBorder:false }, ticks:{ font:{size:10}, callback: v=>fmt(v) }}
+      }
+    }
+  });
+}
+
 /* ── LINE CHART ── */
 function renderLineChart(){
   const byDate = {};
-  let hasDate = false;
   filtered.forEach(d=>{
     const dateField = d.TANGGAL||d.DATE||d.TGL||d.tanggal||d.date;
     const dt = parseDate(dateField);
     if(!dt) return;
-    hasDate = true;
     const key = dt.toISOString().slice(0,10);
     if(!byDate[key]) byDate[key]={ltt:0,panen:0};
     byDate[key].ltt   += num(d['LUAS TAMBAH TANAM']);
@@ -1161,6 +1271,43 @@ function renderKecTable(){
   });
 }
 
+/* ── JENIS LTT TABLE ── */
+let jenisMap = {};
+function renderJenisTable(){
+  jenisMap = {};
+  filtered.forEach(d=>{
+    const k = d['JENIS LTT'] || 'Lainnya';
+    if(!jenisMap[k]) jenisMap[k]={ltt:0,panen:0};
+    jenisMap[k].ltt   += num(d['LUAS TAMBAH TANAM']);
+    jenisMap[k].panen += num(d['LUAS PANEN']);
+  });
+
+  const q = (document.getElementById('jenisSearch').value||'').toLowerCase();
+  const tbody = document.getElementById('jenisTbody');
+  tbody.innerHTML = '';
+
+  let rows = Object.keys(jenisMap).filter(k=>k.toLowerCase().includes(q));
+  if(!rows.length){
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">Tidak ada data</div></div></td></tr>`;
+    return;
+  }
+
+  rows.forEach(k=>{
+    const l = jenisMap[k].ltt, p = jenisMap[k].panen;
+    const r = l ? (p/l*100) : 0;
+    let cls = 'b-green', label = 'Surplus';
+    if(p < l){ cls='b-red'; label='Defisit'; }
+    else if(r < 80){ cls='b-yellow'; label='Baik'; }
+
+    tbody.innerHTML += `<tr>
+      <td><div class="kec-nm" title="${k}">${k}</div></td>
+      <td><span class="mono">${fmt(l)}</span></td>
+      <td><span class="mono">${fmt(p)}</span></td>
+      <td><span class="badge ${cls}">${label} ${r.toFixed(0)}%</span></td>
+    </tr>`;
+  });
+}
+
 /* ── DETAIL TABLE ── */
 function getDetailRows(){
   const q = (document.getElementById('detailSearch').value||'').toLowerCase();
@@ -1170,15 +1317,17 @@ function getDetailRows(){
     const rasio = ltt ? (panen/ltt*100) : 0;
     const dateField = d.TANGGAL||d.DATE||d.TGL||d.tanggal||d.date||'';
     return {
-      TANGGAL:  dateField,
+      TANGGAL:   dateField,
       KECAMATAN: d.KECAMATAN||'',
+      JENIS:     d['JENIS LTT']||'Lainnya',
       LTT:       ltt,
       PANEN:     panen,
       RASIO:     rasio,
     };
   }).filter(r=>
     r.KECAMATAN.toLowerCase().includes(q) ||
-    r.TANGGAL.toLowerCase().includes(q)
+    r.TANGGAL.toLowerCase().includes(q) ||
+    r.JENIS.toLowerCase().includes(q)
   );
   if(detailSort.key){
     rows.sort((a,b)=>{
@@ -1202,7 +1351,7 @@ function renderDetail(page){
   const tbody = document.getElementById('detailTbody');
   tbody.innerHTML = '';
   if(!slice.length){
-    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">Data Tidak Ditemukan</div><div class="empty-sub">Silakan ubah filter atau kata kunci pencarian.</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">Data Tidak Ditemukan</div><div class="empty-sub">Silakan ubah filter atau kata kunci pencarian.</div></div></td></tr>`;
   } else {
     slice.forEach(r=>{
       let cls='b-green', lbl='Surplus';
@@ -1211,6 +1360,7 @@ function renderDetail(page){
       tbody.innerHTML += `<tr>
         <td><span class="mono">${r.TANGGAL||'—'}</span></td>
         <td>${r.KECAMATAN}</td>
+        <td>${r.JENIS}</td>
         <td><span class="mono">${fmt(r.LTT)}</span></td>
         <td><span class="mono">${fmt(r.PANEN)}</span></td>
         <td><span class="mono">${r.RASIO.toFixed(1)}%</span></td>
@@ -1265,11 +1415,11 @@ function getFilteredCSVData(){
 
 function downloadCSV(){
   const rows = getFilteredCSVData();
-  const header = ['Tanggal','Kecamatan','LTT (ha)','Panen (ha)','Rasio (%)','Status'];
+  const header = ['Tanggal','Kecamatan','Jenis LTT','LTT (ha)','Panen (ha)','Rasio (%)','Status'];
   const lines = [header.join(',')];
   rows.forEach(r=>{
     let lbl = r.PANEN<r.LTT ? 'Defisit' : r.RASIO<80 ? 'Baik' : 'Surplus';
-    lines.push([r.TANGGAL, r.KECAMATAN, r.LTT.toFixed(2), r.PANEN.toFixed(2), r.RASIO.toFixed(2), lbl].join(','));
+    lines.push([r.TANGGAL, r.KECAMATAN, r.JENIS, r.LTT.toFixed(2), r.PANEN.toFixed(2), r.RASIO.toFixed(2), lbl].join(','));
   });
   const blob = new Blob(['\uFEFF'+lines.join('\n')], {type:'text/csv;charset=utf-8;'});
   triggerDownload(blob, 'data-ltt-panen.csv');
@@ -1277,10 +1427,10 @@ function downloadCSV(){
 
 function downloadExcel(){
   const rows = getFilteredCSVData();
-  const tbl = ['<table><thead><tr><th>Tanggal</th><th>Kecamatan</th><th>LTT (ha)</th><th>Panen (ha)</th><th>Rasio (%)</th><th>Status</th></tr></thead><tbody>'];
+  const tbl = ['<table><thead><tr><th>Tanggal</th><th>Kecamatan</th><th>Jenis LTT</th><th>LTT (ha)</th><th>Panen (ha)</th><th>Rasio (%)</th><th>Status</th></tr></thead><tbody>'];
   rows.forEach(r=>{
     let lbl = r.PANEN<r.LTT ? 'Defisit' : r.RASIO<80 ? 'Baik' : 'Surplus';
-    tbl.push(`<tr><td>${r.TANGGAL}</td><td>${r.KECAMATAN}</td><td>${r.LTT.toFixed(2)}</td><td>${r.PANEN.toFixed(2)}</td><td>${r.RASIO.toFixed(2)}</td><td>${lbl}</td></tr>`);
+    tbl.push(`<tr><td>${r.TANGGAL}</td><td>${r.KECAMATAN}</td><td>${r.JENIS}</td><td>${r.LTT.toFixed(2)}</td><td>${r.PANEN.toFixed(2)}</td><td>${r.RASIO.toFixed(2)}</td><td>${lbl}</td></tr>`);
   });
   tbl.push('</tbody></table>');
   const blob = new Blob([tbl.join('')],{type:'application/vnd.ms-excel;charset=utf-8'});
@@ -1302,11 +1452,11 @@ function downloadPDF(){
   const rows = getFilteredCSVData();
   const body = rows.map(r=>{
     let lbl = r.PANEN<r.LTT ? 'Defisit' : r.RASIO<80 ? 'Baik' : 'Surplus';
-    return [r.TANGGAL||'—', r.KECAMATAN, r.LTT.toFixed(2), r.PANEN.toFixed(2), r.RASIO.toFixed(2)+'%', lbl];
+    return [r.TANGGAL||'—', r.KECAMATAN, r.JENIS, r.LTT.toFixed(2), r.PANEN.toFixed(2), r.RASIO.toFixed(2)+'%', lbl];
   });
 
   doc.autoTable({
-    head:[['Tanggal','Kecamatan','LTT (ha)','Panen (ha)','Rasio (%)','Status']],
+    head:[['Tanggal','Kecamatan','Jenis LTT','LTT (ha)','Panen (ha)','Rasio (%)','Status']],
     body,
     startY: 32,
     styles:{ fontSize:9, cellPadding:3 },
